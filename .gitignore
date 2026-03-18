@@ -45,3 +45,5 @@ external/
 
 # rulesync local overrides
 rulesync.local.jsonc
+
+.opencode/
