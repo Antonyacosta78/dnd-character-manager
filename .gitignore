@@ -42,3 +42,6 @@ next-env.d.ts
 
 # external data
 external/
+
+# rulesync local overrides
+rulesync.local.jsonc

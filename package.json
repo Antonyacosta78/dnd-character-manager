@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ai:generate": "rulesync generate --targets opencode --features rules,subagents,skills",
+    "ai:generate:all": "rulesync generate --targets opencode,codexcli,claudecode,cursor --features rules,ignore,subagents,skills",
+    "ai:check": "rulesync generate --check --targets opencode --features rules,subagents,skills"
   },
   "dependencies": {
     "next": "16.1.7",
@@ -21,6 +24,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
+    "rulesync": "^7.20.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

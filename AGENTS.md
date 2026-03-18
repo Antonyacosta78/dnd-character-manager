@@ -1,0 +1,37 @@
+Please also reference the following rules as needed. The list below is provided in TOON format, and `@` stands for the project root directory.
+
+rules[1]:
+  - path: "@.opencode\\memories\\20-frontend-work.md"
+    description: Frontend implementation guidance for Next.js App Router UI work
+    applyTo[3]: src/app/**/*,src/components/**/*,public/**/*
+
+# DnD Character Manager
+
+This repository is a Next.js App Router application for a Dungeons and Dragons character manager.
+
+## Stack
+
+- Next.js 16 with the App Router
+- React 19
+- TypeScript 5
+- Tailwind CSS 4 via `@import "tailwindcss"`
+- Bun available for package management and local scripts
+
+## Source Of Truth
+
+- Treat `.rulesync/` as the canonical location for shared AI instructions.
+- Generate tool-specific files from Rulesync instead of editing generated outputs by hand.
+- If a generated file needs to change, update the matching file in `.rulesync/` and regenerate.
+
+## Working Agreements
+
+- Preserve existing repository changes that are unrelated to the task.
+- Prefer small, auditable edits that match the current code style.
+- Run the smallest useful verification command after changes, usually `bun run lint` for code edits.
+- Keep instructions portable: describe capabilities and constraints in neutral terms, then let Rulesync map them to specific tools.
+
+## Delivery Style
+
+- Lead with what changed, then note where and why.
+- Reference files with clickable paths such as `src/app/page.tsx`.
+- Suggest only natural next steps, such as `bun run ai:generate` or `bun run lint`.
