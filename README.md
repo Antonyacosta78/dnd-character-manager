@@ -119,6 +119,13 @@ bun run ai:check
 - Tailwind CSS 4
 - Bun
 
+## Coding Standards
+
+- Canonical coding standards for humans and AI agents live in `.rulesync/rules/10-coding-standards.md`.
+- Contributor-facing workflow guidance lives in `CONTRIBUTING.md`.
+- When standards under `.rulesync/` change, run `bun run ai:generate` so generated agent/tool instructions stay in sync.
+- `AGENTS.md` is generated locally and ignored by git.
+
 ## Notes
 
 This repository reflects a specific product direction:

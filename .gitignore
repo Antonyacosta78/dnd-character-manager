@@ -47,3 +47,6 @@ external/
 rulesync.local.jsonc
 
 .opencode/
+
+# rulesync generated outputs
+AGENTS.md
