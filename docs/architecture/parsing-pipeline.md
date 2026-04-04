@@ -10,12 +10,17 @@
 ## Changelog
 
 - `2026-03-18` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
-- `2026-04-04` - `OpenCode` - Tuned status to reflect active implementation progress.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
 
 ## Purpose
 
-This document specifies the ingestion pipeline from external 5etools input to runtime-usable rules catalog data. It defines stage contracts, artifacts, idempotency behavior, and failure semantics so implementation can be automated without guessing.
+This document specifies the ingestion pipeline from external Data Source input to runtime-usable rules catalog data. It defines stage contracts, artifacts, idempotency behavior, and failure semantics so implementation can be automated without guessing.
+
+Path convention:
+
+- Source root is read from `EXTERNAL_DATA_PATH` in local `.env`.
+- Path examples in this document are relative to `EXTERNAL_DATA_PATH`.
 
 ## Pipeline Contract
 
@@ -52,7 +57,7 @@ Inputs:
 
 Actions:
 
-- ensure source files are present in `external/5etools/`
+- ensure source files are present under configured `EXTERNAL_DATA_PATH`
 - capture sync metadata (timestamp, source ref, extraction details)
 
 Outputs:
@@ -97,7 +102,7 @@ Inputs:
 Actions:
 
 - run structural checks on expected files and index references
-- optionally run `5etools-utils` schema/file checks for early hygiene enforcement
+- optionally run external schema/file checks for early hygiene enforcement
 
 Outputs:
 
@@ -115,9 +120,10 @@ Inputs:
 
 Actions:
 
-- read index-driven datasets (example: class/spell subfiles)
+- read index-driven datasets (example: class/spell subfiles) and root datasets (for example races/backgrounds/feats/optional features)
 - resolve source mechanics (`_copy`, `_mod`, and related merge semantics)
 - resolve in-dataset references where required for downstream normalization
+- evaluate `additionalSpells` filter expressions with full v1 semantics
 - process tagged text where needed for runtime readability/searching
 
 Outputs:
@@ -157,7 +163,7 @@ Inputs:
 Actions:
 
 - validate required fields and type-level constraints
-- validate cross-entity references (for example subclass -> class, spell references)
+- validate cross-entity references (for example subclass -> class, spell references, and spell grants from feat/optional feature/background/race/reward/subclass sources)
 - validate uniqueness and key stability assumptions
 
 Outputs:
@@ -168,6 +174,7 @@ Outputs:
 Policy:
 
 - validation failures block publish.
+- generated-lookup parity mismatch handling follows `DATA_INTEGRITY_MODE` policy.
 
 ### Stage 7: Publish and Activate
 
@@ -247,6 +254,7 @@ Required test categories:
 - fixture tests for `_copy`/`_mod` resolution semantics
 - normalization contract tests
 - referential integrity tests across entity types
+- spell-option expansion tests across `additionalSpells` contributors (including feats and optional features)
 - replay/idempotency tests by fingerprint
 - activation atomicity tests
 
@@ -270,3 +278,5 @@ This is guidance, not a hard requirement; equivalent structure is acceptable if 
 - `docs/architecture/rules-catalog-provider.md`
 - `docs/architecture/catalog-lineage-and-import-runs.md`
 - `docs/architecture/app-architecture.md`
+- `docs/architecture/parser-option-completeness.md`
+- `docs/specs/foundation/option-complete-data-source-parsing.md`

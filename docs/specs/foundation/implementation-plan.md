@@ -10,7 +10,7 @@
 ## Changelog
 
 - `2026-04-03` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 
 ## Goal
 
@@ -33,7 +33,7 @@ In scope (this plan implements now):
 Out of scope (intentionally deferred):
 
 - full domain behavior for progression, branching, world locks, and snapshot generation
-- complete normalization logic for all 5etools entity types
+- complete normalization logic for all Data Source entity types
 - UI-heavy product flows beyond minimal API integration
 - production hardening features such as distributed job runners
 - admin HTTP endpoint that triggers import pipeline execution
@@ -68,6 +68,10 @@ Completion criteria:
   - Defines external source trust model and lineage requirements.
 - `docs/architecture/parsing-pipeline.md`
   - Defines required import stages, deterministic behavior, and failure semantics.
+- `docs/specs/foundation/option-complete-data-source-parsing.md`
+  - Defines mandatory parser behavior to prevent false negatives and option loss.
+- `docs/architecture/parser-option-completeness.md`
+  - Defines shared parser completeness policy and fail-closed semantics.
 - `docs/architecture/rules-catalog-provider.md`
   - Defines `RulesCatalog` contract, provider strategy, and migration protocol.
 - `docs/architecture/catalog-lineage-and-import-runs.md`
@@ -161,7 +165,7 @@ Import pipeline (ownership: non-request operational path):
 - `src/server/import/types.ts`
   - Shared stage/outcome/issue types.
 - `src/server/import/fingerprint/compute-dataset-fingerprint.ts`
-  - Deterministic fingerprint logic over `external/5etools/data`.
+  - Deterministic fingerprint logic over source root from `EXTERNAL_DATA_PATH`.
 - `src/server/import/run-import-pipeline.ts`
   - Stage orchestration and failure semantics.
 - `src/server/import/publish/activate-catalog-version.ts`
@@ -240,7 +244,7 @@ sequenceDiagram
 
 Trust boundaries and validation points:
 
-- Untrusted external input boundary: `external/5etools/data` enters only in import modules.
+- Untrusted external input boundary: path configured by `EXTERNAL_DATA_PATH` enters only in import modules.
 - Transport boundary: route params/query/body validated before use-case invocation.
 - Policy boundary: authz in application layer before adapter calls.
 - Storage boundary: adapters validate persistence invariants and map DB errors to stable error categories.
@@ -268,7 +272,7 @@ Dependency unavailable path:
 
 Known edge cases:
 
-- Missing `external/5etools/data` directory -> import run fails in `sync` or `fingerprint` stage with explicit issue record.
+- Missing `EXTERNAL_DATA_PATH` directory -> import run fails in `sync` or `fingerprint` stage with explicit issue record.
 - Fingerprint mismatch with expected active lineage under `strict` mode -> fail closed for operational checks.
 - No active catalog version in runtime state -> health command reports mismatch/degraded state; rules endpoint returns controlled unavailable error.
 - `RULES_PROVIDER=raw` in v1 -> startup/config validation fails with explicit unsupported-provider error.
@@ -486,12 +490,14 @@ Automated checks:
 - contract tests for `RulesCatalog` behavior (`derived` required, `raw` explicit non-support allowed)
 - deterministic fingerprint tests across repeated runs and file-order permutations
 - authz tests for allow/deny paths in use-cases
+- parser option-expansion tests include feat/optional feature contributors when resolve/normalize stages are implemented
 
 Manual scenarios:
 
-- Run import command against local `external/5etools/data` and confirm run/issue records persist.
+- Run import command against local `EXTERNAL_DATA_PATH` and confirm run/issue records persist.
 - Confirm CLI output includes parseable JSON summary with `runId`, `outcome`, and `metrics`.
 - Verify failed import does not alter active catalog pointer.
+- Verify parsed option coverage includes feats and optional features in supported readers when parser coverage is enabled.
 - Run `bun run ops:catalog:health`; confirm JSON output on success and non-zero exit code on strict mismatch.
 - Optional: call `GET /api/rules/classes` and confirm typed, deterministic output if example route is implemented.
 
@@ -512,7 +518,7 @@ Assumptions:
 
 - SQLite is the active local DB for Phase 0.
 - Auth provider configuration is available for local development.
-- `external/5etools/data` exists locally but remains gitignored and read-only at runtime.
+- `EXTERNAL_DATA_PATH` is set locally, points to external source input, and remains read-only at runtime.
 
 Resolved decisions:
 
@@ -520,6 +526,8 @@ Resolved decisions:
 - `RawRulesCatalog` is unsupported in v1 and deferred to v2.
 - Import metrics are emitted as part of CLI command output (stdout JSON), not required as a dedicated persisted schema contract in v1.
 - Auth integration standard for v1 foundation is Better Auth (Prisma adapter path).
+- Generated lookup parity mismatch handling is coupled to `DATA_INTEGRITY_MODE` in v1.
+- `additionalSpells` filter expressions require full v1 evaluation; unsupported expression shapes fail closed.
 
 Deferred follow-ups:
 
