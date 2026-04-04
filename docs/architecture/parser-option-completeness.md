@@ -55,6 +55,7 @@ Mandatory contracts:
 
 - Resolve `_meta.dependencies`, `_meta.includes`, `_meta.otherSources`, `_meta.internalCopies`.
 - Resolve recursive `_copy` behavior including `_mod` and `_preserve` semantics.
+- Include direct canonical parsing coverage for option-bearing roots (including feats and optional features).
 - Parse class/subclass feature UIDs using Data Source-compatible formats and source defaults.
 - Fully dereference class/subclass feature references from string and object forms.
 - Reconstruct spell-source availability from both direct spell-source lists and `additionalSpells` contributions.

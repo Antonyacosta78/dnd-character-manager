@@ -478,12 +478,14 @@ Automated checks:
 - contract tests for `RulesCatalog` behavior (`derived` required, `raw` explicit non-support allowed)
 - deterministic fingerprint tests across repeated runs and file-order permutations
 - authz tests for allow/deny paths in use-cases
+- parser option-expansion tests include feat/optional feature contributors when resolve/normalize stages are implemented
 
 Manual scenarios:
 
 - Run import command against local `EXTERNAL_DATA_PATH` and confirm run/issue records persist.
 - Confirm CLI output includes parseable JSON summary with `runId`, `outcome`, and `metrics`.
 - Verify failed import does not alter active catalog pointer.
+- Verify parsed option coverage includes feats and optional features in supported readers when parser coverage is enabled.
 - Run `bun run ops:catalog:health`; confirm JSON output on success and non-zero exit code on strict mismatch.
 - Optional: call `GET /api/rules/classes` and confirm typed, deterministic output if example route is implemented.
 

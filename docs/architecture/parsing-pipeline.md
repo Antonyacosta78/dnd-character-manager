@@ -107,7 +107,7 @@ Inputs:
 
 Actions:
 
-- read index-driven datasets (example: class/spell subfiles)
+- read index-driven datasets (example: class/spell subfiles) and root datasets (for example races/backgrounds/feats/optional features)
 - resolve source mechanics (`_copy`, `_mod`, and related merge semantics)
 - resolve in-dataset references where required for downstream normalization
 - process tagged text where needed for runtime readability/searching
@@ -149,7 +149,7 @@ Inputs:
 Actions:
 
 - validate required fields and type-level constraints
-- validate cross-entity references (for example subclass -> class, spell references)
+- validate cross-entity references (for example subclass -> class, spell references, and spell grants from feat/optional feature/background/race/reward/subclass sources)
 - validate uniqueness and key stability assumptions
 
 Outputs:
@@ -239,6 +239,7 @@ Required test categories:
 - fixture tests for `_copy`/`_mod` resolution semantics
 - normalization contract tests
 - referential integrity tests across entity types
+- spell-option expansion tests across `additionalSpells` contributors (including feats and optional features)
 - replay/idempotency tests by fingerprint
 - activation atomicity tests
 

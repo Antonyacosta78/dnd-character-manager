@@ -35,6 +35,10 @@ Scope coverage (incremental):
 - spells
 - races
 - backgrounds
+- feats
+- optional features
+- character creation options
+- rewards
 - additional Data Source entities as feature coverage expands
 
 ### Runtime Rule Access Source
