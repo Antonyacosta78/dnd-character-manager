@@ -1,10 +1,3 @@
-Please also reference the following rules as needed. The list below is provided in TOON format, and `@` stands for the project root directory.
-
-rules[1]:
-  - path: "@.opencode\\memories\\20-frontend-work.md"
-    description: Frontend implementation guidance for Next.js App Router UI work
-    applyTo[3]: src/app/**/*,src/components/**/*,public/**/*
-
 # DnD Character Manager
 
 This repository is a Next.js App Router application for a Dungeons and Dragons character manager.
