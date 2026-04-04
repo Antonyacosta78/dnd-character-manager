@@ -413,6 +413,7 @@ Application use-cases:
   - `RULES_PROVIDER` (`derived` in v1; `raw` reserved and rejected)
   - `DATA_INTEGRITY_MODE` (`strict`, `warn`, `off`)
   - `DATABASE_URL`
+  - `EXTERNAL_DATA_PATH`
   - `AUTH_SECRET` and provider-specific auth vars
 - Rollout dependencies:
   - `raw` provider work starts in v2 after dedicated spec + parity test plan.
