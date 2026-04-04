@@ -1,5 +1,18 @@
 # Architecture: API and Error Contract
 
+## Metadata
+
+- Status: `completed`
+- Created At: `2026-04-03`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+- `2026-04-04` - `OpenCode` - Tuned status to reflect active implementation progress.
+
 ## Purpose
 
 Define the canonical transport and error contract for foundation-era operational and rules-read surfaces so implementations remain consistent across route handlers, CLI commands, application services, and adapters.

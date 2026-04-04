@@ -1,5 +1,18 @@
 # Architecture: Catalog Lineage and Import Runs
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-04-02`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-02` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+- `2026-04-04` - `OpenCode` - Tuned status to reflect active implementation progress.
+
 ## Purpose
 
 This document defines the persistence model for rules-catalog provenance, import execution tracking, activation state, and rollback safety.

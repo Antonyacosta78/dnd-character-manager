@@ -1,5 +1,16 @@
 # Architecture: Parser Option Completeness Policy
 
+## Metadata
+
+- Status: `proposed`
+- Created At: `2026-04-04`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-04` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
 ## Purpose
 
 Define the shared parser policy that prevents silent option loss when importing Data Source content.
@@ -11,10 +22,8 @@ This note exists to prevent:
 - feature teams implementing partial parser logic that appears to work but silently drops options
 - inconsistent failure handling for option-critical parsing gaps
 
-## Decision Metadata
+## Decision Details
 
-- Status: proposed
-- Date: 2026-04-04
 - Decision owner: foundation architecture
 - Scope: import pipeline stages `validate_source`, `resolve`, `normalize`, `validate_domain`
 - Primary audience: senior developers and AI coding agents implementing import/parser flows

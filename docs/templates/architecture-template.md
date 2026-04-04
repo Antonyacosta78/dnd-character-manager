@@ -1,5 +1,16 @@
 # Architecture: <name>
 
+## Metadata
+
+- Status: `proposed` | `in-progress` | `blocked` | `accepted` | `deprecated`
+- Created At: `YYYY-MM-DD`
+- Last Updated: `YYYY-MM-DD`
+- Owner: `<name or team>`
+
+## Changelog
+
+- `YYYY-MM-DD` - `<author>` - <what changed and why>
+
 ## Purpose
 
 - Explain the shared concern this note covers and why it matters across multiple features.
@@ -45,7 +56,7 @@
 
 Use any of these when the topic needs stronger precision:
 
-- `Decision Metadata` (status, owner, date)
+- `Decision History` (alternatives considered and why they were rejected)
 - `Compatibility and Migration` (rollout, fallback, backout)
 - `Contract Appendix` (types, request/response schemas, CLI output schemas)
 - `Error Taxonomy` (error codes and mapping rules)
