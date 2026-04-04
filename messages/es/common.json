@@ -1,0 +1,7 @@
+{
+  "appName": "Gestor de Personajes de D&D",
+  "homeTitle": "Crea y administra tus aventureros",
+  "homeDescription": "Esta superficie mínima confirma la integración de i18n con rutas neutrales por idioma.",
+  "activeLocaleLabel": "Idioma resuelto",
+  "supportedLocalesLabel": "Idiomas compatibles: en, es"
+}

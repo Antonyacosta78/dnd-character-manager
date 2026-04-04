@@ -34,6 +34,7 @@ Goal: establish the project shape, vocabulary, and constraints before feature wo
 - shared terminology for character, branch, world, game, and snapshot
 - docs workflow for feature rundowns, specs, and implementation plans
 - architecture notes for app shape, parsing, and data sources
+- i18n foundation direction (locale strategy, fallback behavior, and doc linkage)
 
 Status: in progress
 
@@ -141,6 +142,7 @@ The first version should include the minimum needed to become a real primary too
 - frozen game snapshots
 - printable/exportable 4-page sheet
 - basic roster search and filtering
+- i18n foundation support (locale resolution, persisted preference, and fallback for `en`/`es`)
 
 If needed, `v1.0` should favor reliability and scope control over extra polish.
 
@@ -152,6 +154,7 @@ These are strong candidates for the first post-release improvement cycle.
 - richer branch history views
 - better chronology controls
 - more polished roster browsing
+- translation polish for broader UI coverage beyond the v1 i18n foundation
 - better spell browsing and reference ergonomics
 - stronger inventory and loot handling
 - expanded support for additional commonly used source material
@@ -196,3 +199,6 @@ Do not cut the core promise first: branching character progression with playable
 - `docs/architecture/app-architecture.md`
 - `docs/architecture/data-sources.md`
 - `docs/architecture/feature-workflow.md`
+- `docs/features/internationalization.md`
+- `docs/specs/internationalization/foundation.md`
+- `docs/architecture/internationalization.md`
