@@ -7,11 +7,22 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "bun test",
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "data:fingerprint": "bun run src/server/cli/data-fingerprint.ts",
+    "data:import": "bun run src/server/cli/data-import.ts",
+    "ops:catalog:health": "bun run src/server/cli/ops-catalog-health.ts",
     "ai:generate": "rulesync generate --targets opencode --features rules,subagents,skills",
     "ai:generate:all": "rulesync generate --targets opencode,codexcli,claudecode,cursor --features rules,ignore,subagents,skills",
     "ai:check": "rulesync generate --check --targets opencode --features rules,subagents,skills"
   },
   "dependencies": {
+    "@better-auth/prisma-adapter": "^1.4.2",
+    "@prisma/client": "^5.22.0",
+    "better-auth": "^1.4.2",
     "next": "16.1.7",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -24,6 +35,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
+    "prisma": "^5.22.0",
     "rulesync": "^7.20.0",
     "tailwindcss": "^4",
     "typescript": "^5"

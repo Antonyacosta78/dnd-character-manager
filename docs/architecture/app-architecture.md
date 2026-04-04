@@ -108,7 +108,7 @@ Responsibilities:
 
 - Concrete implementations for ports:
   - Prisma repositories
-  - Auth.js session adapters
+  - Better Auth session adapters
   - `DerivedRulesCatalog` and future `RawRulesCatalog`
 
 Rules:
@@ -191,7 +191,7 @@ Constraints:
 
 Authentication and authorization are first-class from v1, not retrofit concerns.
 
-- Auth provider: Auth.js with Prisma adapter.
+- Auth provider: Better Auth with Prisma adapter.
 - Ownership model: user-owned records with `ownerUserId` semantics.
 - Enforcement location: application layer use-cases.
 - Policy model for v1:
@@ -224,7 +224,7 @@ Allowed high-level dependency direction:
 Disallowed examples:
 
 - UI -> Prisma adapter
-- Domain -> Prisma/Auth.js/Next.js
+- Domain -> Prisma/Better Auth/Next.js
 - Application -> raw `external/` file access
 
 ## Operational Concerns

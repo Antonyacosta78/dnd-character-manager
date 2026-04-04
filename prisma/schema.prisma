@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  isAdmin       Boolean   @default(false)
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("user")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+model CatalogVersion {
+  id                 String               @id @default(cuid())
+  providerKind       String
+  datasetFingerprint String
+  datasetLabel       String?
+  sourceRef          String?
+  importerVersion    String
+  status             String               @default("draft")
+  metadataJson       String?
+  createdAt          DateTime             @default(now())
+  validatedAt        DateTime?
+  publishedAt        DateTime?
+
+  importRuns           CatalogImportRun[]
+  runtimeStates        CatalogRuntimeState[]    @relation("ActiveCatalogVersion")
+  activationEventsFrom CatalogActivationEvent[] @relation("CatalogActivationFromVersion")
+  activationEventsTo   CatalogActivationEvent[] @relation("CatalogActivationToVersion")
+
+  @@unique([providerKind, datasetFingerprint, importerVersion])
+}
+
+model CatalogImportRun {
+  id                         String            @id @default(cuid())
+  catalogVersionId           String?
+  triggerKind                String
+  requestedByUserId          String?
+  integrityMode              String
+  outcome                    String            @default("running")
+  currentStage               String
+  datasetFingerprintObserved String?
+  sourceManifestJson         String?
+  stageMetricsJson           String?
+  errorSummary               String?
+  startedAt                  DateTime          @default(now())
+  finishedAt                 DateTime?
+
+  catalogVersion    CatalogVersion?         @relation(fields: [catalogVersionId], references: [id])
+  issues            CatalogImportIssue[]
+  activationEvents  CatalogActivationEvent[]
+
+  @@index([startedAt])
+  @@index([catalogVersionId])
+}
+
+model CatalogImportIssue {
+  id          String   @id @default(cuid())
+  runId       String
+  stage       String
+  severity    String
+  code        String
+  message     String
+  filePath    String?
+  jsonPointer String?
+  detailsJson String?
+  createdAt   DateTime @default(now())
+
+  run CatalogImportRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, severity, stage])
+}
+
+model CatalogRuntimeState {
+  id                     Int             @id
+  activeCatalogVersionId String?
+  lastIntegrityCheckAt   DateTime?
+  lastIntegrityStatus    String?
+  lastIntegrityMessage   String?
+  dataIntegrityMode      String          @default("strict")
+  updatedAt              DateTime        @updatedAt
+
+  activeCatalogVersion CatalogVersion? @relation("ActiveCatalogVersion", fields: [activeCatalogVersionId], references: [id])
+}
+
+model CatalogActivationEvent {
+  id                   String   @id @default(cuid())
+  fromCatalogVersionId String?
+  toCatalogVersionId   String
+  runId                String?
+  activatedByUserId    String?
+  reason               String?
+  createdAt            DateTime @default(now())
+
+  fromCatalogVersion CatalogVersion?  @relation("CatalogActivationFromVersion", fields: [fromCatalogVersionId], references: [id])
+  toCatalogVersion   CatalogVersion   @relation("CatalogActivationToVersion", fields: [toCatalogVersionId], references: [id])
+  run                CatalogImportRun? @relation(fields: [runId], references: [id])
+
+  @@index([createdAt])
+}

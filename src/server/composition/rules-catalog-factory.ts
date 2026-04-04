@@ -1,11 +1,7 @@
+import type { AppConfig } from "@/server/composition/app-config";
 import type {
   RulesCatalog,
-  RulesProviderKind,
 } from "@/server/ports/rules-catalog";
-
-export interface CreateRulesCatalogOptions {
-  provider: RulesProviderKind;
-}
 
 export interface RulesCatalogImplementations {
   derived: () => RulesCatalog;
@@ -13,10 +9,10 @@ export interface RulesCatalogImplementations {
 }
 
 export function createRulesCatalog(
-  options: CreateRulesCatalogOptions,
+  config: Pick<AppConfig, "rulesProvider">,
   implementations: RulesCatalogImplementations,
 ): RulesCatalog {
-  if (options.provider === "raw") {
+  if (config.rulesProvider === "raw") {
     return implementations.raw();
   }
 

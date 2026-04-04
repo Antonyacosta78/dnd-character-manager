@@ -9,7 +9,7 @@
 In scope (this plan implements now):
 
 - server-side composition baseline and typed runtime config
-- auth/session context port and Auth.js adapter wiring
+- auth/session context port and Better Auth adapter wiring
 - SQLite-first Prisma baseline for catalog lineage/import run/activation state
 - import pipeline skeleton with deterministic fingerprint stage and run issue recording
 - import trigger as CLI command (`bun run data:import`), not HTTP-triggered
@@ -89,7 +89,7 @@ Completion criteria:
 ## Files to Change
 
 - `package.json` (risk: medium)
-  - Add dependencies for Prisma/Auth.js and scripts for `db:*`, `data:fingerprint`, and `data:import` entry points.
+  - Add dependencies for Prisma/Better Auth and scripts for `db:*`, `data:fingerprint`, and `data:import` entry points.
   - Why risk: dependency changes affect local setup and CI behavior.
   - Depends on: final naming of import runner and Prisma location.
 
@@ -104,7 +104,7 @@ Completion criteria:
   - Depends on: none (port is source contract).
 
 - `src/app/layout.tsx` (risk: low)
-  - Wire auth/session wrapper only if required by chosen Auth.js integration path.
+  - Wire auth/session wrapper only if required by chosen Better Auth integration path.
   - Why risk: could unintentionally move server/client boundaries.
   - Depends on: `src/auth.ts` and auth integration decision.
 
@@ -129,9 +129,9 @@ Composition (ownership: composition root only):
 Auth adapter (ownership: infrastructure integration):
 
 - `src/auth.ts`
-  - Auth.js config and exported helpers for session access.
+  - Better Auth config and exported helpers for session access.
 - `src/server/adapters/auth/auth-session-context.ts`
-  - Auth.js-backed `SessionContextPort` implementation.
+  - Better Auth-backed `SessionContextPort` implementation.
 
 Prisma persistence (ownership: adapter layer):
 
@@ -356,7 +356,7 @@ export interface ImportIssue {
 Layer ownership and conversion:
 
 - Port-owned types live in `src/server/ports/**/*` and are implementation agnostic.
-- Adapter-internal types (Prisma records, Auth.js objects) stay in adapter modules.
+- Adapter-internal types (Prisma records, Better Auth objects) stay in adapter modules.
 - Application DTOs are mapped from port types before returning to route handlers.
 
 ## Functions and Components
@@ -408,20 +408,20 @@ Application use-cases:
 - External source integration occurs only in import modules under `src/server/import/**/*`.
 - Import trigger integration is CLI-only in v1 (`bun run data:import`); no import route handler.
 - CLI command output contract: `bun run data:import` prints structured JSON summary to stdout, including import metrics so teams can persist snapshots only when needed.
-- Auth integration uses Auth.js and feeds `SessionContextPort`.
+- Auth integration uses Better Auth and feeds `SessionContextPort`.
 - Configuration and feature gates:
   - `RULES_PROVIDER` (`derived` in v1; `raw` reserved and rejected)
   - `DATA_INTEGRITY_MODE` (`strict`, `warn`, `off`)
   - `DATABASE_URL`
   - `EXTERNAL_DATA_PATH`
-  - `AUTH_SECRET` and provider-specific auth vars
+  - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and provider-specific auth vars
 - Rollout dependencies:
   - `raw` provider work starts in v2 after dedicated spec + parity test plan.
 
 ## Implementation Order
 
 1. Add baseline dependencies and scripts.
-   - Output: updated `package.json` with Prisma/Auth/data scripts.
+   - Output: updated `package.json` with Prisma/Better Auth/data scripts.
    - Verify: `bun install` and `bun run lint`.
    - Merge safety: yes; no runtime behavior change yet.
 
@@ -430,7 +430,7 @@ Application use-cases:
    - Verify: typecheck + simple unit test for config parsing.
    - Merge safety: yes; can ship without endpoint wiring.
 
-3. Add session context port and Auth.js adapter.
+3. Add session context port and Better Auth adapter.
    - Output: `src/server/ports/session-context.ts`, `src/server/adapters/auth/auth-session-context.ts`, `src/auth.ts`.
    - Verify: lint + manual session resolution test path.
    - Merge safety: partial; safe behind non-required route usage.
@@ -507,6 +507,7 @@ Resolved decisions:
 - Import trigger is CLI-only in foundation scope (`bun run data:import` via Bun/Node runtime).
 - `RawRulesCatalog` is unsupported in v1 and deferred to v2.
 - Import metrics are emitted as part of CLI command output (stdout JSON), not required as a dedicated persisted schema contract in v1.
+- Auth integration standard for v1 foundation is Better Auth (Prisma adapter path).
 
 Deferred follow-ups:
 
