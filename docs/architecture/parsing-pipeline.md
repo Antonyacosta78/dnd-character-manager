@@ -2,7 +2,12 @@
 
 ## Purpose
 
-This document specifies the ingestion pipeline from external 5etools input to runtime-usable rules catalog data. It defines stage contracts, artifacts, idempotency behavior, and failure semantics so implementation can be automated without guessing.
+This document specifies the ingestion pipeline from external Data Source input to runtime-usable rules catalog data. It defines stage contracts, artifacts, idempotency behavior, and failure semantics so implementation can be automated without guessing.
+
+Path convention:
+
+- Source root is read from `EXTERNAL_DATA_PATH` in local `.env`.
+- Path examples in this document are relative to `EXTERNAL_DATA_PATH`.
 
 ## Pipeline Contract
 
@@ -39,7 +44,7 @@ Inputs:
 
 Actions:
 
-- ensure source files are present in `external/5etools/`
+- ensure source files are present under configured `EXTERNAL_DATA_PATH`
 - capture sync metadata (timestamp, source ref, extraction details)
 
 Outputs:
@@ -84,7 +89,7 @@ Inputs:
 Actions:
 
 - run structural checks on expected files and index references
-- optionally run `5etools-utils` schema/file checks for early hygiene enforcement
+- optionally run external schema/file checks for early hygiene enforcement
 
 Outputs:
 
@@ -257,3 +262,5 @@ This is guidance, not a hard requirement; equivalent structure is acceptable if 
 - `docs/architecture/rules-catalog-provider.md`
 - `docs/architecture/catalog-lineage-and-import-runs.md`
 - `docs/architecture/app-architecture.md`
+- `docs/architecture/parser-option-completeness.md`
+- `docs/specs/foundation/option-complete-data-source-parsing.md`

@@ -15,7 +15,12 @@ It exists to prevent two common failure modes:
 
 Primary location:
 
-- `external/5etools/data`
+- path configured by `EXTERNAL_DATA_PATH` in local `.env`
+
+Path convention:
+
+- path references in this document are relative to `EXTERNAL_DATA_PATH`
+- no fixed repository path is assumed
 
 Characteristics:
 
@@ -30,7 +35,7 @@ Scope coverage (incremental):
 - spells
 - races
 - backgrounds
-- additional 5etools entities as feature coverage expands
+- additional Data Source entities as feature coverage expands
 
 ### Runtime Rule Access Source
 
@@ -127,7 +132,7 @@ Recommended command model (exact script names may vary):
 
 - `data:sync` - acquire/extract expected external dataset
 - `data:fingerprint` - compute and print deterministic dataset hash
-- `data:validate` - run source-level checks (optionally includes 5etools-utils checks)
+- `data:validate` - run source-level checks (optionally includes external schema toolkit checks)
 - `data:import` - parse, resolve, normalize, validate, publish
 
 These commands are separable so failures are diagnosable by stage.
@@ -136,7 +141,7 @@ These commands are separable so failures are diagnosable by stage.
 
 The following are explicitly prohibited:
 
-- reading `external/5etools/data` directly from UI or request handlers
+- reading files under `EXTERNAL_DATA_PATH` directly from UI or request handlers
 - writing to `external/` from runtime code
 - activating new catalog data without recorded fingerprint lineage
 - mixing source-format fields directly into domain/application types
