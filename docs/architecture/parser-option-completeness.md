@@ -10,7 +10,7 @@
 ## Changelog
 
 - `2026-04-04` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 ## Purpose
 
 Define the shared parser policy that prevents silent option loss when importing Data Source content.
