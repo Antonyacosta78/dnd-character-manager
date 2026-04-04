@@ -1,5 +1,17 @@
 # Feature Rundown: Design System Foundation (Arcane Codex v1)
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-04-03`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Summary
 
 Establish the first usable design system for the app so new UI can ship with a consistent fantasy editorial identity instead of generic starter styling.

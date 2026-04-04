@@ -1,5 +1,16 @@
 # Spec: <name>
 
+## Metadata
+
+- Status: `proposed` | `in-progress` | `blocked` | `approved` | `superseded`
+- Created At: `YYYY-MM-DD`
+- Last Updated: `YYYY-MM-DD`
+- Owner: `<name or team>`
+
+## Changelog
+
+- `YYYY-MM-DD` - `<author>` - <what changed and why>
+
 ## Related Feature
 
 - Link the single feature this spec belongs to.

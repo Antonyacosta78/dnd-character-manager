@@ -1,5 +1,17 @@
 # Architecture: App Structure
 
+## Metadata
+
+- Status: `completed`
+- Created At: `2026-03-18`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-03-18` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Purpose
 
 This document is the baseline runtime architecture for the application. It defines the boundaries that protect delivery speed now while keeping migration cost bounded as the product moves from character core to branching timelines, snapshots, and output generation.
