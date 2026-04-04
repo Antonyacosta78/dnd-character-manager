@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "websearch": "allow",
+  },
+  "mcp": {
+    "browsermcp": {
+      "type": "local",
+      "command": ["bunx", "@browsermcp/mcp@latest"],
+    },
+  },
+}
