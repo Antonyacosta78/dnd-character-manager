@@ -110,6 +110,7 @@ Actions:
 - read index-driven datasets (example: class/spell subfiles) and root datasets (for example races/backgrounds/feats/optional features)
 - resolve source mechanics (`_copy`, `_mod`, and related merge semantics)
 - resolve in-dataset references where required for downstream normalization
+- evaluate `additionalSpells` filter expressions with full v1 semantics
 - process tagged text where needed for runtime readability/searching
 
 Outputs:
@@ -160,6 +161,7 @@ Outputs:
 Policy:
 
 - validation failures block publish.
+- generated-lookup parity mismatch handling follows `DATA_INTEGRITY_MODE` policy.
 
 ### Stage 7: Publish and Activate
 

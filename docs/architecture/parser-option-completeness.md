@@ -82,6 +82,11 @@ Supported `additionalSpells` forms are mandatory:
 - `all` filter expressions
 - addition types: `innate`, `known`, `prepared`, `expanded`
 
+Evaluation rule:
+
+- v1 requires full filter-expression evaluation for option-complete imports.
+- Unsupported expression shapes are hard failures (`PARSER_UNSUPPORTED_ADDITIONAL_SPELLS_SHAPE`).
+
 ### Generated-file rule
 
 Generated files are not canonical source-of-truth, but they are mandatory consistency checks when present:
@@ -93,6 +98,10 @@ Mismatch policy:
 
 - mismatch in strict import contexts is a blocking error
 - mismatch in non-strict local contexts may be warning-only only when explicitly configured by integrity mode
+
+Decision:
+
+- v1 keeps mismatch handling coupled to `DATA_INTEGRITY_MODE` (no independent parity flag).
 
 ## Boundaries
 
@@ -206,5 +215,4 @@ Minimum verification required before this policy is considered adopted in code:
 
 ## Open Questions
 
-- Should generated-lookup mismatch behavior be configurable independently from `DATA_INTEGRITY_MODE`, or remain coupled in v1?
-- Which minimum subset of filter-expression semantics is acceptable for first pass before full expression parity is required?
+- None for this policy version.

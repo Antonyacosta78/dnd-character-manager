@@ -64,6 +64,16 @@ Generated files are not canonical source-of-truth, but become mandatory consiste
 - Preserve provenance fields required for option integrity: `edition`, `reprintedAs`, `otherSources`, and inherited-source behavior.
 - Emit fail-fast diagnostics for unresolved references, unsupported additional-spell structures, and identity collisions.
 
+### Resolved decisions
+
+- Generated-lookup parity mismatches use dedicated parser reason `PARSER_GENERATED_LOOKUP_MISMATCH` and map through existing transport envelopes.
+- Generated-lookup mismatch handling is coupled to `DATA_INTEGRITY_MODE` in v1:
+  - `strict`: import fails
+  - `warn`: warning diagnostic allowed
+  - `off`: parity checks may be skipped by mode policy
+- `additionalSpells` filter expressions require full evaluation in v1.
+- Unsupported expression shapes fail closed with `PARSER_UNSUPPORTED_ADDITIONAL_SPELLS_SHAPE`.
+
 ### Stage-level behavior
 
 - `validate_source`
@@ -126,8 +136,7 @@ flowchart TD
 
 ## Open Questions
 
-- Should generated-lookup parity mismatches map to a dedicated import error reason code, or reuse a generic domain-validation mismatch reason in v1?
-- For filter-expression-based `additionalSpells`, should the parser implement full expression evaluation immediately, or gate with an explicit compatibility subset plus fail-fast diagnostics?
+- None for this slice.
 
 ## Related Implementation Plan
 

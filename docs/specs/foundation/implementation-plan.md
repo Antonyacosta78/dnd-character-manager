@@ -514,6 +514,8 @@ Resolved decisions:
 - `RawRulesCatalog` is unsupported in v1 and deferred to v2.
 - Import metrics are emitted as part of CLI command output (stdout JSON), not required as a dedicated persisted schema contract in v1.
 - Auth integration standard for v1 foundation is Better Auth (Prisma adapter path).
+- Generated lookup parity mismatch handling is coupled to `DATA_INTEGRITY_MODE` in v1.
+- `additionalSpells` filter expressions require full v1 evaluation; unsupported expression shapes fail closed.
 
 Deferred follow-ups:
 
