@@ -1,5 +1,17 @@
 # Architecture: Rules Catalog Provider
 
+## Metadata
+
+- Status: `accepted`
+- Created At: `2026-04-02`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-02` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Purpose
 
 This document defines the runtime contract for reading rules content and the implementation strategy for swapping data-access engines without changing application/domain logic.

@@ -1,15 +1,25 @@
 # Architecture: Design System Decision Record
 
+## Metadata
+
+- Status: `accepted`
+- Created At: `2026-04-03`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Purpose
 
 Define the official UI style and design system direction for v1 so senior engineers and AI coding agents can ship fast without drifting into generic SaaS UI patterns or inconsistent fantasy styling.
 
 This document is intentionally prescriptive. It exists to reduce ambiguity in implementation decisions.
 
-## Decision Metadata
+## Decision Details
 
-- Status: accepted
-- Date: 2026-04-03
 - Decision owner: product lead and senior engineering
 - Primary audience: senior web developers and AI coding agents
 - Scope: web app UI for v1 and the extension path for v2 theming

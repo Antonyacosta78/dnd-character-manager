@@ -1,5 +1,16 @@
 # Implementation Plan: <name>
 
+## Metadata
+
+- Status: `draft` | `ready` | `in-progress` | `blocked` | `completed`
+- Created At: `YYYY-MM-DD`
+- Last Updated: `YYYY-MM-DD`
+- Owner: `<name or team>`
+
+## Changelog
+
+- `YYYY-MM-DD` - `<author>` - <what changed and why>
+
 ## Goal
 
 - Describe the concrete outcome in code (what will exist after this work that does not exist now).
