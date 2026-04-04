@@ -1,5 +1,17 @@
 # Implementation Plan: Architectural Foundation (Phase 0)
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-04-03`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Goal
 
 - Deliver a working backend foundation that enforces the repository's architecture rules in running code, not just in documentation.

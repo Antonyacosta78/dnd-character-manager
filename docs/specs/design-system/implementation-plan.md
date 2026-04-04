@@ -1,5 +1,17 @@
 # Implementation Plan: Design System Foundation (Arcane Codex v1)
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-04-03`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Goal
 
 - Deliver a production-usable design system foundation that replaces starter styling with an Arcane Codex visual language optimized for dense DnD workflows.

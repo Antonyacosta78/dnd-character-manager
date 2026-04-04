@@ -1,5 +1,18 @@
 # Architecture: Parsing Pipeline
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-03-18`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-03-18` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+- `2026-04-04` - `OpenCode` - Tuned status to reflect active implementation progress.
+
 ## Purpose
 
 This document specifies the ingestion pipeline from external 5etools input to runtime-usable rules catalog data. It defines stage contracts, artifacts, idempotency behavior, and failure semantics so implementation can be automated without guessing.

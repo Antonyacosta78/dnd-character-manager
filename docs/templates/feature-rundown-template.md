@@ -1,5 +1,16 @@
 # Feature Rundown: <name>
 
+## Metadata
+
+- Status: `proposed` | `in-progress` | `blocked` | `completed` | `cancelled`
+- Created At: `YYYY-MM-DD`
+- Last Updated: `YYYY-MM-DD`
+- Owner: `<name or team>`
+
+## Changelog
+
+- `YYYY-MM-DD` - `<author>` - <what changed and why>
+
 ## Summary
 
 Describe the feature in a few sentences. Explain what it does, who it helps, and why it matters.
@@ -38,3 +49,8 @@ Describe the feature in a few sentences. Explain what it does, who it helps, and
 
 - Link shared architecture notes that affect this feature.
 - Examples: parsing, data sources, state strategy, or persistence.
+
+## Document Health
+
+- Keep this rundown updated as scope changes.
+- If status is `blocked`, include the blocker and owner in `Open Questions`.

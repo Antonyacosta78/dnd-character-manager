@@ -1,5 +1,17 @@
 # Spec: Visual Baseline (v1 Preliminary Lock)
 
+## Metadata
+
+- Status: `approved`
+- Created At: `2026-04-03`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+
 ## Related Feature
 
 - `docs/features/design-system-foundation.md`
