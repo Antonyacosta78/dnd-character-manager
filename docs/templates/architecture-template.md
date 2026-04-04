@@ -2,12 +2,19 @@
 
 ## Purpose
 
-Explain the shared concern this note covers and why it matters across multiple features.
+- Explain the shared concern this note covers and why it matters across multiple features.
+- State what risks this decision prevents (for example: coupling, drift, unsafe defaults).
 
 ## Current Plan
 
 - Describe the current technical direction.
-- Keep this focused on shared rules, boundaries, or system-wide approaches.
+- Keep this focused on shared rules, boundaries, and system-wide behavior.
+- When helpful, structure this section with clear subsections, such as:
+  - scope
+  - contracts/interfaces
+  - behavior rules
+  - error/failure semantics
+  - examples (code snippets or payloads)
 
 ## Boundaries
 
@@ -16,8 +23,8 @@ Explain the shared concern this note covers and why it matters across multiple f
 
 ## Notes
 
-- Capture constraints, tradeoffs, assumptions, or future concerns.
-- This is a good place for details that should not clutter the main plan.
+- Capture constraints, tradeoffs, assumptions, migration concerns, and operational implications.
+- Add implementation guidance that should stay consistent across features.
 
 ## Related Specs
 
@@ -33,3 +40,16 @@ Explain the shared concern this note covers and why it matters across multiple f
 
 - Record unresolved shared technical questions.
 - Remove items once the architecture direction is stable.
+
+## Optional Sections
+
+Use any of these when the topic needs stronger precision:
+
+- `Decision Metadata` (status, owner, date)
+- `Compatibility and Migration` (rollout, fallback, backout)
+- `Contract Appendix` (types, request/response schemas, CLI output schemas)
+- `Error Taxonomy` (error codes and mapping rules)
+- `Examples` (code snippets, sequence diagrams, payload examples)
+- `Verification Expectations` (minimum tests/checks required before adoption)
+
+These are optional. Keep the document readable; add only what materially reduces ambiguity.
