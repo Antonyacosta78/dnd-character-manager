@@ -102,12 +102,18 @@ describe("POST /api/auth/register", () => {
   });
 
   it("maps provider/internal failures to INTERNAL_ERROR / 500", async () => {
+    const logs: unknown[] = [];
+
     const postRoute = createRegisterPostRoute({
       createAccount: async () => {
         throw new Error("database unavailable");
       },
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_register_internal",
+      logError: (entry) => {
+        logs.push(entry);
+      },
+      captureException: () => {},
     });
 
     const response = await postRoute(
@@ -130,5 +136,36 @@ describe("POST /api/auth/register", () => {
     assert.equal(payload.error.status, 500);
     assert.equal(payload.meta.requestId, "req_from_client");
     assert.equal(response.headers.get("x-request-id"), "req_from_client");
+    assert.equal(logs.length, 1);
+    assert.equal((logs[0] as { error: { code: string } }).error.code, "INTERNAL_ERROR");
+  });
+
+  it("regenerates invalid inbound request ids", async () => {
+    const postRoute = createRegisterPostRoute({
+      createAccount: async () => ({
+        setCookieHeaders: [],
+      }),
+      now: () => new Date("2026-04-05T12:00:00.000Z"),
+      createRequestId: () => "req_generated_register",
+    });
+
+    const response = await postRoute(
+      new Request("https://example.test/api/auth/register", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-request-id": "bad header",
+        },
+        body: JSON.stringify({
+          username: "darrel",
+          password: "s3cret",
+        }),
+      }),
+    );
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.meta.requestId, "req_generated_register");
+    assert.equal(response.headers.get("x-request-id"), "req_generated_register");
   });
 });

@@ -1,8 +1,12 @@
-import { randomUUID } from "node:crypto";
-
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import { emitServerErrorLog } from "@/server/observability/server-error-log";
+import { captureServerException } from "@/server/observability/sentry-server";
+import {
+  createRequestId,
+  resolveRequestId,
+} from "@/server/observability/request-id";
 
 type RegisterField = "username" | "password" | "email" | "body";
 type RegisterValidationIssue = "required" | "invalidType" | "invalidFormat" | "duplicate" | "invalidPayload";
@@ -45,15 +49,19 @@ export interface RegisterRouteDeps {
   createAccount: CreateAccount;
   now?: () => Date;
   createRequestId?: () => string;
+  logError?: typeof emitServerErrorLog;
+  captureException?: typeof captureServerException;
 }
 
 export function createRegisterPostRoute({
   createAccount,
   now = () => new Date(),
-  createRequestId = () => `req_${randomUUID()}`,
+  createRequestId: createRequestIdFallback = createRequestId,
+  logError = emitServerErrorLog,
+  captureException = captureServerException,
 }: RegisterRouteDeps) {
   return async function POST(request: Request) {
-    const requestId = resolveRequestId(request, createRequestId);
+    const requestId = resolveRequestId(request, createRequestIdFallback);
     const timestamp = now().toISOString();
 
     const parsedBody = await parseRequestBody(request);
@@ -112,6 +120,26 @@ export function createRegisterPostRoute({
         });
       }
 
+      logError({
+        timestamp,
+        message: "Register route failed.",
+        requestId,
+        route: "/api/auth/register",
+        method: request.method,
+        error: {
+          code: "INTERNAL_ERROR",
+          status: 500,
+          name: error instanceof Error ? error.name : undefined,
+        },
+      });
+
+      captureException(error, {
+        requestId,
+        route: "/api/auth/register",
+        method: request.method,
+        errorCode: "INTERNAL_ERROR",
+      });
+
       return NextResponse.json<ApiErrorResponse>(
         {
           error: {
@@ -141,18 +169,6 @@ const defaultPostRoute = createRegisterPostRoute({
 
 export async function POST(request: Request) {
   return defaultPostRoute(request);
-}
-
-function resolveRequestId(request: Request, fallback: () => string) {
-  const requestId = request.headers.get("x-request-id");
-
-  if (!requestId) {
-    return fallback();
-  }
-
-  const isSafeRequestId = /^[A-Za-z0-9._:-]{1,120}$/.test(requestId);
-
-  return isSafeRequestId ? requestId : fallback();
 }
 
 async function parseRequestBody(request: Request): Promise<

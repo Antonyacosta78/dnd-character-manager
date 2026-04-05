@@ -34,6 +34,20 @@ export default async function SignUpPage() {
             passwordRequiredError: t("auth.signUp.errors.passwordRequired"),
             passwordMismatchError: t("auth.signUp.errors.passwordMismatch"),
             emailInvalidError: t("auth.signUp.errors.emailInvalid"),
+            failureRequestIdLabel: t("observability.requestIdLabel"),
+            reportIssue: t("observability.reportIssue.cta"),
+            reportIssueTitle: t("observability.reportIssue.title"),
+            reportIssueDescription: t("observability.reportIssue.description"),
+            reportIssueTimestampLabel: t("observability.reportIssue.timestampLabel"),
+            reportIssueRouteLabel: t("observability.reportIssue.routeLabel"),
+            reportIssueRequestIdLabel: t("observability.reportIssue.requestIdLabel"),
+            reportIssueNotesLabel: t("observability.reportIssue.notesLabel"),
+            reportIssueNotesHint: t("observability.reportIssue.notesHint"),
+            reportIssuePrivacyHint: t("observability.reportIssue.privacyHint"),
+            reportIssueSubmit: t("observability.reportIssue.submit"),
+            reportIssueSubmitting: t("observability.reportIssue.submitting"),
+            reportIssueSuccess: t("observability.reportIssue.success"),
+            reportIssueFailure: t("observability.reportIssue.failure"),
           }}
         />
       </div>
