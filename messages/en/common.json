@@ -192,7 +192,32 @@
       "submit": "Sign in",
       "pending": "Signing in...",
       "error": "Sign-in failed. Check your credentials and try again.",
+      "createAccountCta": "Need an account? Create one",
       "backHome": "Back to home"
+    },
+    "signUp": {
+      "eyebrow": "Authentication",
+      "title": "Create account",
+      "description": "Create your account to start building and managing characters.",
+      "usernameLabel": "Username",
+      "passwordLabel": "Password",
+      "emailLabel": "Email (optional)",
+      "usernamePlaceholder": "Choose a username",
+      "passwordPlaceholder": "Create a password",
+      "emailPlaceholder": "Enter your email (optional)",
+      "submit": "Create account",
+      "pending": "Creating account...",
+      "success": "Account created. You can now sign in.",
+      "signInCta": "Already have an account? Sign in",
+      "backHome": "Back to home",
+      "errors": {
+        "generic": "Could not create your account. Try again.",
+        "payload": "Please review your input and try again.",
+        "usernameRequired": "Username is required.",
+        "usernameDuplicate": "That username is already taken.",
+        "passwordRequired": "Password is required.",
+        "emailInvalid": "Enter a valid email or leave it empty."
+      }
     },
     "characters": {
       "protectedLabel": "Protected route",

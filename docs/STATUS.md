@@ -66,19 +66,30 @@ Checklist markers:
 
 ### Phase 1 - Authentication And Identity
 
-- Status: `planned`
+- Status: `in-progress`
 - Confidence: `high`
 - Checklist
-  - [ ] Authentication entry and session lifecycle flow
-  - [ ] App/API access behavior for unauthenticated users
-  - [ ] Ownership scoping for user-linked records
-  - [ ] Application-layer authz checks at operation boundaries
+  - [~] Authentication entry and session lifecycle flow (sign-in implemented, registration pending)
+  - [ ] Self-service registration entry flow (`username`, `password`, optional `email`)
+  - [x] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
+  - [~] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
+  - [~] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
 - Evidence
   - `docs/features/authentication-and-identity-foundation.md`
   - `docs/ROADMAP.md`
-  - `docs/specs/foundation/implementation-plan.md`
+  - `docs/specs/authentication/foundation.md`
+  - `docs/specs/authentication/implementation-plan.md`
   - `src/auth.ts`
   - `src/app/api/auth/[...all]/route.ts`
+  - `src/app/sign-in/page.tsx`
+  - `src/app/sign-in/sign-in-form.tsx`
+  - `src/app/characters/page.tsx`
+  - `src/app/api/characters/route.ts`
+  - `src/app/api/characters/__tests__/route.test.ts`
+  - `src/server/application/use-cases/list-owner-characters.ts`
+  - `src/server/application/use-cases/__tests__/list-owner-characters.authz.test.ts`
+  - `src/server/ports/character-repository.ts`
+  - `src/server/adapters/prisma/character-repository.ts`
   - `src/server/adapters/auth/auth-session-context.ts`
 
 ### Phase 2 - Character Core

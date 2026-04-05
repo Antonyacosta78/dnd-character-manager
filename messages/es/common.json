@@ -192,7 +192,32 @@
       "submit": "Iniciar sesión",
       "pending": "Iniciando sesión...",
       "error": "No se pudo iniciar sesión. Revisa tus credenciales e inténtalo de nuevo.",
+      "createAccountCta": "¿Necesitas una cuenta? Créala",
       "backHome": "Volver al inicio"
+    },
+    "signUp": {
+      "eyebrow": "Autenticación",
+      "title": "Crear cuenta",
+      "description": "Crea tu cuenta para empezar a crear y administrar personajes.",
+      "usernameLabel": "Nombre de usuario",
+      "passwordLabel": "Contraseña",
+      "emailLabel": "Correo electrónico (opcional)",
+      "usernamePlaceholder": "Elige un nombre de usuario",
+      "passwordPlaceholder": "Crea una contraseña",
+      "emailPlaceholder": "Ingresa tu correo (opcional)",
+      "submit": "Crear cuenta",
+      "pending": "Creando cuenta...",
+      "success": "Cuenta creada. Ahora puedes iniciar sesión.",
+      "signInCta": "¿Ya tienes una cuenta? Inicia sesión",
+      "backHome": "Volver al inicio",
+      "errors": {
+        "generic": "No se pudo crear tu cuenta. Inténtalo de nuevo.",
+        "payload": "Revisa tus datos e inténtalo de nuevo.",
+        "usernameRequired": "El nombre de usuario es obligatorio.",
+        "usernameDuplicate": "Ese nombre de usuario ya está en uso.",
+        "passwordRequired": "La contraseña es obligatoria.",
+        "emailInvalid": "Ingresa un correo válido o déjalo vacío."
+      }
     },
     "characters": {
       "protectedLabel": "Ruta protegida",

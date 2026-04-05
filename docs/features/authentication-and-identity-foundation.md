@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Expanded Phase 1 scope to include MVP self-service registration (`username`, `password`, optional `email`) so sign-in is paired with account creation in the same auth foundation slice.
 - `2026-04-05` - `Antony Acosta` - Added the Phase 1 authentication implementation plan reference so execution can proceed with concrete sequencing.
 - `2026-04-04` - `Antony Acosta` - Resolved remaining auth open questions: defer email verification past MVP hardening and use `/characters` as the first protected end-to-end validation route. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Locked MVP credential strategy to username plus password, made email optional, and added unique username requirement so implementation scope is clear before spec drafting. (Made with OpenCode)
@@ -23,6 +24,7 @@ This feature serves players first by protecting personal character libraries in 
 ## Must Have
 
 - Add a minimal sign-in entry path using username plus password that can establish a valid session in local and production environments.
+- Add a minimal self-service registration entry path using username plus password (with optional email) that can create an account in local and production environments.
 - Require a unique username for each account at creation time.
 - Keep email optional (`nullable`) in the user profile for this MVP slice.
 - Resolve a current user identity for server-side app operations through a stable session context boundary.
@@ -48,6 +50,7 @@ This feature serves players first by protecting personal character libraries in 
 
 ## Acceptance Criteria
 
+- A new user can register with `username + password` (and optional `email`) and receive stable validation errors for duplicate username or invalid payloads.
 - A signed-in user can reach protected surfaces and receives only their own scoped records.
 - An unauthenticated request to a protected page or route returns defined signed-out behavior.
 - Application use-cases that require identity read it from session context and enforce authz before repository access.
