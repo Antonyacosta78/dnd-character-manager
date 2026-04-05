@@ -30,3 +30,4 @@ Compliance checks must cover at minimum:
 - focus visibility and keyboard flow
 - reduced-motion handling
 - domain emphasis clarity for stats/combat/branch/snapshot states
+- base default profile consistency (`2D` Noble Chronicle + `bookish` typography) outside Theme Selector-specific work

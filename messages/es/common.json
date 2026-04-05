@@ -3,5 +3,181 @@
   "homeTitle": "Crea y administra tus aventureros",
   "homeDescription": "Esta superficie mínima confirma la integración de i18n con rutas neutrales por idioma.",
   "activeLocaleLabel": "Idioma resuelto",
-  "supportedLocalesLabel": "Idiomas compatibles: en, es"
+  "supportedLocalesLabel": "Idiomas compatibles: en, es",
+  "designSystem": {
+    "home": {
+      "title": "Rutas de referencia de la base Arcane Codex",
+      "description": "Usa las superficies separadas para revisar flujos densos de workbench y la presentación editorial de codex."
+    },
+    "sandbox": {
+      "title": "Sandbox de UI",
+      "description": "Ruta solo para desarrollo para QA visual de primitivas y componentes de dominio.",
+      "devOnly": "Solo desarrollo",
+      "primitives": "Componentes primitivos",
+      "domain": "Componentes de dominio",
+      "patterns": "Rutas de patrones",
+      "patternsDescription": "Usa las rutas workbench y codex para revisar patrones completos y cobertura de estados.",
+      "switcher": {
+        "title": "Selectores de tema en vivo",
+        "description": "Cambia todo el sandbox entre paletas y stacks tipograficos para evaluar la direccion en contexto.",
+        "paletteLabel": "Direccion de color",
+        "fontLabel": "Stack tipografico",
+        "fontOptions": {
+          "baseline": "Base 1A (Cinzel / Source Serif / Inter)",
+          "serifUi": "UI serif (controles con Source Serif)",
+          "bookish": "Ledger editorial (UI Palatino/Georgia)",
+          "times": "Times clasico (peso en Times New Roman)"
+        }
+      },
+      "palette": {
+        "title": "Comparativa de paletas (2A-2E)",
+        "description": "Vista lado a lado de las cinco direcciones base de color de visual baseline v1.",
+        "current": "Actual",
+        "previewLabel": "Vista de componentes",
+        "previewBody": "Botones, badges y estados de alerta renderizados con sobrescritura local de tokens.",
+        "swatches": {
+          "bg": "Fondo",
+          "surface": "Superficie",
+          "ink": "Tinta",
+          "accent": "Acento",
+          "support": "Soporte"
+        },
+        "options": {
+          "2A": {
+            "name": "Pergamino + Oxblood + Latón",
+            "description": "Identidad codex fuerte con profundidad cálida de pergamino y señal temática alta."
+          },
+          "2B": {
+            "name": "Cool Arcane Ledger",
+            "description": "Dirección más fría con base pizarra y calidez fantástica contenida."
+          },
+          "2C": {
+            "name": "Ranger Archive",
+            "description": "Mezcla terrosa verde-marrón con sensación de diario de campo."
+          },
+          "2D": {
+            "name": "Noble Chronicle",
+            "description": "Tono de bitácora azul-dorado más regio con contraste moderno más limpio."
+          },
+          "2E": {
+            "name": "High-Contrast Utility Codex",
+            "description": "Variante centrada en legibilidad con personalidad más sobria y contraste utilitario superior."
+          }
+        }
+      }
+    },
+    "surface": {
+      "workbench": "Workbench",
+      "codex": "Codex"
+    },
+    "workbench": {
+      "title": "Arcane Codex · Workbench",
+      "subtitle": "Superficie densa de planificación para edición activa de personajes.",
+      "abilitySubtitle": "Bloques compactos de puntuaciones y tabla de salvaciones ajustados para lectura rápida."
+    },
+    "codex": {
+      "title": "Arcane Codex · Codex",
+      "subtitle": "Superficie editorial de lectura con ornamentación contenida.",
+      "abilitySubtitle": "La presentación codex conserva el significado de estadísticas con un ritmo más calmado.",
+      "editorialIntro": "La superficie codex mantiene claridad mecánica mientras permite un tono editorial de pergamino más marcado para contextos de lectura."
+    },
+    "nav": {
+      "aria": "Superficies principales de Arcane Codex"
+    },
+    "shell": {
+      "quickAction": "Acción rápida",
+      "drawerTrigger": "Abrir panel lateral",
+      "drawerTitle": "Notas de workbench",
+      "drawerDescription": "Estado de referencia del panel para comportamiento de primitivas.",
+      "dialogTrigger": "Abrir diálogo",
+      "dialogTitle": "Guía codex",
+      "dialogDescription": "Estado de referencia del diálogo para comportamiento de primitivas.",
+      "dismiss": "Cerrar",
+      "drawerInputLabel": "Etiqueta del campo",
+      "drawerInputPlaceholder": "Escribe un valor",
+      "drawerTextareaLabel": "Texto largo",
+      "drawerTextareaPlaceholder": "Escribe notas"
+    },
+    "sections": {
+      "combat": "Resumen de combate",
+      "abilities": "Matriz de habilidades",
+      "branch": "Resumen de rama",
+      "stateCoverage": "Galería de cobertura de estados",
+      "stateCoverageSubtitle": "Los estados de carga, vacío, validación y error recuperable están representados de forma explícita."
+    },
+    "states": {
+      "loading": "Estado de carga",
+      "empty": "Estado vacío",
+      "emptyMessage": "No hay registros disponibles para esta sección.",
+      "validation": "Estado de validación",
+      "validationMessage": "La entrada no pasó las validaciones del esquema y debe mostrar guía estructurada.",
+      "recoverableError": "Estado de error recuperable",
+      "recoverableErrorMessage": "La operación no pudo completarse; se puede reintentar.",
+      "tryAgain": "Intentar de nuevo"
+    },
+    "validation": {
+      "routeBoundaryTitle": "Falló la validación en el límite de ruta",
+      "routeBoundaryMessage": "La ruta recibió datos de modelo de vista inválidos y no puede renderizar los patrones principales de forma segura.",
+      "routeBoundaryHint": "Revisa el mapeo de datos en la ruta antes de renderizar componentes de patrón.",
+      "patternTitle": "Falló la validación del patrón",
+      "patternMessage": "El patrón rechazó datos inválidos y renderizó una alternativa segura.",
+      "issueCount": "Cantidad de incidencias"
+    },
+    "ability": {
+      "str": "Fuerza",
+      "dex": "Destreza",
+      "con": "Constitución",
+      "int": "Inteligencia",
+      "wis": "Sabiduría",
+      "cha": "Carisma"
+    },
+    "proficiency": {
+      "none": "Ninguna",
+      "proficient": "Competente",
+      "expertise": "Pericia"
+    },
+    "saves": {
+      "heading": "Tiradas de salvación",
+      "ability": "Habilidad",
+      "modifier": "Modificador",
+      "proficiency": "Competencia"
+    },
+    "combat": {
+      "armorClass": "Clase de Armadura",
+      "initiative": "Iniciativa",
+      "hitPoints": "Puntos de Golpe",
+      "speed": "Velocidad",
+      "spellSaveDc": "CD de Salvación de Conjuro",
+      "unavailable": "Sin definir"
+    },
+    "branch": {
+      "branch": "Rama",
+      "stateStable": "Estable",
+      "stateDraft": "Borrador",
+      "stateLocked": "Bloqueada",
+      "worldLocked": "Mundo bloqueado",
+      "worldUnlocked": "Mundo abierto",
+      "snapshotFrozen": "Instantánea congelada",
+      "snapshotActive": "Instantánea activa",
+      "updated": "Actualizado",
+      "unavailable": "Sin mundo asignado"
+    },
+    "runes": {
+      "str": "Runa de Fuerza",
+      "dex": "Runa de Destreza",
+      "con": "Runa de Constitución",
+      "int": "Runa de Inteligencia",
+      "wis": "Runa de Sabiduría",
+      "cha": "Runa de Carisma",
+      "armorClass": "Runa de Clase de Armadura",
+      "initiative": "Runa de Iniciativa",
+      "hitPoints": "Runa de Puntos de Golpe",
+      "speed": "Runa de Velocidad",
+      "spellSaveDc": "Runa de CD de Salvación de Conjuro",
+      "branch": "Runa de Rama",
+      "worldLock": "Runa de Bloqueo de Mundo",
+      "snapshotFrozen": "Runa de Instantánea Congelada",
+      "invalid": "Runa de estado inválido"
+    }
+  }
 }

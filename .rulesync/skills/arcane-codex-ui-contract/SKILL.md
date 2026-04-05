@@ -49,10 +49,12 @@ When constraints conflict, decide in this order:
 - Prefer editorial fantasy tone over corporate dashboard defaults.
 - Use ornament as hierarchy support, not as continuous decoration.
 - Keep data-entry text zones clean (no heavy textures behind form text).
+- Keep base UI defaults aligned with current lock: `2D` (Noble Chronicle) + `bookish` typography stack.
+- Treat additional palette/font variants as Theme Selector behavior, not ad hoc route-level overrides.
 - Use typography roles intentionally:
   - display serif: headings and section markers
   - body serif: longer codex prose
-  - UI sans: controls, dense data, and table content
+  - UI readable serif by default in this slice; alternate stacks may be applied only through Theme Selector controls
 
 ## Implementation Workflow
 
