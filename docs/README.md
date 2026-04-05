@@ -22,6 +22,7 @@ This folder keeps the project notes that are worth preserving.
 - Use lowercase kebab-case for file and folder names.
 - Put one feature per file in `features/`, for example `character-creation.md`.
 - Put feature-specific specs in a matching folder under `specs/`, for example `specs/character-creation/data-model.md`.
+- For user-facing features, create `specs/<feature>/ux-guide.md` by default unless explicitly out of scope.
 - Put the coding-level plan for a feature in `specs/<feature>/implementation-plan.md`.
 - Use short topic names for spec files, such as `flow.md`, `validation.md`, or `normalization.md`.
 - Use broad cross-cutting names in `architecture/`, such as `app-architecture.md` or `data-sources.md`.
