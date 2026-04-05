@@ -42,6 +42,7 @@ Detailed evidence and checklist: `docs/STATUS.md`
 - Phase 7 - Playable Output
 - Phase 8 - Roster And Navigation
 - Phase 9 - History And Comparison
+- Phase 10 - Runtime Reliability And Bug Capture
 
 ```mermaid
 flowchart LR
@@ -55,6 +56,7 @@ flowchart LR
   P7["Phase 7 Playable Output"]
   P8["Phase 8 Roster & Navigation"]
   P9["Phase 9 History & Comparison"]
+  P10["Phase 10 Runtime Reliability & Bug Capture"]
   P0 --> P2
   P2 --> P4
   P4 --> P5
@@ -67,6 +69,11 @@ flowchart LR
   P5 --> P9
   P6 --> P9
   P4 --> P9
+  P1 --> P10
+  P2 --> P10
+  P7 --> P10
+  P8 --> P10
+  P9 --> P10
   P1 --> P2
   P1 --> P4
   P1 --> P5
@@ -211,6 +218,19 @@ Goal: help players understand how a character changed over time.
 
 This phase deepens the product's identity, but it should not block the core create-plan-play-print loop.
 
+## Phase 10 - Runtime Reliability And Bug Capture
+
+Goal: make production issues visible and traceable fast enough to support unknown users without building a heavy analytics stack.
+
+- capture unhandled client runtime errors with release and environment tags
+- capture API/server exceptions with structured logging and normalized error codes
+- include request correlation IDs so one user report can be traced across app and API events
+- keep a minimal operational view for top recurring errors and recent error spikes
+- enforce telemetry and log redaction rules so secrets and sensitive auth/session payloads are never captured
+- provide a simple issue-reporting path that lets users share reproducible bug context
+
+This phase is intentionally lean. It should improve supportability and trust without slowing core character-loop delivery.
+
 ## Likely v1.0 Boundary
 
 The first version should include the minimum needed to become a real primary tool for the group.
@@ -240,6 +260,7 @@ These are strong candidates for the first post-release improvement cycle.
 - better spell browsing and reference ergonomics
 - stronger inventory and loot handling
 - expanded support for additional commonly used source material
+- runtime reliability and bug capture foundations for external-user readiness
 
 ## Later / v2 Direction
 
