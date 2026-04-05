@@ -41,3 +41,9 @@
 - **What changed:** Hardened sheet interactions for mobile by introducing sticky bottom save CTA, tightened tap-target behavior through compact controls, and improved accessibility announcements (`aria-live` save-state updates, explicit section button labels).
 - **Verification run:** `bun run lint`; `bun test src/app/(core)/characters/__tests__/character-core-mobile-smoke.test.tsx`
 - **Known limitations/deferred:** Full real-device QA matrix (iOS/Android browser variance) remains a manual follow-up.
+
+## Phase 7 - offline draft recovery + conflict resolution
+
+- **What changed:** Extended draft store contracts with `character-sheet` scope plus base-revision/conflict metadata, added workflow selectors + conflict store tests, and integrated `ConflictResolutionDialog` with Keep Local / Keep Server / Review Differences behavior in sheet save flow.
+- **Verification run:** `bun run lint`; `bun test src/client/state/__tests__/draft-store.test.ts src/client/state/__tests__/draft-store.storage.test.ts src/client/state/__tests__/draft-store.character-core-conflict.test.ts`
+- **Known limitations/deferred:** Section-level diff drill-down is currently section-list only (no field-level compare view yet).
