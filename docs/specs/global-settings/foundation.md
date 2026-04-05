@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `proposed`
+- Status: `approved`
 - Created At: `2026-04-05`
 - Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Synced spec to shipped behavior: per-control feedback overlays, eased `900ms` save-feedback cycle, reduced-motion fallback semantics, and hook stability guidance to prevent snapshot identity update loops. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Extended MVP theme contract with an experimental border-radius setting (`none` to `pronounced`) and updated types, validation, persistence/fallback, and verification expectations while preserving the unified API + i18n ownership split model. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Locked implementation-level decisions for persistence ownership split, save-feedback animation behavior, app-shell trigger placement, and verification matrix expectations. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Added extension governance and consumer API contract so future user-level settings can be added through typed hooks/selectors without fragmenting settings ownership. (Made with OpenCode)
@@ -21,7 +22,7 @@
 ## Context
 
 - Phase 2 in `docs/ROADMAP.md` defines Global Settings as a small, centralized, user-level configuration foundation.
-- `docs/STATUS.md` currently marks this phase as planned; this spec provides the concrete implementation contract needed before coding.
+- `docs/STATUS.md` marks this phase as completed with implementation evidence; this spec now serves as the approved behavior contract for maintenance and extension.
 - The design-system foundation is already wired, with default visual baseline (`2D` + `bookish`) and validated theme variants demonstrated in `src/app/ui/sandbox/sandbox-theme-shell.tsx`.
 - i18n foundation is already wired with supported locales (`en`, `es`), cookie/localStorage convergence, and fallback semantics.
 
@@ -71,7 +72,8 @@ This spec keeps scope intentionally narrow: one stable Global Settings modal, on
    - Preference changes apply immediately after user interaction (no explicit Save button required).
    - Preference writes happen immediately after apply (best effort, deterministic ordering).
    - On successful write, UI must show non-blocking completion feedback.
-   - Save completion feedback pattern: inline overlay on the edited control using success-state token color + status copy (for example `Setting saved`), then fade out after approximately `500-1000ms`.
+   - Save completion feedback pattern: inline overlay on the edited control using success-state token color + status copy (for example `Setting saved`), with eased fade-in/fade-out cycle around `900ms`.
+   - Overlay must scope to the edited input control, not the entire settings section container.
 
 5. **Persistence ownership split contract**
    - Global Settings provides one unified consumer API for reads/writes.
@@ -145,6 +147,8 @@ Outputs:
   - Keep session behavior usable; show recoverable warning; do not crash modal.
 - **Rapid sequential preference changes**
   - Latest selection wins; save feedback corresponds to latest acknowledged write outcome.
+- **Selector/action snapshot churn**
+  - Action consumer APIs must keep stable snapshot identity to avoid render loops (`getSnapshot` cache warnings / maximum update depth errors).
 - **Cross-tab mismatch**
   - Explicitly out of scope for MVP; no real-time sync guarantee.
 - **Locale mismatch at hydration**
@@ -253,7 +257,7 @@ Manual behavior scenarios:
 - Open Global Settings from nav cog trigger and verify modal semantics.
 - Change theme palette, font, and radius; verify immediate visual application and persisted restoration after reload.
 - Change language; verify locale update consistency with existing i18n behavior and persistence.
-- Verify inline save feedback overlay appears on changed control and fades out after a short readable interval.
+- Verify inline save feedback overlay appears on changed control only and runs eased fade cycle around `900ms`.
 - Force persistence failure path (for example storage unavailable) and verify recoverable warning behavior.
 
 Accessibility checks:
@@ -286,11 +290,11 @@ Accessibility checks:
 - Initial theme options include all currently available variants from `ui/sandbox`.
 - MVP theme controls include an experimental border-radius preset range from `none` to `pronounced` (`none`, `subtle`, `moderate`, `pronounced`).
 - Behavior is auto-apply with immediate persistence and visible save-completion feedback.
-- Save feedback uses inline control overlay with short fade-out timing (`500-1000ms`).
+- Save feedback uses inline control overlay with eased `900ms` cycle timing and reduced-motion fallback.
 - Persistence ownership is split internally (theme via Global Settings modules, locale via i18n path) behind one unified settings consumer API.
 - Global Settings trigger is a cog icon at the end of primary navigation.
 - Account-sync is deferred.
 
 ## Related Implementation Plan
 
-- `docs/specs/global-settings/implementation-plan.md` (to be created)
+- `docs/specs/global-settings/implementation-plan.md`

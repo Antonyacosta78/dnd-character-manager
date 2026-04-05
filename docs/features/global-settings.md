@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `proposed`
+- Status: `completed`
 - Created At: `2026-04-05`
 - Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Synced rundown with shipped implementation details: per-control save feedback overlays, eased `900ms` feedback timing, and selector/action hook stability constraints from runtime validation. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Added an MVP experimental border-radius theme control contract (`none` through `pronounced`) and aligned acceptance criteria/resolved decisions so implementation includes validation, persistence, and fallback behavior. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Locked implementation-direction decisions for settings ownership split, save-feedback interaction, app-shell trigger placement, and verification expectations so the implementation plan can proceed without ambiguity. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Added extensibility and consumer-API expectations so new user-level settings can be added predictably without changing IA or bypassing centralized state contracts. (Made with OpenCode)
@@ -128,7 +129,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - If persistence read fails, app falls back to defaults and remains usable.
 - Preference application should occur early enough to avoid jarring visual mismatch during app load.
 - Global Settings persistence should align with existing global-state and i18n preference patterns where possible.
-- Save feedback uses an inline control overlay pattern: success-color fill + "Setting saved" status text, then fade out in roughly `500-1000ms` after save completion.
+- Save feedback uses an inline control overlay on the edited input only: success-color fill + "Setting saved" status text with an eased animation cycle around `900ms` (reduced-motion-safe fallback).
 
 ## Sequencing Slices
 
@@ -159,7 +160,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - Border-radius is included under theme settings as an experimental/tunable control with typed values from `none` to `pronounced` (`none`, `subtle`, `moderate`, `pronounced`).
 - Selecting a theme updates app-wide presentation consistently across navigable routes.
 - Theme changes auto-apply and persist immediately, with visible UI feedback for save completion.
-- Save feedback appears as inline overlay status on the changed control and fades out after a short readable interval.
+- Save feedback appears as inline overlay status on the changed control (not the entire section) and runs an eased fade-in/fade-out around `900ms`.
 - Settings consumers read from a centralized hook/selector API instead of direct storage access.
 - Refreshing the app preserves the prior valid selection.
 - Invalid persisted values are ignored and replaced by a safe default without breaking UI.
@@ -175,6 +176,8 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - Settings growth path remains centralized: extend sections and typed settings contracts over time; do not scatter user-level controls across unrelated routes.
 - Settings ownership uses one unified Global Settings consumer API, with internal persistence delegation allowed (locale via i18n path, theme via Global Settings modules).
 - Modal trigger placement is a small cog icon at the end of primary navigation.
+- Global settings feedback animation uses per-control overlays with eased `900ms` cycle timing and reduced-motion fallback.
+- Settings action consumers must use stable selector/action hook usage so snapshot identity does not trigger render loops.
 
 ## Related Specs
 

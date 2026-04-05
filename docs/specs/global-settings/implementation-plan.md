@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `ready`
+- Status: `completed`
 - Created At: `2026-04-05`
 - Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Synced plan to shipped implementation outcomes, including per-control eased save-feedback overlays (`900ms`), selector/action hook stability updates to prevent snapshot loops, and completed DoD checklist state. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Expanded MVP scope to include an experimental theme border-radius setting with typed presets (`none` to `pronounced`) and updated plan details for contracts, actions/selectors, persistence/fallback validation, and verification coverage. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Created implementation plan for Global Settings MVP with locked scope decisions for theme/language, modal IA, unified consumer API, persistence ownership split, and verification strategy. (Made with OpenCode)
 
@@ -32,7 +33,7 @@ In scope (implement now):
   - theme persistence in Global Settings modules
   - locale persistence delegated to existing i18n path
 - Validate persisted values before apply and fail safely to defaults.
-- Show inline save feedback overlay on edited control with success fill + `Setting saved` copy and fade-out around `500-1000ms`.
+- Show inline save feedback overlay on edited control only with success fill + `Setting saved` copy and eased animation cycle around `900ms`.
 
 Out of scope (defer intentionally):
 
@@ -48,6 +49,7 @@ Completion criteria:
 - Theme and language are editable only through Global Settings in MVP.
 - Theme includes an experimental border-radius preset control with typed options (`none`, `subtle`, `moderate`, `pronounced`).
 - Changes auto-apply and persist immediately with visible save feedback.
+- Save feedback is scoped to the edited control and uses reduced-motion-safe eased timing.
 - Invalid persisted values fall back safely without broken UI.
 - Consumers use centralized `useGlobalSettings(selector)` + typed actions (no ad-hoc storage access).
 
@@ -196,8 +198,12 @@ Tests and tooling (owner: platform/frontend):
 - `src/client/state/__tests__/global-settings.theme-storage.test.ts`
   - Theme parse/validate/storage unavailable paths.
 
-- `src/components/settings/__tests__/global-settings-modal.a11y.test.tsx` (or nearest existing UI test location)
-  - Modal semantics, keyboard traversal, focus return, live-region announcement.
+- `src/components/settings/__tests__/setting-save-feedback.test.tsx`
+  - Live-region semantics and state rendering for `saved` and `idle` transitions.
+
+Note:
+
+- Modal accessibility was validated manually in this slice; dedicated automated modal accessibility tests are deferred follow-up hardening.
 
 ## Data Flow
 
@@ -210,7 +216,7 @@ Tests and tooling (owner: platform/frontend):
    - theme -> Global Settings theme storage
    - language -> i18n locale bridge
 7. UI receives persistence result and shows inline feedback on edited control:
-   - success: success fill + `Setting saved` copy, fade out `500-1000ms`
+   - success: success fill + `Setting saved` copy, eased fade cycle around `900ms`
    - failure: recoverable warning copy with next-step guidance
 8. On next app load, hydration resolves persisted values, validates, then applies safe effective values.
 
@@ -452,7 +458,7 @@ Automated checks:
 - targeted tests:
   - `bun test src/client/state/__tests__/global-settings.store.test.ts`
   - `bun test src/client/state/__tests__/global-settings.theme-storage.test.ts`
-  - modal/accessibility test file(s)
+  - `bun test src/components/settings/__tests__/setting-save-feedback.test.tsx`
 
 Manual checks:
 
@@ -461,7 +467,7 @@ Manual checks:
 - Change palette/font and verify immediate visual apply + persisted restore after reload.
 - Change radius and verify immediate corner-style apply + persisted restore after reload.
 - Change language and verify locale update + persisted restore after reload.
-- Confirm save overlay on edited control shows success fill + `Setting saved`, then fades in `~500-1000ms`.
+- Confirm save overlay on edited control only shows success fill + `Setting saved`, then runs eased fade cycle around `900ms`.
 - Simulate theme persistence failure and confirm recoverable non-blocking warning.
 - Verify defaults when persisted values are invalid (`2D`, `bookish`, `moderate`, i18n-resolved locale).
 
@@ -495,6 +501,7 @@ Assumptions for implementation:
 - Existing design-system token setup can represent all five palettes, four fonts, and the four experimental radius presets without re-architecting token layers.
 - Existing i18n locale update utility can be invoked from Global Settings bridge without changing i18n fallback contract.
 - `SurfaceShell` remains the correct shared app-shell integration point for primary-nav trigger placement.
+- Selector/action API usage must preserve stable snapshot identity (avoid object-literal selector returns in action hooks).
 
 Deferred follow-ups (explicitly out of MVP):
 
@@ -504,14 +511,14 @@ Deferred follow-ups (explicitly out of MVP):
 
 ## Definition of Done
 
-- [ ] Global Settings modal is available from a nav-end cog icon on primary routes.
-- [ ] Two-pane IA is implemented and keyboard-accessible.
-- [ ] MVP settings scope is limited to theme + language.
-- [ ] Theme options exactly match locked set (`2A-2E`, `baseline/serifUi/bookish/times`, radius: `none/subtle/moderate/pronounced`).
-- [ ] Settings updates auto-apply and persist immediately.
-- [ ] Save feedback uses inline overlay success fill + `Setting saved` and fades in `~500-1000ms`.
-- [ ] Persistence ownership split is implemented behind unified API.
-- [ ] Consumers use centralized selector/action hooks only.
-- [ ] Invalid persisted values fallback safely without UI breakage (`2D`, `bookish`, `moderate`, i18n-resolved locale).
-- [ ] i18n catalogs include all new settings copy with parity.
-- [ ] Verification matrix checks pass (or remaining gaps are explicitly documented).
+- [x] Global Settings modal is available from a nav-end cog icon on primary routes.
+- [x] Two-pane IA is implemented and keyboard-accessible.
+- [x] MVP settings scope is limited to theme + language.
+- [x] Theme options exactly match locked set (`2A-2E`, `baseline/serifUi/bookish/times`, radius: `none/subtle/moderate/pronounced`).
+- [x] Settings updates auto-apply and persist immediately.
+- [x] Save feedback uses per-control inline overlay success fill + `Setting saved` with eased `900ms` cycle.
+- [x] Persistence ownership split is implemented behind unified API.
+- [x] Consumers use centralized selector/action hooks only.
+- [x] Invalid persisted values fallback safely without UI breakage (`2D`, `bookish`, `moderate`, i18n-resolved locale).
+- [x] i18n catalogs include all new settings copy with parity.
+- [x] Verification matrix checks pass (remaining gaps explicitly documented).

@@ -100,6 +100,28 @@ export function GlobalSettingsModal({ labels }: { labels: GlobalSettingsModalLab
     };
   }, [dismiss, open]);
 
+  useEffect(() => {
+    if (!open || typeof document === "undefined") {
+      return;
+    }
+
+    const { body, documentElement } = document;
+    const previousOverflow = body.style.overflow;
+    const previousPaddingRight = body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+
+    body.style.overflow = "hidden";
+
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      body.style.overflow = previousOverflow;
+      body.style.paddingRight = previousPaddingRight;
+    };
+  }, [open]);
+
   const themeLabels = useMemo<ThemeSettingsPanelLabels>(
     () => ({
       title: labels.appearanceTitle,
@@ -183,7 +205,7 @@ export function GlobalSettingsModal({ labels }: { labels: GlobalSettingsModalLab
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={descriptionId}
-            className="fixed left-1/2 top-1/2 z-30 w-[min(56rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-radius-sm border border-border-strong bg-bg-elevated p-4 shadow-shadow-panel"
+            className="fixed left-1/2 top-1/2 z-30 flex h-[min(44rem,calc(100vh-2rem))] w-[min(56rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-radius-sm border border-border-strong bg-bg-elevated p-4 shadow-shadow-panel"
             onKeyDown={(event) => {
               if (event.key !== "Tab" || !dialogRef.current) {
                 return;
@@ -223,10 +245,10 @@ export function GlobalSettingsModal({ labels }: { labels: GlobalSettingsModalLab
               </Button>
             </div>
 
-            <div className="mt-4 grid gap-4 lg:grid-cols-[14rem_1fr]">
+            <div className="mt-4 grid min-h-0 flex-1 gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]">
               <nav
                 aria-label={labels.sectionsAriaLabel}
-                className="rounded-radius-sm border border-border-default bg-bg-surface p-2"
+                className="max-h-full overflow-y-auto rounded-radius-sm border border-border-default bg-bg-surface p-2"
               >
                 <ul className="space-y-1">
                   <li>
@@ -262,7 +284,7 @@ export function GlobalSettingsModal({ labels }: { labels: GlobalSettingsModalLab
                 </ul>
               </nav>
 
-              <div className="rounded-radius-sm border border-border-default bg-bg-muted p-3">
+              <div className="min-h-0 overflow-y-auto rounded-radius-sm border border-border-default bg-bg-muted p-3">
                 {activeSection === "appearance" ? (
                   <ThemeSettingsPanel labels={themeLabels} />
                 ) : (
