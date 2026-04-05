@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 
 import { LocalePreferenceConverger } from "@/app/locale-preference-converger";
 import { DraftStoreProvider } from "@/client/state/draft-store.provider";
+import { GlobalSettingsProvider } from "@/client/state/global-settings.provider";
 
 import "./globals.css";
 
@@ -38,12 +39,21 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html lang={locale} data-theme="arcane-codex" data-motion="system">
+    <html
+      lang={locale}
+      data-theme="arcane-codex"
+      data-motion="system"
+      data-theme-palette="2D"
+      data-theme-font="bookish"
+      data-theme-radius="moderate"
+    >
       <body
         className={`${cinzel.variable} ${sourceSerif.variable} ${inter.variable} antialiased`}
       >
         <LocalePreferenceConverger />
-        <DraftStoreProvider>{children}</DraftStoreProvider>
+        <GlobalSettingsProvider>
+          <DraftStoreProvider>{children}</DraftStoreProvider>
+        </GlobalSettingsProvider>
       </body>
     </html>
   );

@@ -35,12 +35,13 @@ Detailed evidence and checklist: `docs/STATUS.md`
 - Phase 0 - Foundation: completed
 - Phase 1 - Authentication And Identity: in-progress
 - Phase 2 - Character Core: planned
-- Phase 3 - Progression Planning: planned
-- Phase 4 - Branching And Timelines: planned
-- Phase 5 - Games, Worlds, And Snapshots: planned
-- Phase 6 - Playable Output: planned
-- Phase 7 - Roster And Navigation: planned
-- Phase 8 - History And Comparison: planned
+- Phase 3 - Global Settings: completed
+- Phase 4 - Progression Planning: planned
+- Phase 5 - Branching And Timelines: planned
+- Phase 6 - Games, Worlds, And Snapshots: planned
+- Phase 7 - Playable Output: planned
+- Phase 8 - Roster And Navigation: planned
+- Phase 9 - History And Comparison: planned
 
 ## Phase 0 - Foundation
 
@@ -78,7 +79,19 @@ Goal: make it possible to create a real character and manage it as a persistent 
 
 This phase should end with the app feeling like a usable character library, even before branching and games are fully present.
 
-## Phase 3 - Progression Planning
+## Phase 3 - Global Settings
+
+Goal: establish a reliable app-wide settings foundation as the central home for user-level preferences.
+
+- ship a dedicated Global Settings modal with section navigation and a form content panel
+- centralize user-level preferences such as theme and language
+- keep preference behavior global and consistent across routes
+- persist preferences with safe validation and fallback behavior
+- separate prep-time preferences from in-session game-state actions
+
+This phase is intentionally small. It prevents settings sprawl and establishes one predictable control point for app-level configuration.
+
+## Phase 4 - Progression Planning
 
 Goal: let players define a character from level 1 up to a target level `N`.
 
@@ -92,7 +105,7 @@ Goal: let players define a character from level 1 up to a target level `N`.
 
 This is the first point where the product starts feeling better than a static sheet.
 
-## Phase 4 - Branching And Timelines
+## Phase 5 - Branching And Timelines
 
 Goal: deliver the product's signature behavior.
 
@@ -106,7 +119,7 @@ Goal: deliver the product's signature behavior.
 
 This phase is the heart of the app. If it is weak, the product becomes just another sheet builder.
 
-## Phase 5 - Games, Worlds, And Snapshots
+## Phase 6 - Games, Worlds, And Snapshots
 
 Goal: connect characters to actual play.
 
@@ -120,7 +133,7 @@ Goal: connect characters to actual play.
 
 This phase turns progression planning into real table history.
 
-## Phase 6 - Playable Output
+## Phase 7 - Playable Output
 
 Goal: make the app usable as a real pre-game tool.
 
@@ -132,7 +145,7 @@ Goal: make the app usable as a real pre-game tool.
 
 This is the point where the tool can replace a paper-first or ad hoc workflow for the group.
 
-## Phase 7 - Roster And Navigation
+## Phase 8 - Roster And Navigation
 
 Goal: make many-character play manageable.
 
@@ -145,7 +158,7 @@ Goal: make many-character play manageable.
 
 This phase matters because the product is not only for one hero in one campaign. It is for a personal library of protagonists.
 
-## Phase 8 - History And Comparison
+## Phase 9 - History And Comparison
 
 Goal: help players understand how a character changed over time.
 
@@ -228,6 +241,7 @@ Do not cut the core promise first: branching character progression with playable
 - `docs/architecture/app-architecture.md`
 - `docs/architecture/data-sources.md`
 - `docs/architecture/feature-workflow.md`
+- `docs/features/global-settings.md`
 - `docs/features/authentication-and-identity-foundation.md`
 - `docs/features/internationalization.md`
 - `docs/specs/internationalization/foundation.md`

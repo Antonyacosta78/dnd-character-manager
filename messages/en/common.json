@@ -98,6 +98,45 @@
       "drawerTextareaLabel": "Long text",
       "drawerTextareaPlaceholder": "Type notes"
     },
+    "globalSettings": {
+      "triggerLabel": "Open global settings",
+      "title": "Global settings",
+      "description": "Manage app-wide preferences for appearance and language.",
+      "dismiss": "Close settings",
+      "sectionsAria": "Global settings sections",
+      "sections": {
+        "appearance": "Appearance",
+        "language": "Language"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "description": "Theme choices apply immediately across routes.",
+        "paletteLabel": "Theme palette",
+        "fontLabel": "Theme font",
+        "radiusLabel": "Theme radius (experimental)",
+        "radiusDescription": "Experimental preset for corner roundness.",
+        "radiusOptions": {
+          "none": "None",
+          "subtle": "Subtle",
+          "moderate": "Moderate",
+          "pronounced": "Pronounced"
+        }
+      },
+      "language": {
+        "title": "Language",
+        "description": "Language updates persist immediately.",
+        "languageLabel": "App language",
+        "options": {
+          "en": "English",
+          "es": "Spanish"
+        }
+      },
+      "feedback": {
+        "saving": "Saving setting...",
+        "saved": "Setting saved",
+        "failed": "Could not save setting"
+      }
+    },
     "sections": {
       "combat": "Combat summary",
       "abilities": "Ability matrix",

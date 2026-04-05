@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 
 import { AppIcon } from "@/components/domain/rune-icon";
+import {
+  GlobalSettingsModal,
+  type GlobalSettingsModalLabels,
+} from "@/components/settings/global-settings-modal";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Drawer } from "@/components/ui/drawer";
@@ -33,13 +37,21 @@ export interface SurfaceShellProps {
     drawerInputPlaceholder: string;
     drawerTextareaLabel: string;
     drawerTextareaPlaceholder: string;
+    globalSettings: GlobalSettingsModalLabels;
   };
   children: ReactNode;
 }
 
 export function SurfaceShell({ mode, activeRoute, labels, children }: SurfaceShellProps) {
   return (
-    <main className={cn("min-h-screen px-4 py-6 sm:px-6 lg:px-8", SURFACE_CLASS_BY_MODE[mode])}>
+    <main
+      className={cn("relative min-h-screen px-4 py-6 sm:px-6 lg:px-8", SURFACE_CLASS_BY_MODE[mode])}
+    >
+      {/* TODO(phase-8-roster-and-navigation): Move this trigger into the primary navbar once the shared navbar ships. */}
+      <div className="absolute right-4 top-4 z-20 sm:right-6 lg:right-8">
+        <GlobalSettingsModal labels={labels.globalSettings} />
+      </div>
+
       <div className="mx-auto max-w-7xl space-y-4">
         <header className="rounded-radius-sm border border-border-strong bg-bg-surface px-4 py-3 shadow-shadow-soft">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -99,24 +111,27 @@ export function SurfaceShell({ mode, activeRoute, labels, children }: SurfaceShe
 
           <div className="mt-3 grid gap-3 lg:grid-cols-[16rem_1fr]">
             <aside className="rounded-radius-sm border border-border-default bg-bg-elevated p-2">
-              <Tabs
-                ariaLabel={labels.navAriaLabel}
-                activeValue={activeRoute}
-                items={[
-                  {
-                    value: "workbench",
-                    label: labels.workbench,
-                    href: "/workbench",
-                    icon: <AppIcon name="workbench" label={labels.workbench} />,
-                  },
-                  {
-                    value: "codex",
-                    label: labels.codex,
-                    href: "/codex",
-                    icon: <AppIcon name="codex" label={labels.codex} />,
-                  },
-                ]}
-              />
+              <div className="flex items-center gap-2">
+                <Tabs
+                  ariaLabel={labels.navAriaLabel}
+                  activeValue={activeRoute}
+                  className="flex-1"
+                  items={[
+                    {
+                      value: "workbench",
+                      label: labels.workbench,
+                      href: "/workbench",
+                      icon: <AppIcon name="workbench" label={labels.workbench} />,
+                    },
+                    {
+                      value: "codex",
+                      label: labels.codex,
+                      href: "/codex",
+                      icon: <AppIcon name="codex" label={labels.codex} />,
+                    },
+                  ]}
+                />
+              </div>
             </aside>
 
             <div className="rounded-radius-sm border border-border-default bg-bg-elevated px-3 py-2 text-xs uppercase tracking-[0.08em] text-fg-muted">

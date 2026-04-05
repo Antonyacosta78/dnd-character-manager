@@ -98,6 +98,45 @@
       "drawerTextareaLabel": "Texto largo",
       "drawerTextareaPlaceholder": "Escribe notas"
     },
+    "globalSettings": {
+      "triggerLabel": "Abrir configuración global",
+      "title": "Configuración global",
+      "description": "Administra preferencias globales de apariencia e idioma.",
+      "dismiss": "Cerrar configuración",
+      "sectionsAria": "Secciones de configuración global",
+      "sections": {
+        "appearance": "Apariencia",
+        "language": "Idioma"
+      },
+      "appearance": {
+        "title": "Apariencia",
+        "description": "Las opciones de tema se aplican de inmediato en todas las rutas.",
+        "paletteLabel": "Paleta del tema",
+        "fontLabel": "Tipografía del tema",
+        "radiusLabel": "Radio del tema (experimental)",
+        "radiusDescription": "Ajuste experimental predefinido para redondeo de esquinas.",
+        "radiusOptions": {
+          "none": "Ninguno",
+          "subtle": "Sutil",
+          "moderate": "Moderado",
+          "pronounced": "Pronunciado"
+        }
+      },
+      "language": {
+        "title": "Idioma",
+        "description": "Los cambios de idioma se guardan de inmediato.",
+        "languageLabel": "Idioma de la aplicación",
+        "options": {
+          "en": "Inglés",
+          "es": "Español"
+        }
+      },
+      "feedback": {
+        "saving": "Guardando configuración...",
+        "saved": "Configuración guardada",
+        "failed": "No se pudo guardar la configuración"
+      }
+    },
     "sections": {
       "combat": "Resumen de combate",
       "abilities": "Matriz de habilidades",
