@@ -215,6 +215,20 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
+### Phase 10 - Runtime Reliability And Bug Capture
+
+- Status: `planned`
+- Confidence: `high`
+- Checklist
+  - [ ] Capture unhandled client runtime errors with release/environment tagging
+  - [ ] Capture API/server exceptions with structured logs and normalized error codes
+  - [ ] Propagate request correlation IDs for user-report traceability
+  - [ ] Provide a minimal recurring-error and spike visibility surface
+  - [ ] Enforce telemetry redaction to prevent sensitive auth/session payload capture
+  - [ ] Provide a simple issue-reporting path for reproducible bug context
+- Evidence
+  - `docs/ROADMAP.md`
+
 ## Update Cadence
 
 - Update this file whenever roadmap-relevant docs or implementation land.
