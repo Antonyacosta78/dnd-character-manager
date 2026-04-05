@@ -76,7 +76,22 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 2 - Progression Planning
+### Phase 2 - Global Settings
+
+- Status: `planned`
+- Confidence: `high`
+- Checklist
+  - [ ] Global Settings modal exists in primary navigation with section navigation + content panel layout
+  - [ ] User-level preferences are centralized here (theme and language included in MVP scope)
+  - [ ] Preference persistence + hydration is deterministic with fallback
+  - [ ] Scope stays global-only (no character/world/game-specific overrides)
+- Evidence
+  - `docs/ROADMAP.md`
+  - `docs/features/global-settings.md`
+  - `docs/specs/global-settings/foundation.md`
+  - `docs/specs/global-settings/implementation-plan.md`
+
+### Phase 3 - Progression Planning
 
 - Status: `planned`
 - Confidence: `high`
@@ -88,7 +103,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 3 - Branching And Timelines
+### Phase 4 - Branching And Timelines
 
 - Status: `planned`
 - Confidence: `high`
@@ -100,7 +115,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 4 - Games, Worlds, And Snapshots
+### Phase 5 - Games, Worlds, And Snapshots
 
 - Status: `planned`
 - Confidence: `high`
@@ -112,7 +127,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 5 - Playable Output
+### Phase 6 - Playable Output
 
 - Status: `planned`
 - Confidence: `high`
@@ -124,7 +139,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 6 - Roster And Navigation
+### Phase 7 - Roster And Navigation
 
 - Status: `planned`
 - Confidence: `high`
@@ -136,7 +151,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 7 - History And Comparison
+### Phase 8 - History And Comparison
 
 - Status: `planned`
 - Confidence: `high`
