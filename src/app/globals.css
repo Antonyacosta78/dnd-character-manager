@@ -1,26 +1,150 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-canvas: #f5f0e3;
+  --bg-surface: #eae2d0;
+  --bg-elevated: #fbf8ef;
+  --bg-muted: #ded2bc;
+
+  --fg-primary: #1f2430;
+  --fg-secondary: #3a4357;
+  --fg-muted: #586177;
+
+  --border-default: #b9ad94;
+  --border-strong: #93866c;
+
+  --accent-rubric: #2d4270;
+  --accent-rubric-strong: #23345a;
+  --accent-brass: #b2873b;
+  --accent-arcane: #5f4a8a;
+
+  --state-info: #375974;
+  --state-success: #2f6b3a;
+  --state-warning: #896322;
+  --state-danger: #8f2d2d;
+  --state-danger-strong: #6d1f1f;
+
+  --domain-stat-core: #2d4270;
+  --domain-stat-combat: #7a5c28;
+  --domain-branch: #5f4a8a;
+  --domain-world-lock: #9a7430;
+  --domain-snapshot-frozen: #3f5d7c;
+
+  --ink: #161a23;
+  --parchment: #fbf8ef;
+
+  --font-display: var(--font-cinzel), Georgia, serif;
+  --font-body: var(--font-source-serif), Georgia, serif;
+  --font-ui: Palatino Linotype, Book Antiqua, Palatino, Georgia, serif;
+
+  --radius-xs: 0.2rem;
+  --radius-sm: 0.28rem;
+
+  --shadow-soft: 0 1px 2px rgb(26 18 11 / 12%);
+  --shadow-panel: 0 8px 28px rgb(26 18 11 / 24%);
+
+  --motion-duration-fast: 120ms;
+  --motion-duration-base: 180ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg-canvas: var(--bg-canvas);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-muted: var(--bg-muted);
+
+  --color-fg-primary: var(--fg-primary);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-muted: var(--fg-muted);
+
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+
+  --color-accent-rubric: var(--accent-rubric);
+  --color-accent-rubric-strong: var(--accent-rubric-strong);
+  --color-accent-brass: var(--accent-brass);
+  --color-accent-arcane: var(--accent-arcane);
+
+  --color-state-info: var(--state-info);
+  --color-state-success: var(--state-success);
+  --color-state-warning: var(--state-warning);
+  --color-state-danger: var(--state-danger);
+  --color-state-danger-strong: var(--state-danger-strong);
+
+  --color-domain-stat-core: var(--domain-stat-core);
+  --color-domain-stat-combat: var(--domain-stat-combat);
+  --color-domain-branch: var(--domain-branch);
+  --color-domain-world-lock: var(--domain-world-lock);
+  --color-domain-snapshot-frozen: var(--domain-snapshot-frozen);
+
+  --color-ink: var(--ink);
+  --color-parchment: var(--parchment);
+
+  --font-sans: var(--font-ui);
+  --font-serif: var(--font-body);
+
+  --radius-radius-xs: var(--radius-xs);
+  --radius-radius-sm: var(--radius-sm);
+
+  --shadow-shadow-soft: var(--shadow-soft);
+  --shadow-shadow-panel: var(--shadow-panel);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-reduced-motion: reduce) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --motion-duration-fast: 1ms;
+    --motion-duration-base: 1ms;
   }
 }
 
+[data-motion="reduce"] {
+  --motion-duration-fast: 1ms;
+  --motion-duration-base: 1ms;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-canvas);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-ui {
+    font-family: var(--font-ui);
+  }
+
+  .surface-workbench {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--bg-canvas) 90%, white), var(--bg-canvas));
+    color: var(--fg-primary);
+  }
+
+  .surface-codex {
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--accent-rubric) 22%, transparent), transparent 60%),
+      linear-gradient(180deg, var(--parchment), color-mix(in srgb, var(--parchment) 82%, var(--bg-surface)));
+    color: var(--fg-primary);
+  }
+
+  .codex-ornament {
+    border-color: color-mix(in srgb, var(--border-strong) 82%, var(--accent-brass));
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--parchment) 96%, transparent),
+      color-mix(in srgb, var(--bg-surface) 72%, transparent)
+    );
+  }
+
+  .rune-icon {
+    transition-duration: var(--motion-duration-base);
+    transition-timing-function: var(--motion-ease-standard);
+  }
 }

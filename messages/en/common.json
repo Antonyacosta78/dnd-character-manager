@@ -3,5 +3,181 @@
   "homeTitle": "Build and manage your adventurers",
   "homeDescription": "This starter surface confirms i18n wiring with locale-neutral routing.",
   "activeLocaleLabel": "Resolved locale",
-  "supportedLocalesLabel": "Supported locales: en, es"
+  "supportedLocalesLabel": "Supported locales: en, es",
+  "designSystem": {
+    "home": {
+      "title": "Arcane Codex foundation reference routes",
+      "description": "Use the split surfaces to review dense workbench workflows and editorial codex presentation."
+    },
+    "sandbox": {
+      "title": "UI Sandbox",
+      "description": "Dev-only route for visual QA of primitives and domain components.",
+      "devOnly": "Development only",
+      "primitives": "Primitive components",
+      "domain": "Domain components",
+      "patterns": "Pattern routes",
+      "patternsDescription": "Use workbench and codex routes for full pattern and state-completeness checks.",
+      "switcher": {
+        "title": "Live theme switchers",
+        "description": "Switch the full sandbox between color palettes and font stacks to evaluate the direction in-context.",
+        "paletteLabel": "Color direction",
+        "fontLabel": "Font stack",
+        "fontOptions": {
+          "baseline": "Baseline 1A (Cinzel / Source Serif / Inter)",
+          "serifUi": "Serif UI (Source Serif controls)",
+          "bookish": "Bookish ledger (Palatino/Georgia UI)",
+          "times": "Classic Times (Times New Roman heavy)"
+        }
+      },
+      "palette": {
+        "title": "Palette comparison (2A-2E)",
+        "description": "Side-by-side token previews for the five baseline color directions in visual baseline v1.",
+        "current": "Current",
+        "previewLabel": "Component preview",
+        "previewBody": "Buttons, badges, and alert states rendered against the local token override.",
+        "swatches": {
+          "bg": "Bg",
+          "surface": "Surface",
+          "ink": "Ink",
+          "accent": "Accent",
+          "support": "Support"
+        },
+        "options": {
+          "2A": {
+            "name": "Parchment + Oxblood + Brass",
+            "description": "Strong codex identity with warm parchment depth and high thematic signal."
+          },
+          "2B": {
+            "name": "Cool Arcane Ledger",
+            "description": "Cooler slate-heavy direction with restrained fantasy warmth."
+          },
+          "2C": {
+            "name": "Ranger Archive",
+            "description": "Earthy green-brown mix that feels grounded and field-journal oriented."
+          },
+          "2D": {
+            "name": "Noble Chronicle",
+            "description": "Regal blue-gold ledger tone with cleaner modern contrast."
+          },
+          "2E": {
+            "name": "High-Contrast Utility Codex",
+            "description": "Readability-first variant with quieter personality and stronger utility contrast."
+          }
+        }
+      }
+    },
+    "surface": {
+      "workbench": "Workbench",
+      "codex": "Codex"
+    },
+    "workbench": {
+      "title": "Arcane Codex · Workbench",
+      "subtitle": "Dense planning surface for active character editing.",
+      "abilitySubtitle": "Compact score blocks and save table tuned for fast scanning."
+    },
+    "codex": {
+      "title": "Arcane Codex · Codex",
+      "subtitle": "Editorial reading surface with restrained ornament.",
+      "abilitySubtitle": "Codex presentation keeps stat meaning while using calmer pacing.",
+      "editorialIntro": "The codex surface preserves mechanics clarity while allowing a stronger editorial parchment tone for reading-oriented contexts."
+    },
+    "nav": {
+      "aria": "Primary Arcane Codex surfaces"
+    },
+    "shell": {
+      "quickAction": "Quick action",
+      "drawerTrigger": "Open drawer",
+      "drawerTitle": "Workbench notes",
+      "drawerDescription": "Reference drawer state for primitive behavior.",
+      "dialogTrigger": "Open dialog",
+      "dialogTitle": "Codex guidance",
+      "dialogDescription": "Reference dialog state for primitive behavior.",
+      "dismiss": "Dismiss",
+      "drawerInputLabel": "Field label",
+      "drawerInputPlaceholder": "Type value",
+      "drawerTextareaLabel": "Long text",
+      "drawerTextareaPlaceholder": "Type notes"
+    },
+    "sections": {
+      "combat": "Combat summary",
+      "abilities": "Ability matrix",
+      "branch": "Branch summary",
+      "stateCoverage": "State coverage gallery",
+      "stateCoverageSubtitle": "Loading, empty, validation, and recoverable error states are explicitly represented."
+    },
+    "states": {
+      "loading": "Loading state",
+      "empty": "Empty state",
+      "emptyMessage": "No records are available for this section.",
+      "validation": "Validation state",
+      "validationMessage": "Input failed schema checks and should surface structured guidance.",
+      "recoverableError": "Recoverable error state",
+      "recoverableErrorMessage": "The operation could not complete; retry is available.",
+      "tryAgain": "Try again"
+    },
+    "validation": {
+      "routeBoundaryTitle": "Route boundary validation failed",
+      "routeBoundaryMessage": "The route received invalid view-model data and cannot safely render the primary patterns.",
+      "routeBoundaryHint": "Check route-level data mapping before rendering pattern components.",
+      "patternTitle": "Pattern validation failed",
+      "patternMessage": "The pattern rejected invalid data and rendered a safe fallback.",
+      "issueCount": "Issue count"
+    },
+    "ability": {
+      "str": "Strength",
+      "dex": "Dexterity",
+      "con": "Constitution",
+      "int": "Intelligence",
+      "wis": "Wisdom",
+      "cha": "Charisma"
+    },
+    "proficiency": {
+      "none": "None",
+      "proficient": "Proficient",
+      "expertise": "Expertise"
+    },
+    "saves": {
+      "heading": "Saving throws",
+      "ability": "Ability",
+      "modifier": "Modifier",
+      "proficiency": "Proficiency"
+    },
+    "combat": {
+      "armorClass": "Armor Class",
+      "initiative": "Initiative",
+      "hitPoints": "Hit Points",
+      "speed": "Speed",
+      "spellSaveDc": "Spell Save DC",
+      "unavailable": "Not set"
+    },
+    "branch": {
+      "branch": "Branch",
+      "stateStable": "Stable",
+      "stateDraft": "Draft",
+      "stateLocked": "Locked",
+      "worldLocked": "World-locked",
+      "worldUnlocked": "World-open",
+      "snapshotFrozen": "Snapshot frozen",
+      "snapshotActive": "Snapshot active",
+      "updated": "Updated",
+      "unavailable": "No world assigned"
+    },
+    "runes": {
+      "str": "Strength rune",
+      "dex": "Dexterity rune",
+      "con": "Constitution rune",
+      "int": "Intelligence rune",
+      "wis": "Wisdom rune",
+      "cha": "Charisma rune",
+      "armorClass": "Armor class rune",
+      "initiative": "Initiative rune",
+      "hitPoints": "Hit points rune",
+      "speed": "Speed rune",
+      "spellSaveDc": "Spell save DC rune",
+      "branch": "Branch rune",
+      "worldLock": "World lock rune",
+      "snapshotFrozen": "Snapshot frozen rune",
+      "invalid": "Invalid state rune"
+    }
+  }
 }

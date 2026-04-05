@@ -2,13 +2,15 @@
 
 ## Metadata
 
-- Status: `draft`
+- Status: `completed`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Synced Arcane Codex contract defaults to `2D` + `bookish`, aligned `.rulesync` guidance, and marked implementation Definition of Done checklist complete with verification evidence. (Made with OpenCode)
+- `2026-04-05` - `Antony Acosta` - Recorded implementation decisions for split `workbench`/`codex` routes, runtime schema validation in this slice, and v1 rune/icon semantics so execution evidence aligns with plan scope. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; plan remains draft because design-system implementation has not started in code. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-03` - `Antony Acosta` - Initial document created.
@@ -32,7 +34,7 @@ Scope controls:
   - complete feature UI rollout across all app routes
   - world-specific multi-theme packs (v2)
   - PDF renderer styling parity
-  - custom icon/rune authoring beyond minimal placeholders
+  - advanced rune illustration polish beyond functional semantic v1 glyphs
 
 Completion criteria:
 
@@ -458,11 +460,16 @@ Assumptions:
 - shadcn/Radix-style patterns are used for primitives, with local code ownership.
 - Design token names in the decision record remain authoritative unless explicitly revised.
 
-Unresolved questions:
+Resolved questions:
 
-- final font lock after readability check on dense data tables
-- minimal icon/rune strategy timing (v1 vs v1.1)
-- whether to enforce runtime schema validation immediately or after core UI baseline ships
+- runtime schema validation is implemented now at route and pattern boundaries for this slice
+- split route composition uses separate `workbench` and `codex` surfaces
+- rune/icon semantics ship in v1 with practical, usable semantic glyphs
+- base UI default now uses `2D` (Noble Chronicle) palette with `bookish` font stack; remaining options are deferred to Theme Selector feature work
+
+Remaining open question:
+
+- none for this foundation slice
 
 Deferred follow-ups:
 
@@ -486,12 +493,12 @@ Backout:
 
 ## Definition of Done
 
-- [ ] Arcane Codex token foundation is implemented in global styles.
-- [ ] Root layout typography and metadata are updated for design-system baseline.
-- [ ] Core primitives exist with complete interaction states.
-- [ ] Domain emphasis components exist for stats/combat/branch/snapshot semantics.
-- [ ] Reference route demonstrates required states and both surface intents.
-- [ ] Reduced-motion behavior is supported and validated.
-- [ ] `bun run lint` passes for implementation changes.
-- [ ] `.rulesync` Arcane Codex skill/command artifacts are aligned with implemented behavior.
-- [ ] Spec and plan docs reflect final implementation decisions.
+- [x] Arcane Codex token foundation is implemented in global styles.
+- [x] Root layout typography and metadata are updated for design-system baseline.
+- [x] Core primitives exist with complete interaction states.
+- [x] Domain emphasis components exist for stats/combat/branch/snapshot semantics.
+- [x] Reference route demonstrates required states and both surface intents.
+- [x] Reduced-motion behavior is supported and validated.
+- [x] `bun run lint` passes for implementation changes.
+- [x] `.rulesync` Arcane Codex skill/command artifacts are aligned with implemented behavior.
+- [x] Spec and plan docs reflect final implementation decisions.

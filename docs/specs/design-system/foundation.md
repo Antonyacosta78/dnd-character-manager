@@ -4,11 +4,12 @@
 
 - Status: `approved`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Documented resolved implementation decisions for split route surfaces, runtime schema validation in this slice, and v1 rune/icon semantics. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-03` - `Antony Acosta` - Initial document created.
 
@@ -119,10 +120,14 @@ Shared references:
 
 ## Open Questions
 
-- Does preliminary `1A` typography pass dense-screen readability QA, or should fallback `1C` be used for control-heavy views?
-- Should custom rune rollout happen in one slice or two slices (core stat/combat first, branch/snapshot second)?
 - Should `8A` stay universal, or switch to `8E` adaptation on smaller viewports after first mobile pass?
-- Should runtime schema validation at pattern boundaries be added in this slice or deferred one iteration?
+
+## Resolved Decisions
+
+- Runtime schema validation is included in this slice at route and pattern boundaries.
+- Surface composition is split into dedicated `workbench` and `codex` routes.
+- Rune semantics ship in v1 with practical custom glyphs for domain-critical meanings.
+- Base UI default uses `2D` (Noble Chronicle) plus `bookish` font stack; remaining palette/font variants move to Theme Selector scope.
 
 ## Related Implementation Plan
 
