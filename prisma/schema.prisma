@@ -29,12 +29,110 @@ model Character {
   id          String   @id @default(cuid())
   name        String
   ownerUserId String
+  status      String   @default("draft")
+  revision    Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  owner               User                          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  buildState          CharacterBuildState?
+  validationOverrides CharacterValidationOverride[]
+  inventoryEntries    CharacterInventoryEntry[]
+  spellEntries        CharacterSpellEntry[]
+  levelHistoryEntries CharacterLevelHistoryEntry[]
+  shareSettings       CharacterShareSettings?
 
   @@index([ownerUserId, updatedAt])
+}
+
+model CharacterBuildState {
+  id          String @id @default(cuid())
+  characterId String @unique
+  concept     String
+  className   String
+  classSource String
+  level       Int
+  notes       String?
+  optionalRuleRefsJson String?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+model CharacterInventoryEntry {
+  id          String   @id @default(cuid())
+  characterId String
+  label       String
+  quantity    Int      @default(1)
+  carriedState String  @default("carried")
+  weight      Float?
+  notes       String?
+  catalogName String?
+  catalogSource String?
+  isCustom    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId, sortOrder])
+}
+
+model CharacterSpellEntry {
+  id           String   @id @default(cuid())
+  characterId  String
+  label        String
+  level        Int?
+  status       String
+  notes        String?
+  catalogName  String?
+  catalogSource String?
+  isCustom     Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId, sortOrder])
+}
+
+model CharacterLevelHistoryEntry {
+  id          String   @id @default(cuid())
+  characterId String
+  levelNumber Int
+  className   String
+  classSource String
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId, levelNumber])
+}
+
+model CharacterShareSettings {
+  id          String   @id @default(cuid())
+  characterId String   @unique
+  shareEnabled Boolean @default(false)
+  shareToken  String?  @unique
+  updatedAt   DateTime @updatedAt
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([shareEnabled, shareToken])
+}
+
+model CharacterValidationOverride {
+  id             String   @id @default(cuid())
+  characterId    String
+  code           String
+  path           String
+  acknowledgedAt DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId, acknowledgedAt])
 }
 
 model Account {
