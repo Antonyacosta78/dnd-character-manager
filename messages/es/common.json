@@ -288,6 +288,24 @@
       "adventureEntitySessions": "Los detalles de sesiones para la aventura {id} aparecerán aquí."
     }
   },
+  "observability": {
+    "requestIdLabel": "ID de solicitud",
+    "reportIssue": {
+      "cta": "Reportar problema",
+      "title": "Reportar este problema",
+      "description": "Comparte el contexto técnico de esta falla para facilitar el diagnóstico.",
+      "timestampLabel": "Marca de tiempo",
+      "routeLabel": "Ruta",
+      "requestIdLabel": "ID de solicitud",
+      "notesLabel": "Notas (opcional)",
+      "notesHint": "Notas opcionales (máximo 750 caracteres)",
+      "privacyHint": "Evita incluir contraseñas, tokens o secretos privados en las notas.",
+      "submit": "Enviar reporte",
+      "submitting": "Enviando reporte...",
+      "success": "Reporte enviado correctamente.",
+      "failure": "No se pudo enviar el reporte. Inténtalo de nuevo."
+    }
+  },
   "auth": {
     "signIn": {
       "eyebrow": "Autenticación",

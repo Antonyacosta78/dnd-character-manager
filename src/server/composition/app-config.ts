@@ -4,6 +4,7 @@ import type {
   DataIntegrityMode,
   RulesProviderKind,
 } from "@/server/ports/rules-catalog";
+import packageJson from "../../../package.json";
 
 export type NodeEnv = "development" | "test" | "production";
 
@@ -14,6 +15,19 @@ export interface AppConfig {
   databaseUrl: string;
   externalDataPath: string;
   importerVersion: string;
+  observability: ObservabilityConfig;
+}
+
+export interface ObservabilityConfig {
+  enabled: boolean;
+  environment: string;
+  release: string;
+  sentry: {
+    dsn?: string;
+    clientDsn?: string;
+    serverCaptureEnabled: boolean;
+    clientCaptureEnabled: boolean;
+  };
 }
 
 export type AppEnvironment = Readonly<Record<string, string | undefined>>;
@@ -91,7 +105,137 @@ function parseNodeEnv(value: string | undefined): NodeEnv {
   return "development";
 }
 
+function parseBooleanEnv(value: string | undefined, key: string): boolean | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = value.trim().toLowerCase();
+
+  if (normalized === "true") {
+    return true;
+  }
+
+  if (normalized === "false") {
+    return false;
+  }
+
+  throw new AppConfigError(
+    "REQUEST_VALIDATION_FAILED",
+    `Invalid ${key} value '${value}'. Expected one of: true, false.`,
+  );
+}
+
+function parseOptionalUrl(value: string | undefined, key: string): string | undefined {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  let parsedUrl: URL;
+
+  try {
+    parsedUrl = new URL(trimmed);
+  } catch {
+    throw new AppConfigError(
+      "REQUEST_VALIDATION_FAILED",
+      `Invalid ${key} value '${value}'. Expected a valid URL.`,
+    );
+  }
+
+  if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+    throw new AppConfigError(
+      "REQUEST_VALIDATION_FAILED",
+      `Invalid ${key} protocol '${parsedUrl.protocol}'. Expected http or https.`,
+    );
+  }
+
+  return trimmed;
+}
+
+function resolveObservabilityEnvironment(env: AppEnvironment, nodeEnv: NodeEnv): string {
+  const explicit = env.SENTRY_ENVIRONMENT?.trim();
+
+  if (explicit) {
+    return explicit;
+  }
+
+  const appEnv = env.APP_ENV?.trim().toLowerCase();
+
+  if (appEnv === "staging" || appEnv === "production" || appEnv === "development" || appEnv === "test") {
+    return appEnv;
+  }
+
+  const vercelEnv = env.VERCEL_ENV?.trim().toLowerCase();
+
+  if (vercelEnv === "preview") {
+    return "staging";
+  }
+
+  if (vercelEnv === "production") {
+    return "production";
+  }
+
+  if (vercelEnv === "development") {
+    return "development";
+  }
+
+  return nodeEnv;
+}
+
+function resolveObservabilityEnabled(
+  explicitValue: boolean | undefined,
+  environment: string,
+): boolean {
+  if (explicitValue !== undefined) {
+    return explicitValue;
+  }
+
+  return environment === "staging" || environment === "production";
+}
+
+function resolveObservabilityRelease(env: AppEnvironment): string {
+  const explicitRelease = env.SENTRY_RELEASE?.trim();
+
+  if (explicitRelease) {
+    return explicitRelease;
+  }
+
+  const commitSha = env.VERCEL_GIT_COMMIT_SHA?.trim() || env.GIT_COMMIT_SHA?.trim();
+
+  if (commitSha) {
+    return commitSha;
+  }
+
+  return packageJson.version;
+}
+
+export function readObservabilityConfig(
+  env: AppEnvironment = process.env,
+  nodeEnv: NodeEnv = parseNodeEnv(env.NODE_ENV),
+): ObservabilityConfig {
+  const environment = resolveObservabilityEnvironment(env, nodeEnv);
+  const explicitEnabled = parseBooleanEnv(env.OBSERVABILITY_ENABLED, "OBSERVABILITY_ENABLED");
+  const enabled = resolveObservabilityEnabled(explicitEnabled, environment);
+  const dsn = parseOptionalUrl(env.SENTRY_DSN, "SENTRY_DSN");
+  const clientDsn = parseOptionalUrl(env.NEXT_PUBLIC_SENTRY_DSN, "NEXT_PUBLIC_SENTRY_DSN");
+
+  return {
+    enabled,
+    environment,
+    release: resolveObservabilityRelease(env),
+    sentry: {
+      dsn,
+      clientDsn,
+      serverCaptureEnabled: enabled && Boolean(dsn),
+      clientCaptureEnabled: enabled && Boolean(clientDsn),
+    },
+  };
+}
+
 export function readAppConfig(env: AppEnvironment = process.env): AppConfig {
+  const nodeEnv = parseNodeEnv(env.NODE_ENV);
   const databaseUrl = requireEnv(env, "DATABASE_URL");
   const externalDataPath = requireEnv(env, "EXTERNAL_DATA_PATH");
   const importerVersion = requireEnv(env, "IMPORTER_VERSION");
@@ -99,9 +243,10 @@ export function readAppConfig(env: AppEnvironment = process.env): AppConfig {
   return {
     rulesProvider: parseRulesProvider(env.RULES_PROVIDER),
     dataIntegrityMode: parseDataIntegrityMode(env.DATA_INTEGRITY_MODE),
-    nodeEnv: parseNodeEnv(env.NODE_ENV),
+    nodeEnv,
     databaseUrl,
     externalDataPath: path.resolve(externalDataPath),
     importerVersion,
+    observability: readObservabilityConfig(env, nodeEnv),
   };
 }

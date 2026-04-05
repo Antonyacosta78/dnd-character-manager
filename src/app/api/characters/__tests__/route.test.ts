@@ -66,12 +66,18 @@ describe("GET /api/characters", () => {
   });
 
   it("maps unexpected failures to INTERNAL_ERROR / 500", async () => {
+    const logs: unknown[] = [];
+
     const getRoute = createCharactersGetRoute({
       listOwnerCharacters: async () => {
         throw new Error("db unavailable");
       },
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_test_internal",
+      logError: (entry) => {
+        logs.push(entry);
+      },
+      captureException: () => {},
     });
 
     const response = await getRoute(
@@ -88,5 +94,28 @@ describe("GET /api/characters", () => {
     assert.equal(payload.error.status, 500);
     assert.equal(payload.meta.requestId, "req_from_client");
     assert.equal(response.headers.get("x-request-id"), "req_from_client");
+    assert.equal(logs.length, 1);
+    assert.equal((logs[0] as { error: { code: string } }).error.code, "INTERNAL_ERROR");
+  });
+
+  it("replaces invalid inbound x-request-id values", async () => {
+    const getRoute = createCharactersGetRoute({
+      listOwnerCharacters: async () => [],
+      now: () => new Date("2026-04-05T12:00:00.000Z"),
+      createRequestId: () => "req_generated",
+    });
+
+    const response = await getRoute(
+      new Request("https://example.test/api/characters", {
+        headers: {
+          "x-request-id": "bad header",
+        },
+      }),
+    );
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.meta.requestId, "req_generated");
+    assert.equal(response.headers.get("x-request-id"), "req_generated");
   });
 });

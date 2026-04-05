@@ -3,6 +3,7 @@ import { Cinzel, Inter, Source_Serif_4 } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
 import { LocalePreferenceConverger } from "@/app/locale-preference-converger";
+import { ObservabilityBootstrap } from "@/app/observability-bootstrap";
 import { DraftStoreProvider } from "@/client/state/draft-store.provider";
 import { GlobalSettingsProvider } from "@/client/state/global-settings.provider";
 
@@ -50,6 +51,7 @@ export default async function RootLayout({
       <body
         className={`${cinzel.variable} ${sourceSerif.variable} ${inter.variable} antialiased`}
       >
+        <ObservabilityBootstrap />
         <LocalePreferenceConverger />
         <GlobalSettingsProvider>
           <DraftStoreProvider>{children}</DraftStoreProvider>

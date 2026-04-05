@@ -288,6 +288,24 @@
       "adventureEntitySessions": "Session details for adventure {id} will appear here."
     }
   },
+  "observability": {
+    "requestIdLabel": "Request ID",
+    "reportIssue": {
+      "cta": "Report issue",
+      "title": "Report this issue",
+      "description": "Share technical context from this failure to help triage.",
+      "timestampLabel": "Timestamp",
+      "routeLabel": "Route",
+      "requestIdLabel": "Request ID",
+      "notesLabel": "Notes (optional)",
+      "notesHint": "Optional notes (max 750 characters)",
+      "privacyHint": "Please avoid passwords, tokens, or private secrets in notes.",
+      "submit": "Send report",
+      "submitting": "Sending report...",
+      "success": "Report sent successfully.",
+      "failure": "Could not send report. Try again."
+    }
+  },
   "auth": {
     "signIn": {
       "eyebrow": "Authentication",

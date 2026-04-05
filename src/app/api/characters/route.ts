@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import { NextResponse } from "next/server";
 
 import { createPrismaCharacterRepository } from "@/server/adapters/prisma/character-repository";
@@ -12,6 +10,12 @@ import {
   createListOwnerCharactersUseCase,
   type ListOwnerCharactersUseCase,
 } from "@/server/application/use-cases/list-owner-characters";
+import { emitServerErrorLog } from "@/server/observability/server-error-log";
+import { captureServerException } from "@/server/observability/sentry-server";
+import {
+  createRequestId,
+  resolveRequestId,
+} from "@/server/observability/request-id";
 
 interface ResponseMeta {
   requestId: string;
@@ -36,15 +40,19 @@ export interface CharactersRouteDeps {
   listOwnerCharacters: ListOwnerCharactersUseCase;
   now?: () => Date;
   createRequestId?: () => string;
+  logError?: typeof emitServerErrorLog;
+  captureException?: typeof captureServerException;
 }
 
 export function createCharactersGetRoute({
   listOwnerCharacters,
   now = () => new Date(),
-  createRequestId = () => `req_${randomUUID()}`,
+  createRequestId: createRequestIdFallback = createRequestId,
+  logError = emitServerErrorLog,
+  captureException = captureServerException,
 }: CharactersRouteDeps) {
   return async function GET(request: Request) {
-    const requestId = resolveRequestId(request, createRequestId);
+    const requestId = resolveRequestId(request, createRequestIdFallback);
     const timestamp = now().toISOString();
 
     try {
@@ -64,6 +72,26 @@ export function createCharactersGetRoute({
       );
     } catch (error) {
       const mappedError = mapRouteError(error);
+
+      logError({
+        timestamp,
+        message: "Characters route failed.",
+        requestId,
+        route: "/api/characters",
+        method: request.method,
+        error: {
+          code: mappedError.code,
+          status: mappedError.status,
+          name: error instanceof Error ? error.name : undefined,
+        },
+      });
+
+      captureException(error, {
+        requestId,
+        route: "/api/characters",
+        method: request.method,
+        errorCode: mappedError.code,
+      });
 
       return NextResponse.json<ApiErrorResponse>(
         {
@@ -90,18 +118,6 @@ const defaultGetRoute = createCharactersGetRoute({
 
 export async function GET(request: Request) {
   return defaultGetRoute(request);
-}
-
-function resolveRequestId(request: Request, fallback: () => string) {
-  const requestId = request.headers.get("x-request-id");
-
-  if (!requestId) {
-    return fallback();
-  }
-
-  const isSafeRequestId = /^[A-Za-z0-9._:-]{1,120}$/.test(requestId);
-
-  return isSafeRequestId ? requestId : fallback();
 }
 
 function mapRouteError(error: unknown): ApiErrorResponse["error"] {

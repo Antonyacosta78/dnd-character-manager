@@ -19,6 +19,60 @@ describe("readAppConfig", () => {
     assert.match(config.externalDataPath, /external/);
     assert.match(config.externalDataPath, /5etools/);
     assert.equal(config.importerVersion, "foundation-v1");
+    assert.equal(config.observability.enabled, false);
+    assert.equal(config.observability.environment, "development");
+    assert.equal(config.observability.sentry.serverCaptureEnabled, false);
+    assert.equal(config.observability.sentry.clientCaptureEnabled, false);
+    assert.ok(config.observability.release.length > 0);
+  });
+
+  it("defaults observability enabled in staging and production", () => {
+    const staging = readAppConfig({
+      ...REQUIRED_ENV,
+      APP_ENV: "staging",
+    });
+    const production = readAppConfig({
+      ...REQUIRED_ENV,
+      NODE_ENV: "production",
+      VERCEL_ENV: "production",
+    });
+
+    assert.equal(staging.observability.enabled, true);
+    assert.equal(staging.observability.environment, "staging");
+    assert.equal(production.observability.enabled, true);
+    assert.equal(production.observability.environment, "production");
+  });
+
+  it("uses commit SHA as release when available", () => {
+    const config = readAppConfig({
+      ...REQUIRED_ENV,
+      VERCEL_GIT_COMMIT_SHA: "abc123",
+    });
+
+    assert.equal(config.observability.release, "abc123");
+  });
+
+  it("rejects invalid OBSERVABILITY_ENABLED values", () => {
+    assert.throws(
+      () =>
+        readAppConfig({
+          ...REQUIRED_ENV,
+          OBSERVABILITY_ENABLED: "maybe",
+        }),
+      AppConfigError,
+    );
+  });
+
+  it("rejects invalid Sentry DSN values", () => {
+    assert.throws(
+      () =>
+        readAppConfig({
+          ...REQUIRED_ENV,
+          OBSERVABILITY_ENABLED: "true",
+          SENTRY_DSN: "not-a-url",
+        }),
+      AppConfigError,
+    );
   });
 
   it("throws when required environment variables are missing", () => {
