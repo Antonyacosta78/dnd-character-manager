@@ -23,3 +23,9 @@
 - **What changed:** Added deterministic level-planning domain logic (including multiclass confirmation requirement), implemented plan/finalize use-cases + API endpoints, and wired `LevelUpPanel` into the sheet progression section.
 - **Verification run:** `bun run lint`; `bun test src/server/domain/character-core/__tests__/leveling.test.ts src/server/application/use-cases/__tests__/finalize-level-up.test.ts src/app/api/characters/[id]/level/__tests__/plan-finalize.route.test.ts`
 - **Known limitations/deferred:** Required choice-node graph is currently represented as empty list; deep choice resolution is deferred to richer catalog progression modeling.
+
+## Phase 4 - optional/variant rules + inventory/spells integration
+
+- **What changed:** Extended draft/domain types for optional rule references + inventory/spells payloads, added validation coverage for custom/invalid row states, and introduced sheet editors plus inventory/spells update use-cases for canonical save-path integration.
+- **Verification run:** `bun run lint`; `bun test src/server/domain/character-core/__tests__/validation.test.ts`
+- **Known limitations/deferred:** Optional/variant selection UI is MVP-minimal and currently model-driven via refs without dedicated catalog browsing UX.
