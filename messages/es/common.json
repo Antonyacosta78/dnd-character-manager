@@ -179,5 +179,27 @@
       "snapshotFrozen": "Runa de Instantánea Congelada",
       "invalid": "Runa de estado inválido"
     }
+  },
+  "auth": {
+    "signIn": {
+      "eyebrow": "Autenticación",
+      "title": "Iniciar sesión",
+      "description": "Usa tu nombre de usuario y contraseña para acceder a tu biblioteca de personajes.",
+      "usernameLabel": "Nombre de usuario",
+      "passwordLabel": "Contraseña",
+      "usernamePlaceholder": "Ingresa tu nombre de usuario",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "submit": "Iniciar sesión",
+      "pending": "Iniciando sesión...",
+      "error": "No se pudo iniciar sesión. Revisa tus credenciales e inténtalo de nuevo.",
+      "backHome": "Volver al inicio"
+    },
+    "characters": {
+      "protectedLabel": "Ruta protegida",
+      "title": "Tus personajes",
+      "emptyState": "Aún no tienes personajes.",
+      "lastUpdated": "Última actualización: {updatedAt}",
+      "backHome": "Volver al inicio"
+    }
   }
 }

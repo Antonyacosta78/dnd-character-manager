@@ -10,7 +10,9 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   name          String
-  email         String    @unique
+  username      String    @unique
+  displayUsername String?
+  email         String?   @unique
   emailVerified Boolean   @default(false)
   image         String?
   createdAt     DateTime  @default(now())
@@ -18,8 +20,21 @@ model User {
   isAdmin       Boolean   @default(false)
   accounts      Account[]
   sessions      Session[]
+  characters    Character[]
 
   @@map("user")
+}
+
+model Character {
+  id          String   @id @default(cuid())
+  name        String
+  ownerUserId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+
+  @@index([ownerUserId, updatedAt])
 }
 
 model Account {
