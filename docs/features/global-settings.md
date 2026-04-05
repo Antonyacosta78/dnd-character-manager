@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Aligned feature vocabulary from game to adventure for instance-level play context terms in scope and non-goal boundaries. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Synced rundown with shipped implementation details: per-control save feedback overlays, eased `900ms` feedback timing, and selector/action hook stability constraints from runtime validation. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Added an MVP experimental border-radius theme control contract (`none` through `pronounced`) and aligned acceptance criteria/resolved decisions so implementation includes validation, persistence, and fallback behavior. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Locked implementation-direction decisions for settings ownership split, save-feedback interaction, app-shell trigger placement, and verification expectations so the implementation plan can proceed without ambiguity. (Made with OpenCode)
@@ -74,7 +75,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 ## Must Have
 
 - A dedicated Global Settings modal reachable from primary app navigation.
-- A stable settings model for app-wide, user-level preferences (not character-, branch-, world-, or game-specific data).
+- A stable settings model for app-wide, user-level preferences (not character-, branch-, world-, or adventure-specific data).
 - Two-pane IA shipped for MVP:
   - left section navigation rail
   - right section content form panel
@@ -94,7 +95,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - Safe fallback behavior when stored settings are invalid or unavailable.
 - Clear separation in copy and IA between:
   - prep/session-independent preferences (Global Settings)
-  - in-session or game-state actions (kept out of this feature)
+  - in-session or adventure-state actions (kept out of this feature)
 
 ## Nice to Have
 
@@ -104,7 +105,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 
 ## Non-Goals (MVP)
 
-- No per-character, per-branch, per-world, or per-game theme overrides.
+- No per-character, per-branch, per-world, or per-adventure theme overrides.
 - No session-only quick toggles on gameplay screens.
 - No custom user-authored themes, token editors, or advanced visual tuning controls.
 - No expansion into campaign management preferences.
@@ -117,7 +118,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
   - theme change feedback is immediate and visually clear.
 - In-session expectation:
   - settings remain available but are not positioned as a high-frequency combat/session tool.
-  - any change should be low-friction and non-destructive, without affecting character mechanics or game history.
+  - any change should be low-friction and non-destructive, without affecting character mechanics or adventure history.
 
 ## Persistence Strategy Expectations
 
@@ -165,7 +166,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - Settings consumers read from a centralized hook/selector API instead of direct storage access.
 - Refreshing the app preserves the prior valid selection.
 - Invalid persisted values are ignored and replaced by a safe default without breaking UI.
-- Global Settings does not introduce any character/game data mutation.
+- Global Settings does not introduce any character/adventure data mutation.
 - Scope guardrails hold: no per-world/per-character theming and no custom theme authoring in MVP.
 
 ## Resolved Decisions

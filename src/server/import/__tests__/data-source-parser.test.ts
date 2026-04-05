@@ -2,13 +2,14 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { describe, it } from "node:test";
+import { describe, it } from "bun:test";
 
 import { normalizeDataSource } from "@/server/import/normalize/normalize-data-source";
 import { resolveDataSource } from "@/server/import/resolve/resolve-data-source";
 import { runImportPipeline } from "@/server/import/run-import-pipeline";
 import { validateDomain } from "@/server/import/validate-domain/validate-domain";
 import { validateDataSource } from "@/server/import/validate-source/validate-data-source";
+import type { CatalogPublishRepository } from "@/server/ports/catalog-publish-repository";
 
 interface FixtureData {
   classDoc?: Record<string, unknown>;
@@ -146,6 +147,22 @@ async function runParserStages(rootPath: string) {
     resolved,
     normalized,
     domainValidation,
+  };
+}
+
+function createCatalogPublishRepositoryStub(): CatalogPublishRepository {
+  return {
+    async recoverPendingActivation() {
+      return null;
+    },
+    async publishPhase1() {
+      return {
+        catalogVersionId: "catalog-version-test",
+      };
+    },
+    async activatePublishedCatalog() {
+      return;
+    },
   };
 }
 
@@ -810,6 +827,8 @@ describe("Data Source parser pipeline", () => {
         dataRootPath: rootPath,
         importerVersion: "test",
         integrityMode: "strict",
+      }, {
+        catalogPublishRepository: createCatalogPublishRepositoryStub(),
       });
 
       assert.equal(summary.outcome, "failed");
@@ -861,6 +880,8 @@ describe("Data Source parser pipeline", () => {
         dataRootPath: rootPath,
         importerVersion: "test",
         integrityMode: "strict",
+      }, {
+        catalogPublishRepository: createCatalogPublishRepositoryStub(),
       });
 
       assert.equal(summary.outcome, "succeeded");
@@ -886,6 +907,8 @@ describe("Data Source parser pipeline", () => {
         dataRootPath: rootPath,
         importerVersion: "test",
         integrityMode: "strict",
+      }, {
+        catalogPublishRepository: createCatalogPublishRepositoryStub(),
       });
 
       assert.equal(summary.outcome, "failed");
@@ -933,6 +956,8 @@ describe("Data Source parser pipeline", () => {
         dataRootPath: rootPath,
         importerVersion: "test",
         integrityMode: "strict",
+      }, {
+        catalogPublishRepository: createCatalogPublishRepositoryStub(),
       });
 
       assert.equal(summary.outcome, "failed");

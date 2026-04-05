@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Renamed per-game scope references to per-adventure terminology to match planned instance naming across roadmap artifacts. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Synced plan to shipped implementation outcomes, including per-control eased save-feedback overlays (`900ms`), selector/action hook stability updates to prevent snapshot loops, and completed DoD checklist state. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Expanded MVP scope to include an experimental theme border-radius setting with typed presets (`none` to `pronounced`) and updated plan details for contracts, actions/selectors, persistence/fallback validation, and verification coverage. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Created implementation plan for Global Settings MVP with locked scope decisions for theme/language, modal IA, unified consumer API, persistence ownership split, and verification strategy. (Made with OpenCode)
@@ -38,7 +39,7 @@ In scope (implement now):
 
 Out of scope (defer intentionally):
 
-- Any per-character/per-branch/per-world/per-game settings.
+- Any per-character/per-branch/per-world/per-adventure settings.
 - Custom theme authoring, token editors, arbitrary palette/font uploads.
 - Cross-tab real-time settings sync.
 - Account/cloud sync of settings.
