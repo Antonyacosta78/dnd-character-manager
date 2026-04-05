@@ -54,6 +54,7 @@ AGENTS.md
 
 # temporal files created by humans and agents
 temp/
+.vscode/
 
 # local sqlite db
 /prisma/prisma/local.db
