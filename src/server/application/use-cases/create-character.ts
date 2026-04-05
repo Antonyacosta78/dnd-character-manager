@@ -32,7 +32,7 @@ export function createCreateCharacterUseCase({
       throw new AuthUnauthenticatedError();
     }
 
-    const validation = validateCharacterDraftPayload(input.draft);
+    const validation = validateCharacterDraftPayload(input.draft, { mode: "create" });
 
     if (validation.hardIssues.length > 0) {
       throw new CharacterRequestValidationError({

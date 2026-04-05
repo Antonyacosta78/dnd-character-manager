@@ -53,7 +53,7 @@ export function createSaveCharacterCanonicalUseCase({
       throw new CharacterNotFoundError();
     }
 
-    const validation = validateCharacterDraftPayload(input.draft);
+    const validation = validateCharacterDraftPayload(input.draft, { mode: "save" });
 
     if (validation.hardIssues.length > 0) {
       throw new CharacterRequestValidationError({

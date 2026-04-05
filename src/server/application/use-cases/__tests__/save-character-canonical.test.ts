@@ -4,6 +4,7 @@ import { describe, it } from "bun:test";
 import { AuthUnauthenticatedError } from "@/server/application/errors/auth-errors";
 import { CharacterSaveConflictError } from "@/server/application/errors/character-core-errors";
 import { createSaveCharacterCanonicalUseCase } from "@/server/application/use-cases/save-character-canonical";
+import { CHARACTER_WARNING_CONCEPT_SHORT } from "@/server/domain/character-core/character-core.validation";
 
 describe("createSaveCharacterCanonicalUseCase", () => {
   const draft = {
@@ -36,6 +37,18 @@ describe("createSaveCharacterCanonicalUseCase", () => {
           return null;
         },
         async saveCanonical() {
+          repositoryCalls += 1;
+          throw new Error("not used");
+        },
+        async getByShareToken() {
+          repositoryCalls += 1;
+          return null;
+        },
+        async finalizeLevelUp() {
+          repositoryCalls += 1;
+          throw new Error("not used");
+        },
+        async setShareEnabled() {
           repositoryCalls += 1;
           throw new Error("not used");
         },
@@ -122,6 +135,15 @@ describe("createSaveCharacterCanonicalUseCase", () => {
             changedSections: ["core"],
           } as const;
         },
+        async getByShareToken() {
+          return null;
+        },
+        async finalizeLevelUp() {
+          throw new Error("not used");
+        },
+        async setShareEnabled() {
+          throw new Error("not used");
+        },
       },
       rulesCatalog: {
         async getDatasetVersion() {
@@ -167,5 +189,111 @@ describe("createSaveCharacterCanonicalUseCase", () => {
         return true;
       },
     );
+  });
+
+  it("allows saving levelled characters and preserves warning flow", async () => {
+    const levelTwoDraft = {
+      ...draft,
+      concept: "short",
+      level: 2,
+    };
+
+    const useCase = createSaveCharacterCanonicalUseCase({
+      sessionContext: {
+        async getSessionContext() {
+          return { userId: "user-1", isAdmin: false };
+        },
+      },
+      characterRepository: {
+        async listByOwner() {
+          return [];
+        },
+        async createCharacter() {
+          throw new Error("not used");
+        },
+        async getByIdForOwner() {
+          return {
+            id: "char-1",
+            ownerUserId: "user-1",
+            name: "Aelar",
+            status: "active",
+            revision: 2,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            buildState: {
+              concept: draft.concept,
+              classRef: draft.classRef,
+              level: 1,
+            },
+            warningOverrides: [],
+          };
+        },
+        async saveCanonical() {
+          return {
+            kind: "saved",
+            character: {
+              id: "char-1",
+              ownerUserId: "user-1",
+              name: "Aelar",
+              status: "active",
+              revision: 3,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              buildState: {
+                concept: levelTwoDraft.concept,
+                classRef: levelTwoDraft.classRef,
+                level: levelTwoDraft.level,
+              },
+              warningOverrides: [],
+            },
+          } as const;
+        },
+        async getByShareToken() {
+          return null;
+        },
+        async finalizeLevelUp() {
+          throw new Error("not used");
+        },
+        async setShareEnabled() {
+          throw new Error("not used");
+        },
+      },
+      rulesCatalog: {
+        async getDatasetVersion() {
+          return { provider: "derived", fingerprint: "fp-1" };
+        },
+        classes: {
+          async get() {
+            return { ref: draft.classRef, payload: {} };
+          },
+          async list() {
+            return [];
+          },
+        },
+        subclasses: {
+          async get() {
+            return null;
+          },
+          async listByClass() {
+            return [];
+          },
+        },
+        races: { async get() { return null; }, async list() { return []; } },
+        backgrounds: { async get() { return null; }, async list() { return []; } },
+        spells: { async get() { return null; }, async list() { return []; } },
+        feats: { async get() { return null; }, async list() { return []; } },
+        features: { async resolve() { return null; } },
+      },
+    });
+
+    const result = await useCase({
+      characterId: "char-1",
+      baseRevision: 2,
+      draft: levelTwoDraft,
+      acknowledgedWarningCodes: [CHARACTER_WARNING_CONCEPT_SHORT],
+    });
+
+    assert.equal(result.character.buildState.level, 2);
+    assert.ok(result.warnings.some((warning) => warning.code === CHARACTER_WARNING_CONCEPT_SHORT));
   });
 });

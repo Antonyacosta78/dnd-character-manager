@@ -6,9 +6,17 @@ export const CHARACTER_WARNING_CONCEPT_SHORT = "CHARACTER_CORE_WARNING_CONCEPT_S
 export const CHARACTER_WARNING_CUSTOM_INVENTORY = "CHARACTER_CORE_WARNING_CUSTOM_INVENTORY";
 export const CHARACTER_WARNING_CUSTOM_SPELL = "CHARACTER_CORE_WARNING_CUSTOM_SPELL";
 
-export function validateCharacterDraftPayload(draft: CharacterDraftPayload): CharacterValidationResult {
+interface ValidateCharacterDraftPayloadOptions {
+  mode?: "create" | "save";
+}
+
+export function validateCharacterDraftPayload(
+  draft: CharacterDraftPayload,
+  options: ValidateCharacterDraftPayloadOptions = {},
+): CharacterValidationResult {
   const hardIssues: CharacterValidationResult["hardIssues"] = [];
   const warnings: CharacterValidationResult["warnings"] = [];
+  const requireLevelOne = options.mode === "create";
 
   if (draft.name.trim().length === 0) {
     hardIssues.push({
@@ -34,7 +42,7 @@ export function validateCharacterDraftPayload(draft: CharacterDraftPayload): Cha
     });
   }
 
-  if (draft.level !== 1) {
+  if (requireLevelOne && draft.level !== 1) {
     hardIssues.push({
       code: "CHARACTER_CORE_LEVEL_ONE_REQUIRED",
       path: "level",

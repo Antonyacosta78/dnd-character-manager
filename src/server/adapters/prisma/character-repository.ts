@@ -283,6 +283,12 @@ function toOverrideRows(codes: string[]): Array<{ code: string; path: string }> 
   return codes.map((code) => ({ code, path: "core" }));
 }
 
+function toOverrideCreateMany(codes: string[]) {
+  return {
+    data: toOverrideRows(codes),
+  };
+}
+
 function toBuildState(draft: CreateCharacterInput["draft"]) {
   return {
     concept: draft.concept,
@@ -392,7 +398,7 @@ export function createPrismaCharacterRepository(
             create: toBuildState(input.draft),
           },
           validationOverrides: {
-            createMany: toOverrideRows(input.acknowledgedWarningCodes),
+            createMany: toOverrideCreateMany(input.acknowledgedWarningCodes),
           },
           inventoryEntries: {
             createMany: toInventoryCreateMany(input.draft.inventory),
@@ -497,7 +503,7 @@ export function createPrismaCharacterRepository(
             },
             validationOverrides: {
               deleteMany: {},
-              createMany: toOverrideRows(input.acknowledgedWarningCodes),
+              createMany: toOverrideCreateMany(input.acknowledgedWarningCodes),
             },
             inventoryEntries: {
               deleteMany: {},
