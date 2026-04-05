@@ -6,6 +6,14 @@ import type {
   CatalogImportRunRepository,
   CatalogImportTriggerKind,
 } from "@/server/ports/catalog-import-run-repository";
+import type {
+  CatalogPublishRepository,
+} from "@/server/ports/catalog-publish-repository";
+import {
+  CatalogActivationGuardError,
+  CatalogPayloadOverflowError,
+  CatalogVersionLockError,
+} from "@/server/ports/catalog-publish-repository";
 import type { DataIntegrityMode } from "@/server/ports/rules-catalog";
 import type {
   NormalizedDataSource,
@@ -39,6 +47,7 @@ export interface RunImportPipelineArgs {
 
 export interface RunImportPipelineOptions {
   importRunRepository?: CatalogImportRunRepository;
+  catalogPublishRepository?: CatalogPublishRepository;
   now?: () => Date;
 }
 
@@ -107,6 +116,7 @@ export async function runImportPipeline(
   let currentStage: ImportStage = "sync";
   let datasetFingerprint: string | null = null;
   let normalizedData: NormalizedDataSource | undefined;
+  let catalogVersionId: string | null = null;
 
   if (options.importRunRepository) {
     await options.importRunRepository.createRun({
@@ -216,8 +226,39 @@ export async function runImportPipeline(
       }
     });
 
-    await runStage("publish", async () => undefined);
+    await runStage("publish", async () => {
+      if (!options.catalogPublishRepository) {
+        throw new Error("Catalog publish repository is not configured.");
+      }
 
+      if (!normalizedData || !datasetFingerprint) {
+        throw new Error("Publish stage requires normalized data and dataset fingerprint.");
+      }
+
+      await options.catalogPublishRepository.recoverPendingActivation({
+        runId,
+        reason: "AUTO_RECOVER_ON_PUBLISH",
+      });
+
+      const phase1 = await options.catalogPublishRepository.publishPhase1({
+        providerKind: "derived",
+        datasetFingerprint,
+        importerVersion: args.importerVersion,
+        normalized: normalizedData,
+        runId,
+      });
+
+      catalogVersionId = phase1.catalogVersionId;
+
+      await options.catalogPublishRepository.activatePublishedCatalog({
+        catalogVersionId: phase1.catalogVersionId,
+        datasetFingerprint,
+        runId,
+        reason: "IMPORT_PIPELINE_PUBLISH",
+      });
+    });
+
+    const entityCounts = countEntitiesByKind(normalizedData);
     const issueCounts = countIssues(issues);
 
     if (options.importRunRepository) {
@@ -229,9 +270,10 @@ export async function runImportPipeline(
         runId,
         outcome: "succeeded",
         currentStage: "publish",
-        catalogVersionId: null,
+        catalogVersionId,
         stageMetrics: {
           stageDurationsMs: stageDurations,
+          entityCounts,
           importerVersion: args.importerVersion,
           issueCounts,
         },
@@ -242,17 +284,19 @@ export async function runImportPipeline(
     return {
       runId,
       outcome: "succeeded",
-      catalogVersionId: null,
+      catalogVersionId,
       datasetFingerprint,
       metrics: {
         stageDurationsMs: stageDurations,
-        entityCounts: countEntitiesByKind(normalizedData),
+        entityCounts,
         issueCounts,
       },
       issues,
     };
   } catch (error) {
-    if (error instanceof ImportPipelineStageError) {
+    if (error instanceof CatalogPayloadOverflowError) {
+      issues.push(...error.issues);
+    } else if (error instanceof ImportPipelineStageError) {
       if (error.stageIssues.length === 0) {
         issues.push({
           stage: error.stage,
@@ -267,6 +311,7 @@ export async function runImportPipeline(
     }
 
     const errorIssue = issues.find((issue) => issue.severity === "error");
+    const entityCounts = countEntitiesByKind(normalizedData);
 
     if (options.importRunRepository) {
       await options.importRunRepository.appendIssues(runId, issues);
@@ -274,9 +319,10 @@ export async function runImportPipeline(
         runId,
         outcome: "failed",
         currentStage,
-        catalogVersionId: null,
+        catalogVersionId,
         stageMetrics: {
           stageDurationsMs: stageDurations,
+          entityCounts,
           importerVersion: args.importerVersion,
           issueCounts: countIssues(issues),
         },
@@ -290,11 +336,11 @@ export async function runImportPipeline(
     return {
       runId,
       outcome: "failed",
-      catalogVersionId: null,
+      catalogVersionId,
       datasetFingerprint,
       metrics: {
         stageDurationsMs: stageDurations,
-        entityCounts: countEntitiesByKind(normalizedData),
+        entityCounts,
         issueCounts,
       },
       issues,
@@ -303,6 +349,33 @@ export async function runImportPipeline(
 }
 
 function toImportIssue(error: unknown, stage: ImportStage): ImportIssue {
+  if (error instanceof CatalogPayloadOverflowError) {
+    return {
+      stage,
+      severity: "error",
+      code: "PUBLISH_PAYLOAD_JSON_TOO_LARGE",
+      message: `${error.issues.length} canonical payloadJson row(s) exceed the 2MB limit.`,
+    };
+  }
+
+  if (error instanceof CatalogActivationGuardError) {
+    return {
+      stage,
+      severity: "error",
+      code: "PUBLISH_ACTIVATION_GUARD_FAILED",
+      message: error.message,
+    };
+  }
+
+  if (error instanceof CatalogVersionLockError) {
+    return {
+      stage,
+      severity: "error",
+      code: "PUBLISH_VERSION_LOCK_CONFLICT",
+      message: error.message,
+    };
+  }
+
   if (error instanceof DatasetFingerprintError) {
     return {
       stage,

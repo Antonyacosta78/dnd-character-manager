@@ -54,3 +54,7 @@ AGENTS.md
 
 # temporal files created by humans and agents
 temp/
+
+# local sqlite db
+/prisma/prisma/local.db
+/prisma/prisma/local.db-*

@@ -10,8 +10,10 @@
 ## Changelog
 
 - `2026-04-02` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
-- `2026-04-04` - `OpenCode` - Tuned status to reflect active implementation progress.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Recorded guarded two-phase publish/activation protocol for foundation catalog decisions. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Resolved v1 source metadata, metrics modeling, and activation governance decisions for lineage operations. Made with OpenCode.
 
 ## Purpose
 
@@ -226,15 +228,27 @@ model CatalogActivationEvent {
 
 ## Activation Protocol
 
-Activation must be a single transaction:
+Publish and activation use a guarded two-phase protocol:
 
-1. Verify target `catalog_versions.status = 'published'`.
+Phase 1 (`publish` transaction):
+
+1. Create or reuse target catalog version identity.
+2. Write version-scoped runtime rows.
+3. Mark publish success (`status = 'published'` and publish marker fields).
+4. Commit.
+
+Phase 2 (`activation` transaction, guarded):
+
+1. Verify target `catalog_versions.status = 'published'` and publish-success marker is present.
 2. Read current active version from `catalog_runtime_state`.
 3. Insert `catalog_activation_events` row.
 4. Update `catalog_runtime_state.active_catalog_version_id`.
 5. Commit.
 
-If any step fails, the active version must remain unchanged.
+Failure handling:
+
+- if phase 1 fails, no publish rows or status changes are committed.
+- if phase 2 fails, published rows may exist but active pointer remains unchanged.
 
 ## Rollback Protocol
 
@@ -297,11 +311,11 @@ On failure:
 - rerun import
 - rollback active version only if a bad catalog was activated
 
-## Open Design Questions
+## Resolved Design Decisions (2026-04-04)
 
-1. Should we split source metadata into a dedicated `catalog_sources` table for deduplication?
-2. Do we need per-entity import metrics at v1 (counts by type) as first-class columns vs JSON metrics?
-3. Should we enforce activation approval workflow in-app or keep it command-driven initially?
+1. Source metadata deduplication table (`catalog_sources`) is deferred beyond v1 foundation scope.
+2. Per-entity import metrics remain in JSON (`stage_metrics_json`) for v1; first-class metric columns are deferred.
+3. Activation governance remains command-driven in v1; in-app approval workflow is deferred.
 
 ## Related Docs
 

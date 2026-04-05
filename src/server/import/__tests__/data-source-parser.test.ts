@@ -458,8 +458,8 @@ describe("Data Source parser pipeline", () => {
             classSource: "PHB",
             additionalSpells: [
               {
-                expanded: {
-                  "1": [{ all: "level=1|class=Wizard" }],
+                known: {
+                  "1": ["magic missile"],
                 },
               },
             ],
@@ -547,6 +547,154 @@ describe("Data Source parser pipeline", () => {
       assert.ok(
         resolved.spellSourceEdges.some(
           (edge) => edge.grantType === "optionalfeature" && edge.ownerName === "Invocation Test",
+        ),
+      );
+    } finally {
+      await rm(rootPath, { recursive: true, force: true });
+    }
+  });
+
+  it("does not expand broad level-only Bard Lore additionalSpells choices", async () => {
+    const rootPath = await createFixtureRoot({
+      classDoc: {
+        class: [
+          {
+            name: "Bard",
+            source: "PHB",
+            classFeatures: ["Bardic Inspiration|Bard||1"],
+          },
+        ],
+        subclass: [
+          {
+            name: "College of Lore",
+            shortName: "Lore",
+            source: "PHB",
+            className: "Bard",
+            classSource: "PHB",
+            additionalSpells: [
+              {
+                known: {
+                  "6": [{ choose: "level=0;1;2;3" }],
+                },
+              },
+            ],
+            subclassFeatures: ["Additional Magical Secrets|Bard||Lore||6"],
+          },
+        ],
+        classFeature: [
+          {
+            name: "Bardic Inspiration",
+            source: "PHB",
+            className: "Bard",
+            classSource: "PHB",
+            level: 1,
+          },
+        ],
+        subclassFeature: [
+          {
+            name: "Additional Magical Secrets",
+            source: "PHB",
+            className: "Bard",
+            classSource: "PHB",
+            subclassShortName: "Lore",
+            subclassSource: "PHB",
+            level: 6,
+          },
+        ],
+      },
+    });
+
+    try {
+      const { resolved } = await runParserStages(rootPath);
+
+      assert.equal(
+        resolved.spellSourceEdges.some(
+          (edge) => edge.grantType === "subclass" && edge.ownerName === "College of Lore",
+        ),
+        false,
+      );
+    } finally {
+      await rm(rootPath, { recursive: true, force: true });
+    }
+  });
+
+  it("normalizes race owner names and inherits parent race spells for subraces", async () => {
+    const rootPath = await createFixtureRoot({
+      spellsDoc: {
+        spell: [
+          { name: "Magic Missile", source: "PHB", level: 1, school: "E" },
+          { name: "Light", source: "PHB", level: 0, school: "E" },
+        ],
+      },
+      racesDoc: {
+        race: [
+          {
+            name: "Tiefling",
+            source: "PHB",
+            additionalSpells: [
+              {
+                known: {
+                  "1": ["light#c"],
+                },
+              },
+            ],
+          },
+          {
+            name: "Kobold; Draconic Sorcery",
+            source: "MPMM",
+            additionalSpells: [
+              {
+                known: {
+                  "1": ["light#c"],
+                },
+              },
+            ],
+          },
+        ],
+        subrace: [
+          {
+            name: "Asmodeus",
+            source: "MTF",
+            raceName: "Tiefling",
+            raceSource: "PHB",
+          },
+          {
+            name: "Vahadar",
+            source: "PSK",
+            raceName: "Elf (Kaladesh)",
+            raceSource: "PSK",
+            additionalSpells: [
+              {
+                known: {
+                  "1": ["light#c"],
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    try {
+      const { resolved } = await runParserStages(rootPath);
+
+      assert.ok(
+        resolved.spellSourceEdges.some(
+          (edge) =>
+            edge.grantType === "race" && edge.ownerSource === "MTF" && edge.ownerName === "Tiefling (Asmodeus)",
+        ),
+      );
+
+      assert.ok(
+        resolved.spellSourceEdges.some(
+          (edge) =>
+            edge.grantType === "race" && edge.ownerSource === "PSK" && edge.ownerName === "Elf (Kaladesh; Vahadar)",
+        ),
+      );
+
+      assert.ok(
+        resolved.spellSourceEdges.some(
+          (edge) => edge.grantType === "race" && edge.ownerSource === "MPMM" && edge.ownerName === "Kobold",
         ),
       );
     } finally {

@@ -11,11 +11,22 @@ This decision prevents:
 - repeated per-request normalization or JSON-shape re-interpretation
 - accidental coupling between app use-cases and import internals
 
-## Decision Metadata
+## Metadata
 
-- Status: proposed
-- Date: 2026-04-04
-- Owner: foundation architecture
+- Status: `in-progress`
+- Created At: `2026-04-04`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-04` - `Antony Acosta` - Created architecture note for catalog storage/read-model boundaries.
+- `2026-04-04` - `Antony Acosta` - Resolved publish strategy, transaction boundary, payload size policy, and v1 runtime read posture decisions. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Finalized v1 canonical row layout decision to keep one canonical table with compound indexes. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Updated current-state note to reflect implemented publish persistence and guarded activation state. Made with OpenCode.
+
+## Decision Scope
+
 - Scope: publish stage + `DerivedRulesCatalog` runtime readers
 
 ## Current Plan
@@ -52,6 +63,9 @@ Rationale:
 ### Publish behavior rules
 
 - Publish writes are version-scoped (`catalog_version_id` required on all runtime rows).
+- Publish row writes use `replace` semantics per catalog version (`delete + insert` for version-scoped runtime rows).
+- Publish and activation use a guarded two-phase boundary (publish commit first, guarded activation commit second).
+- Canonical `payloadJson` rows are capped at `2MB` (UTF-8 bytes) with fail-closed overflow behavior and explicit diagnostics.
 - Publish is fail-closed: if row writes fail, publish fails.
 - Activation is explicit and atomic with activation-event recording.
 - Runtime reads are active-version scoped only.
@@ -64,6 +78,8 @@ Rationale:
 - return deterministic, typed payloads for a fixed active fingerprint
 - return `null` for not-found `get` calls
 - avoid direct reads from external source paths
+- use baseline indexed queries in v1 (no precomputed searchable text columns in this slice)
+- support fingerprint-scoped in-memory caching with required invalidation on active fingerprint change
 
 Namespaces covered in v1 publish/read-model slice:
 
@@ -100,7 +116,7 @@ Current state:
 
 - lineage tables exist
 - parser pipeline produces normalized data
-- publish stage does not yet persist runtime catalog rows
+- publish stage persists runtime catalog rows and guarded activation state
 
 Migration approach:
 
@@ -190,8 +206,18 @@ Minimum required before adoption:
 ## Notes
 
 - SQLite remains the primary runtime store in v1 foundation.
-- Optional JSON artifact snapshots are allowed as secondary diagnostics, not primary runtime source.
+- Optional JSON artifact snapshots are allowed as secondary diagnostics, disabled by default in v1, and never the primary runtime source.
 - Keep runtime query logic in adapters/repositories; app layer consumes only ports.
+
+## Resolved Decisions (2026-04-04)
+
+- Publish write strategy is `replace` per catalog version.
+- Publish/activation transaction boundary is guarded two-phase.
+- Canonical `payloadJson` size policy is `2MB` max per row with fail-closed overflow handling.
+- Immutable JSON artifact snapshots are optional and disabled by default.
+- Search/read posture is baseline indexed queries only in v1.
+- Reader cache policy is fingerprint-scoped in-memory cache with strict fingerprint-change invalidation.
+- Canonical entity rows stay in one table with compound indexes in v1; physical partitioning by kind is deferred until measured read pressure justifies it.
 
 ## Related Specs
 
@@ -204,7 +230,3 @@ Minimum required before adoption:
 - Placeholder: `docs/features/foundation.md`
 - Affected future features: character creation, progression planning, spell option selection
 
-## Open Questions
-
-- Should canonical entity rows be physically partitioned by kind in v1 (separate tables), or remain one table with compound indexes until read pressure proves otherwise?
-- Should publish write an optional immutable artifact file bundle for each catalog version in addition to DB rows?

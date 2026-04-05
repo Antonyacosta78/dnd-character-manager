@@ -10,7 +10,8 @@
 ## Changelog
 
 - `2026-04-02` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Recorded v1 fingerprint-scoped reader cache policy. Made with OpenCode.
 
 ## Purpose
 
@@ -230,6 +231,13 @@ Contract-level expectations:
 - `list*` endpoints used for UI option sets should be cacheable by dataset fingerprint
 - single-entity lookups should support stable low-latency access
 - provider-level caches must be invalidated when active dataset fingerprint changes
+
+v1 foundation policy:
+
+- `DerivedRulesCatalog` uses fingerprint-scoped in-memory caching for read paths
+- cache keys must include provider + active fingerprint + namespace + query args
+- cache entries must be invalidated immediately when active dataset fingerprint changes
+- database rows remain the runtime source of truth; cache is an optimization layer only
 
 The cache strategy can differ by provider as long as behavior remains contract-consistent.
 

@@ -211,6 +211,10 @@ Minimum verification required before this policy is considered adopted in code:
 - This policy intentionally favors explicit failure over silent partial success when option integrity is at risk.
 - Canonical input remains non-generated source files; generated files are consistency signals, not primary data.
 
+## Related Architecture
+
+- `docs/architecture/generated-lookup-case-definition-protocol.md`
+
 ## Related Specs
 
 - `docs/specs/foundation/option-complete-data-source-parsing.md`

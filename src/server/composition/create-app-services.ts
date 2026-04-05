@@ -1,4 +1,6 @@
 import { readAppConfig, type AppConfig } from "@/server/composition/app-config";
+import { createDerivedRulesCatalog } from "@/server/adapters/rules-catalog/derived-rules-catalog";
+import { createRawRulesCatalog } from "@/server/adapters/rules-catalog/raw-rules-catalog";
 import {
   createRulesCatalog,
   type RulesCatalogImplementations,
@@ -18,7 +20,7 @@ export interface AppServices {
 
 export interface CreateAppServicesOptions {
   config?: AppConfig;
-  rulesCatalogImplementations: RulesCatalogImplementations;
+  rulesCatalogImplementations?: RulesCatalogImplementations;
   sessionContextPort: SessionContextPort;
   catalogVersionRepository?: CatalogVersionRepository;
   catalogImportRunRepository?: CatalogImportRunRepository;
@@ -26,7 +28,10 @@ export interface CreateAppServicesOptions {
 
 export function createAppServices(options: CreateAppServicesOptions): AppServices {
   const config = options.config ?? readAppConfig();
-  const rulesCatalog = createRulesCatalog(config, options.rulesCatalogImplementations);
+  const rulesCatalog = createRulesCatalog(config, {
+    derived: options.rulesCatalogImplementations?.derived ?? (() => createDerivedRulesCatalog()),
+    raw: options.rulesCatalogImplementations?.raw ?? (() => createRawRulesCatalog()),
+  });
 
   return {
     config,

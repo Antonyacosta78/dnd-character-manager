@@ -1,5 +1,17 @@
 # Implementation Plan: Catalog Publish and RulesCatalog Interface (Foundation)
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-04-04`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-04` - `Antony Acosta` - Created implementation plan for foundation publish/read-model delivery.
+- `2026-04-04` - `Antony Acosta` - Incorporated resolved decisions for publish strategy, activation protocol, payload size policy, and runtime cache posture. Made with OpenCode.
+
 ## Goal
 
 - Deliver a working publish/read path so successful imports become queryable runtime catalog data through `RulesCatalog`.
@@ -28,6 +40,15 @@ Completion criteria:
 - `DerivedRulesCatalog` can serve deterministic `get/list` calls from active version data.
 - `RulesCatalog` consumers in app services no longer depend on parser internals or external files.
 - tests confirm publish idempotency, activation atomicity, and namespace reader behavior.
+
+## Resolved Decisions (2026-04-04)
+
+- Publish writes use `replace` semantics per catalog version (`delete + insert`, version-scoped).
+- Publish and activation use a guarded two-phase boundary.
+- Canonical `payloadJson` has a `2MB` max per row (UTF-8 bytes) and fails closed on overflow.
+- Immutable JSON artifact snapshots are optional and disabled by default.
+- Search/read posture remains baseline indexed queries in v1 (no precomputed searchable text columns).
+- Reader adapters use fingerprint-scoped in-memory cache with invalidation on active fingerprint change.
 
 ## Non-Goals
 
@@ -157,8 +178,8 @@ sequenceDiagram
   CLI->>PIPE: run import
   PIPE->>PIPE: validate/resolve/normalize/validate_domain
   PIPE->>PUB: publish(normalized, fingerprint, importerVersion)
-  PUB->>DB: write catalog_version + runtime rows (tx)
-  PUB->>DB: activate runtime pointer + activation event (tx)
+  PUB->>DB: phase 1 publish rows + publish-success marker (tx)
+  PUB->>DB: phase 2 guarded activation pointer + event (tx)
   PUB-->>PIPE: catalogVersionId
   PIPE-->>CLI: success summary + catalogVersionId
 
@@ -177,7 +198,8 @@ Trust boundaries and validation points:
 
 Success path:
 
-- publish persists runtime rows and sets active catalog pointer.
+- publish phase 1 persists runtime rows using replace semantics and marks publish success.
+- activation phase 2 atomically updates active catalog pointer and activation event after publish guard verification.
 - subsequent `RulesCatalog` reads return active-version scoped data.
 
 Not found path:
@@ -197,6 +219,7 @@ Known edge cases:
 - no active catalog version yet -> readers return controlled unavailable behavior.
 - concurrent publish attempts for same fingerprint -> unique constraints and transaction strategy prevent split-brain active state.
 - partial row write failures -> transaction rollback with unchanged active pointer.
+- phase 1 publish success + phase 2 activation failure -> catalog remains published but inactive; retry activation safely without rewriting rows.
 
 Fail-open vs fail-closed decisions:
 
@@ -256,9 +279,9 @@ Ownership:
 ## Functions and Components
 
 - `publishCatalog(args)`
-  - writes runtime catalog rows and version status in transaction.
+  - writes runtime catalog rows with replace semantics, enforces `2MB` payload limit, and marks publish success in phase 1 transaction.
 - `activateCatalogVersion(args)`
-  - ensures active pointer switch + activation event atomicity.
+  - verifies publish-success guard, then ensures active pointer switch + activation event atomicity in phase 2 transaction.
 - `createDerivedRulesCatalog(deps)`
   - wires namespace readers and version metadata reader.
 - `create*Reader(deps)` per namespace
@@ -289,17 +312,17 @@ Environment/config:
    - Merge safety: partial (no runtime wiring yet).
 
 2. Add publish repository port + Prisma adapter.
-   - Output: publish transaction implementation returning `catalogVersionId`.
+   - Output: phase 1 publish implementation (replace writes + payload size guard) returning `catalogVersionId`.
    - Verify: publish repository tests.
    - Merge safety: partial.
 
 3. Wire publish stage in `run-import-pipeline`.
-   - Output: publish stage persists rows and activation state.
+   - Output: guarded two-phase publish + activation orchestration and failure mapping.
    - Verify: import integration tests + CLI output includes real `catalogVersionId`.
    - Merge safety: partial; command path affected.
 
 4. Implement `DerivedRulesCatalog` and namespace readers.
-   - Output: runtime readers serving active-version data.
+   - Output: runtime readers serving active-version data with fingerprint-scoped cache invalidation behavior.
    - Verify: contract tests for get/list/resolve semantics.
    - Merge safety: yes if composition not switched yet.
 
@@ -347,7 +370,7 @@ Assumptions:
 
 Follow-ups intentionally deferred:
 
-- optional artifact-file snapshot output.
+- optional artifact-file snapshot output remains disabled by default until explicitly enabled.
 - read-model performance optimizations beyond baseline indexes.
 
 ## Rollout and Backout

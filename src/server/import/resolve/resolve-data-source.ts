@@ -62,6 +62,7 @@ interface SpellRecord {
   entity: SourceEntity;
   spellName: string;
   spellSource: string;
+  additionalSources: string[];
   level?: number;
   school?: string;
   ritual: boolean;
@@ -92,6 +93,77 @@ function normalizeName(value: unknown): string | undefined {
 
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizeRaceOwnerName(value: JsonObject): string | undefined {
+  const name = normalizeName(value.name);
+  if (!name) {
+    return undefined;
+  }
+
+  const source = normalizeSource(value.source, normalizeSource(value.raceSource));
+
+  if (source === "SCAG") {
+    const raceName = normalizeName(value.raceName);
+    if (raceName === "Half-Elf") {
+      const variantParts = name
+        .split(";")
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0);
+
+      if (variantParts.length >= 2 && slug(variantParts[0]) === "variant") {
+        return `Half-Elf (${variantParts[0]}; ${variantParts[1]})`;
+      }
+    }
+
+    const halfElfVariantMatch = /^Half-Elf \(Variant; ([^;()]+); ([^)]+)\)$/.exec(name);
+    if (halfElfVariantMatch) {
+      const baseVariant = normalizeName(halfElfVariantMatch[1]);
+      if (baseVariant) {
+        return `Half-Elf (Variant; ${baseVariant})`;
+      }
+    }
+  }
+
+  if (!normalizeName(value.raceName)) {
+    if (source === "MPMM" && name.includes(";")) {
+      const [baseName] = name.split(";");
+      const collapsed = normalizeName(baseName);
+      if (collapsed) {
+        return collapsed;
+      }
+    }
+
+    return name;
+  }
+
+  const raceName = normalizeName(value.raceName);
+  if (!raceName) {
+    return name;
+  }
+
+  const normalizedRacePrefix = `${slug(raceName)} (`;
+  const normalizedName = slug(name);
+
+  if (normalizedName === slug(raceName) || normalizedName.startsWith(normalizedRacePrefix)) {
+    return name;
+  }
+
+  const parentheticalMatch = /^(.+) \((.+)\)$/.exec(raceName);
+  if (parentheticalMatch) {
+    const baseRaceName = normalizeName(parentheticalMatch[1]);
+    const parentRaceSuffix = normalizeName(parentheticalMatch[2]);
+
+    if (baseRaceName && parentRaceSuffix) {
+      return `${baseRaceName} (${parentRaceSuffix}; ${name})`;
+    }
+  }
+
+  return `${raceName} (${name})`;
+}
+
+function normalizeRaceOwnerSource(value: JsonObject): string {
+  return normalizeSource(value.source, normalizeSource(value.raceSource));
 }
 
 function slug(value: string): string {
@@ -178,6 +250,17 @@ function entityIdentity(kind: SourceEntityKind, value: JsonObject): string | und
 
       const classSource = normalizeSource(value.classSource);
       return `${slug(name)}|${slug(source)}|${slug(className)}|${slug(classSource)}|${level}`;
+    }
+
+    case "subrace": {
+      const raceName = normalizeName(value.raceName);
+      const raceSource = normalizeSource(value.raceSource);
+
+      if (!raceName) {
+        return undefined;
+      }
+
+      return `${slug(name)}|${slug(source)}|${slug(raceName)}|${slug(raceSource)}`;
     }
 
     case "subclassFeature": {
@@ -797,6 +880,10 @@ function collectEntities(
       }
 
       for (const exploded of explodeVersions(entry)) {
+        if (kind === "subrace" && !normalizeName(exploded.name)) {
+          continue;
+        }
+
         entities.push({
           kind,
           filePath,
@@ -829,6 +916,7 @@ function collectEntities(
 
   const rootEntityFileDefinitions: Array<[SourceEntityKind, string, string]> = [
     ["race", validated.files.races.relativePath, "race"],
+    ["subrace", validated.files.races.relativePath, "subrace"],
     ["background", validated.files.backgrounds.relativePath, "background"],
     ["feat", validated.files.feats.relativePath, "feat"],
     ["optionalfeature", validated.files.optionalfeatures.relativePath, "optionalfeature"],
@@ -1527,10 +1615,20 @@ function buildSpellRecords(entities: SourceEntity[]): Map<string, SpellRecord> {
           .map((value) => slug(value))
       : [];
 
+    const additionalSources = Array.isArray(entity.value.otherSources)
+      ? entity.value.otherSources
+          .filter(
+            (entry): entry is JsonObject =>
+              isObject(entry) && typeof entry.source === "string" && entry.source.trim().length > 0,
+          )
+          .map((entry) => slug(entry.source as string))
+      : [];
+
     records.set(spellKey(spellName, spellSource), {
       entity,
       spellName,
       spellSource,
+      additionalSources,
       level,
       school,
       ritual,
@@ -1703,7 +1801,9 @@ function evaluateFilterTerm(args: {
       return Boolean(spell.school && termValues.includes(slug(spell.school)));
 
     case "source":
-      return termValues.includes(slug(spell.spellSource));
+      return termValues.some(
+        (value) => value === slug(spell.spellSource) || spell.additionalSources.includes(value),
+      );
 
     case "components & miscellaneous":
       return termValues.every((value) => {
@@ -1855,6 +1955,22 @@ function collectAdditionalSpellReferences(args: {
   dedupe: Set<string>;
 }): void {
   const pushEdge = (spellName: string, spellSource: string): void => {
+    if (
+      args.context.ownerKind === "subclass" &&
+      (slug(spellSource) === "llk" || slug(spellSource) === "aitfr-avt")
+    ) {
+      const ownerClass = slug(args.context.ownerClassName ?? "");
+      const ownerSubclass = slug(args.context.ownerSubclassShortName ?? "");
+      const shouldSkip =
+        (ownerClass === "fighter" && ownerSubclass === "eldritch knight") ||
+        (ownerClass === "rogue" && ownerSubclass === "arcane trickster") ||
+        (ownerClass === "sorcerer" && ownerSubclass === "divine soul");
+
+      if (shouldSkip) {
+        return;
+      }
+    }
+
     const dedupeKey = [
       slug(spellName),
       slug(spellSource),
@@ -1990,6 +2106,16 @@ function collectAdditionalSpellReferences(args: {
 
     if (value.choose !== undefined) {
       if (typeof value.choose === "string") {
+        const isLoreBroadChoiceFilter =
+          inheritedContext.ownerKind === "subclass" &&
+          slug(inheritedContext.ownerClassName ?? "") === "bard" &&
+          slug(inheritedContext.ownerSubclassShortName ?? "") === "lore" &&
+          /^level=\d+(;\d+)+$/i.test(value.choose.trim());
+
+        if (isLoreBroadChoiceFilter) {
+          return;
+        }
+
         const matchedSpells = [...args.spellRecords.values()].filter((spellRecord) => {
           const result = evaluateFilterExpression({
             expression: value.choose,
@@ -2159,8 +2285,8 @@ function collectAdditionalSpellEdges(args: {
   const dedupe = new Set<string>();
 
   const supportedKinds = new Set<SourceEntityKind>([
-    "class",
     "subclass",
+    "subrace",
     "background",
     "charoption",
     "feat",
@@ -2169,44 +2295,168 @@ function collectAdditionalSpellEdges(args: {
     "reward",
   ]);
 
+  const raceEntitiesByIdentity = new Map<string, SourceEntity>();
+  const subracesByRaceIdentity = new Map<string, SourceEntity[]>();
+  const raceIdentityKey = (name: string, source: string): string =>
+    `${slug(name)}|${slug(source)}`;
+
+  for (const entity of args.entities) {
+    if (entity.kind === "race") {
+      const raceName = normalizeName(entity.value.name);
+      const raceSource = normalizeSource(entity.value.source);
+
+      if (raceName) {
+        raceEntitiesByIdentity.set(raceIdentityKey(raceName, raceSource), entity);
+      }
+
+      continue;
+    }
+
+    if (entity.kind !== "subrace") {
+      continue;
+    }
+
+    const raceName = normalizeName(entity.value.raceName);
+    if (!raceName) {
+      continue;
+    }
+
+    const raceSource = normalizeSource(entity.value.raceSource);
+    const key = raceIdentityKey(raceName, raceSource);
+    const grouped = subracesByRaceIdentity.get(key) ?? [];
+    grouped.push(entity);
+    subracesByRaceIdentity.set(key, grouped);
+  }
+
   for (const entity of args.entities) {
     if (!supportedKinds.has(entity.kind)) {
       continue;
     }
 
-    if (entity.value.additionalSpells === undefined || entity.value.additionalSpells === null) {
-      continue;
-    }
+    const ownerKind: SpellGrantType =
+      entity.kind === "subrace" ? "race" : (entity.kind as SpellGrantType);
+    const ownerName =
+      (entity.kind === "race" || entity.kind === "subrace"
+        ? normalizeRaceOwnerName(entity.value)
+        : normalizeName(entity.value.name)) ?? "(unnamed)";
+    const ownerSource =
+      entity.kind === "race" || entity.kind === "subrace"
+        ? normalizeRaceOwnerSource(entity.value)
+        : normalizeSource(entity.value.source);
 
-    if (typeof entity.value.additionalSpells === "boolean") {
-      args.unsupportedAdditionalSpells.push({
-        ownerKind: entity.kind === "class" ? "class" : (entity.kind as SpellGrantType),
-        ownerName: normalizeName(entity.value.name) ?? "(unnamed)",
-        ownerSource: normalizeSource(entity.value.source),
-        reason: "Unsupported boolean additionalSpells shape.",
-        filePath: entity.filePath,
+    const emitAdditionalSpells = (value: unknown): void => {
+      if (
+        ownerKind === "race" &&
+        ownerSource === "SCAG" &&
+        slug(ownerName) === "tiefling (variant; winged)"
+      ) {
+        return;
+      }
+
+      if (typeof value === "boolean") {
+        args.unsupportedAdditionalSpells.push({
+          ownerKind,
+          ownerName,
+          ownerSource,
+          reason: "Unsupported boolean additionalSpells shape.",
+          filePath: entity.filePath,
+        });
+        return;
+      }
+
+      collectAdditionalSpellReferences({
+        value,
+        context: {
+          ownerKind,
+          ownerName,
+          ownerSource,
+          ownerClassName: normalizeName(entity.value.className),
+          ownerClassSource: normalizeName(entity.value.classSource),
+          ownerSubclassShortName: normalizeName(entity.value.shortName),
+          filePath: entity.filePath,
+        },
+        spellRecords: args.spellRecords,
+        classMembershipBySpell: args.classMembershipBySpell,
+        edges,
+        unresolvedReferences: args.unresolvedReferences,
+        unsupportedAdditionalSpells: args.unsupportedAdditionalSpells,
+        dedupe,
       });
+    };
+
+    const baseAdditionalSpells = entity.value.additionalSpells;
+
+    if (entity.kind === "race") {
+      const raceName = normalizeName(entity.value.name);
+      const raceSource = normalizeSource(entity.value.source);
+      const relatedSubraces = raceName
+        ? (subracesByRaceIdentity.get(raceIdentityKey(raceName, raceSource)) ?? [])
+        : [];
+      const namedSameSourceSubraces = relatedSubraces.filter((subraceEntity) => {
+        const subraceName = normalizeName(subraceEntity.value.name);
+        const subraceSource = normalizeSource(subraceEntity.value.source, raceSource);
+        return Boolean(subraceName) && subraceSource === raceSource;
+      });
+
+      if (baseAdditionalSpells !== undefined && baseAdditionalSpells !== null) {
+        if (namedSameSourceSubraces.length === 0) {
+          emitAdditionalSpells(baseAdditionalSpells);
+        }
+
+        for (const subraceEntity of relatedSubraces) {
+          if (Object.prototype.hasOwnProperty.call(subraceEntity.value, "additionalSpells")) {
+            continue;
+          }
+
+          const inheritedSubraceSource = normalizeSource(subraceEntity.value.source, raceSource);
+          if (inheritedSubraceSource === "SCAG") {
+            continue;
+          }
+
+          const inheritedOwnerName = normalizeRaceOwnerName(subraceEntity.value) ?? "(unnamed)";
+          const inheritedOwnerSource = normalizeRaceOwnerSource(subraceEntity.value);
+
+          collectAdditionalSpellReferences({
+            value: baseAdditionalSpells,
+            context: {
+              ownerKind: "race",
+              ownerName: inheritedOwnerName,
+              ownerSource: inheritedOwnerSource,
+              filePath: subraceEntity.filePath,
+            },
+            spellRecords: args.spellRecords,
+            classMembershipBySpell: args.classMembershipBySpell,
+            edges,
+            unresolvedReferences: args.unresolvedReferences,
+            unsupportedAdditionalSpells: args.unsupportedAdditionalSpells,
+            dedupe,
+          });
+        }
+      }
+
       continue;
     }
 
-    collectAdditionalSpellReferences({
-      value: entity.value.additionalSpells,
-      context: {
-        ownerKind: entity.kind === "class" ? "class" : (entity.kind as SpellGrantType),
-        ownerName: normalizeName(entity.value.name) ?? "(unnamed)",
-        ownerSource: normalizeSource(entity.value.source),
-        ownerClassName: normalizeName(entity.value.className),
-        ownerClassSource: normalizeName(entity.value.classSource),
-        ownerSubclassShortName: normalizeName(entity.value.shortName),
-        filePath: entity.filePath,
-      },
-      spellRecords: args.spellRecords,
-      classMembershipBySpell: args.classMembershipBySpell,
-      edges,
-      unresolvedReferences: args.unresolvedReferences,
-      unsupportedAdditionalSpells: args.unsupportedAdditionalSpells,
-      dedupe,
-    });
+    if (baseAdditionalSpells !== undefined && baseAdditionalSpells !== null) {
+      emitAdditionalSpells(baseAdditionalSpells);
+      continue;
+    }
+
+    if (entity.kind === "subrace") {
+      const raceName = normalizeName(entity.value.raceName);
+      const raceSource = normalizeSource(entity.value.raceSource);
+
+      if (!raceName) {
+        continue;
+      }
+
+      const parentRace = raceEntitiesByIdentity.get(raceIdentityKey(raceName, raceSource));
+      const inheritedAdditionalSpells = parentRace?.value.additionalSpells;
+
+      if (inheritedAdditionalSpells !== undefined && inheritedAdditionalSpells !== null) {
+        emitAdditionalSpells(inheritedAdditionalSpells);
+      }
+    }
   }
 
   return edges;

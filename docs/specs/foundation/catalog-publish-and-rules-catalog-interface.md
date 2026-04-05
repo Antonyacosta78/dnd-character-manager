@@ -1,5 +1,18 @@
 # Spec: Catalog Publish and RulesCatalog Interface (Foundation)
 
+## Metadata
+
+- Status: `in-progress`
+- Created At: `2026-04-04`
+- Last Updated: `2026-04-04`
+- Owner: `Antony Acosta`
+
+## Changelog
+
+- `2026-04-04` - `Antony Acosta` - Created the foundation spec for catalog publish and `RulesCatalog` reader wiring.
+- `2026-04-04` - `Antony Acosta` - Resolved blocking and non-blocking publish/read-model decisions for v1 implementation scope. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Updated context to reflect implemented publish persistence and derived runtime reader wiring. Made with OpenCode.
+
 ## Related Feature
 
 - Placeholder: `docs/features/foundation.md` (feature rundown not created yet).
@@ -8,9 +21,9 @@
 ## Context
 
 - The import parser pipeline now validates, resolves, normalizes, and domain-validates Data Source input.
-- The current `publish` stage is still a placeholder and does not persist normalized catalog content for runtime reads.
-- Runtime `RulesCatalog` interfaces are defined in ports, but concrete derived reader adapters are not yet wired.
-- Result: imports can succeed, but application code cannot query published class/spell/feat/feature content through `RulesCatalog`.
+- The import pipeline now persists normalized catalog content in publish stage and activates a runtime catalog version.
+- Runtime `RulesCatalog` interfaces now have a concrete derived reader adapter backed by published storage.
+- Result: successful imports can be consumed through `RulesCatalog` namespaces for foundation v1 domains.
 
 This spec defines the first publishable runtime catalog implementation and reader interface wiring.
 
@@ -48,9 +61,10 @@ Guidance:
 On successful validation:
 
 1. Create or reuse `CatalogVersion` for `(providerKind, datasetFingerprint, importerVersion)`.
-2. Upsert canonical and relation rows for that catalog version.
-3. Mark version publish status and publish timestamp.
-4. Update active runtime pointer and activation event atomically.
+2. Replace canonical and relation rows for that catalog version (`delete + insert`, version-scoped).
+3. Enforce canonical `payloadJson` max size (`2MB` UTF-8 bytes per row); fail-closed with explicit diagnostics when exceeded.
+4. Mark version publish status and publish-success marker.
+5. In a guarded second transaction, verify publish success and atomically update active runtime pointer with activation event insert.
 
 Failure policy:
 
@@ -91,8 +105,8 @@ Input:
 Transform:
 
 - normalize runtime rows for canonical and relation tables.
-- write rows in transaction.
-- activate catalog pointer in same transaction boundary as activation event.
+- phase 1 transaction: replace version-scoped runtime rows and commit publish-success marker.
+- phase 2 guarded transaction: verify publish success, then atomically insert activation event and switch active pointer.
 
 Output:
 
@@ -124,19 +138,19 @@ Trust boundaries:
 - Canonical payload storage must avoid runtime dependence on external Data Source file paths.
 - Large payload writes must avoid unbounded memory amplification during publish.
 
-## Open Questions
+## Resolved Decisions (2026-04-04)
 
 Blocking:
 
-- Should publish use full replacement semantics per version (`delete + insert` for version rows) or upsert-diff semantics for row writes?
-- Should activation happen in same transaction as publish row writes, or as a second guarded transaction after successful publish commit?
-- What is the maximum accepted payload size for `payloadJson` per row in SQLite for v1, and what behavior is required if exceeded?
+- Publish uses `replace` semantics per catalog version (`delete + insert` for version-scoped runtime rows).
+- Publish/activation uses a guarded two-phase boundary: publish commits first, activation pointer+event commit second only after publish-success verification.
+- Canonical row `payloadJson` is limited to `2MB` per row (UTF-8 bytes) with fail-closed overflow behavior and explicit diagnostics.
 
 Non-blocking:
 
-- Do we want optional JSON artifact snapshots (versioned files) for audit/debug in addition to DB storage?
-- Should `CatalogEntity` include lightweight indexed columns for common search text to improve `list(search)` latency in v1?
-- Should read adapters cache active-version row sets in-memory by fingerprint, or rely only on DB reads initially?
+- Immutable JSON artifact snapshots are optional and disabled by default in v1.
+- Search/read posture in v1 uses baseline indexed queries only; precomputed searchable text columns are deferred.
+- Reader adapters use fingerprint-scoped in-memory cache in v1, with invalidation when active dataset fingerprint changes.
 
 ## Related Implementation Plan
 

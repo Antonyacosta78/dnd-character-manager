@@ -64,6 +64,17 @@ function createEntityIdentity(kind: SourceEntityKind, value: Record<string, unkn
       return `${kind}:${slug(name)}|${slug(source)}|${slug(className)}|${slug(classSource)}|${level}`;
     }
 
+    case "subrace": {
+      const raceName = normalizeName(value.raceName);
+      const raceSource = normalizeSource(value.raceSource);
+
+      if (!raceName) {
+        return undefined;
+      }
+
+      return `${kind}:${slug(name)}|${slug(source)}|${slug(raceName)}|${slug(raceSource)}`;
+    }
+
     case "subclassFeature": {
       const className = normalizeName(value.className);
       const classSource = normalizeSource(value.classSource);

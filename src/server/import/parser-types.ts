@@ -44,6 +44,7 @@ export interface ValidatedDataSource {
 export type SourceEntityKind =
   | "class"
   | "subclass"
+  | "subrace"
   | "classFeature"
   | "subclassFeature"
   | "spell"
