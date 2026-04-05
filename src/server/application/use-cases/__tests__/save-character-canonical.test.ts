@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
 import { AuthUnauthenticatedError } from "@/server/application/errors/auth-errors";
-import { CharacterSaveConflictError } from "@/server/application/errors/character-core-errors";
+import {
+  CharacterRequestValidationError,
+  CharacterSaveConflictError,
+} from "@/server/application/errors/character-core-errors";
 import { createSaveCharacterCanonicalUseCase } from "@/server/application/use-cases/save-character-canonical";
 import { CHARACTER_WARNING_CONCEPT_SHORT } from "@/server/domain/character-core/character-core.validation";
 
@@ -189,6 +192,105 @@ describe("createSaveCharacterCanonicalUseCase", () => {
         return true;
       },
     );
+  });
+
+  it("rejects canonical saves that regress level below current character level", async () => {
+    let saveCanonicalCalls = 0;
+
+    const useCase = createSaveCharacterCanonicalUseCase({
+      sessionContext: {
+        async getSessionContext() {
+          return { userId: "user-1", isAdmin: false };
+        },
+      },
+      characterRepository: {
+        async listByOwner() {
+          return [];
+        },
+        async createCharacter() {
+          throw new Error("not used");
+        },
+        async getByIdForOwner() {
+          return {
+            id: "char-1",
+            ownerUserId: "user-1",
+            name: "Aelar",
+            status: "active",
+            revision: 2,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            buildState: {
+              concept: draft.concept,
+              classRef: draft.classRef,
+              level: 2,
+            },
+            warningOverrides: [],
+          };
+        },
+        async saveCanonical() {
+          saveCanonicalCalls += 1;
+          throw new Error("not used");
+        },
+        async getByShareToken() {
+          return null;
+        },
+        async finalizeLevelUp() {
+          throw new Error("not used");
+        },
+        async setShareEnabled() {
+          throw new Error("not used");
+        },
+      },
+      rulesCatalog: {
+        async getDatasetVersion() {
+          return { provider: "derived", fingerprint: "fp-1" };
+        },
+        classes: {
+          async get() {
+            return { ref: draft.classRef, payload: {} };
+          },
+          async list() {
+            return [];
+          },
+        },
+        subclasses: {
+          async get() {
+            return null;
+          },
+          async listByClass() {
+            return [];
+          },
+        },
+        races: { async get() { return null; }, async list() { return []; } },
+        backgrounds: { async get() { return null; }, async list() { return []; } },
+        spells: { async get() { return null; }, async list() { return []; } },
+        feats: { async get() { return null; }, async list() { return []; } },
+        features: { async resolve() { return null; } },
+      },
+    });
+
+    await assert.rejects(
+      () =>
+        useCase({
+          characterId: "char-1",
+          baseRevision: 2,
+          draft: {
+            ...draft,
+            level: 1,
+          },
+          acknowledgedWarningCodes: [],
+        }),
+      (error: unknown) => {
+        assert.ok(error instanceof CharacterRequestValidationError);
+        assert.equal(error.code, "REQUEST_VALIDATION_FAILED");
+        assert.equal(error.details.hardIssues?.[0]?.code, "CHARACTER_CORE_LEVEL_REGRESSION_BLOCKED");
+        assert.equal(error.details.hardIssues?.[0]?.path, "level");
+
+        return true;
+      },
+    );
+
+    assert.equal(saveCanonicalCalls, 0);
   });
 
   it("allows saving levelled characters and preserves warning flow", async () => {

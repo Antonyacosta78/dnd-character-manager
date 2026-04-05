@@ -20,7 +20,13 @@ interface LevelUpPanelProps {
   characterId: string;
   baseRevision: number;
   currentClassRef: CharacterCatalogRef;
-  onFinalized: (revision: number, level: number) => void;
+  onFinalized: (payload: LevelUpFinalizedPayload) => void;
+}
+
+export interface LevelUpFinalizedPayload {
+  revision: number;
+  level: number;
+  classRef: CharacterCatalogRef;
 }
 
 interface LevelPlanPayload {
@@ -137,7 +143,11 @@ export function LevelUpPanel({
                   level: number;
                 };
               };
-              onFinalized(payload.data.revision, payload.data.level);
+              onFinalized({
+                revision: payload.data.revision,
+                level: payload.data.level,
+                classRef: plan.classRef,
+              });
             } finally {
               setIsFinalizing(false);
             }

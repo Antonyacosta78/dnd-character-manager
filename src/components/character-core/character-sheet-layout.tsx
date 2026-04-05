@@ -23,7 +23,14 @@ import {
   CHARACTER_WARNING_CONCEPT_SHORT,
   validateCharacterDraftPayload,
 } from "@/server/domain/character-core/character-core.validation";
-import type { CharacterAggregate, CharacterInventoryEntry, CharacterSpellEntry } from "@/server/ports/character-repository";
+import type {
+  CharacterAggregate,
+  CharacterCatalogRef,
+  CharacterDraftPayload,
+  CharacterInventoryEntry,
+  CharacterSpellEntry,
+} from "@/server/ports/character-repository";
+import type { LevelUpFinalizedPayload } from "@/components/character-core/level-up-panel";
 
 interface CharacterSheetLayoutCopy {
   tabsAria: string;
@@ -109,12 +116,50 @@ const DRAFT_SCOPE = "character-sheet" as const;
 
 type SheetTab = "core" | "progression" | "inventory" | "spells" | "notes";
 
+interface CharacterSheetProgressionState {
+  classRef: CharacterCatalogRef;
+  level: number;
+}
+
+interface CreateCharacterSheetSaveDraftInput {
+  name: string;
+  concept: string;
+  notes: string;
+  inventory: CharacterInventoryEntry[];
+  spells: CharacterSpellEntry[];
+  optionalRuleRefs: CharacterDraftPayload["optionalRuleRefs"];
+  progression: CharacterSheetProgressionState;
+}
+
+export function createCharacterSheetSaveDraft({
+  name,
+  concept,
+  notes,
+  inventory,
+  spells,
+  optionalRuleRefs,
+  progression,
+}: CreateCharacterSheetSaveDraftInput): CharacterDraftPayload {
+  return {
+    name,
+    concept,
+    classRef: progression.classRef,
+    level: progression.level,
+    notes,
+    inventory,
+    spells,
+    optionalRuleRefs,
+  };
+}
+
 export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutProps) {
   const [activeTab, setActiveTab] = useState<SheetTab>("core");
   const [isSaving, setIsSaving] = useState(false);
   const [name, setName] = useState(character.name);
   const [concept, setConcept] = useState(character.buildState.concept);
   const [notes, setNotes] = useState(character.buildState.notes ?? "");
+  const [buildClassRef, setBuildClassRef] = useState(character.buildState.classRef);
+  const [buildLevel, setBuildLevel] = useState(character.buildState.level);
   const [revision, setRevision] = useState(character.revision);
   const [inventory, setInventory] = useState<CharacterInventoryEntry[]>(character.inventory ?? []);
   const [spells, setSpells] = useState<CharacterSpellEntry[]>(character.spells ?? []);
@@ -193,14 +238,14 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
       validateCharacterDraftPayload({
         name,
         concept,
-        classRef: character.buildState.classRef,
-        level: character.buildState.level,
+        classRef: buildClassRef,
+        level: buildLevel,
         notes,
         inventory,
         spells,
         optionalRuleRefs: character.buildState.optionalRuleRefs,
       }),
-    [character.buildState.classRef, character.buildState.level, character.buildState.optionalRuleRefs, concept, inventory, name, notes, spells],
+    [buildClassRef, buildLevel, character.buildState.optionalRuleRefs, concept, inventory, name, notes, spells],
   );
   const unacknowledgedWarnings = validation.warnings.filter((warning) => !acknowledgedWarningCodes.includes(warning.code));
   const saveDisabled = selectCharacterCoreSaveDisabled(draftEnvelope, validation.hardIssues.length > 0, unacknowledgedWarnings.length > 0);
@@ -218,16 +263,18 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
         },
         body: JSON.stringify({
           baseRevision: overrideBaseRevision ?? baseRevision,
-          draft: {
+          draft: createCharacterSheetSaveDraft({
             name,
             concept,
-            classRef: character.buildState.classRef,
-            level: character.buildState.level,
             notes,
             inventory,
             spells,
             optionalRuleRefs: character.buildState.optionalRuleRefs,
-          },
+            progression: {
+              classRef: buildClassRef,
+              level: buildLevel,
+            },
+          }),
           acknowledgedWarningCodes,
         }),
       });
@@ -292,7 +339,7 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
         <div>
           <h1 className="text-lg font-semibold text-fg-primary">{name}</h1>
           <p className="text-xs text-fg-secondary">
-            {character.buildState.classRef.name} · {character.buildState.level}
+            {buildClassRef.name} · {buildLevel}
           </p>
         </div>
         <p className="text-xs text-fg-secondary" aria-live="polite">
@@ -343,15 +390,15 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
           copy={copy.level}
           characterId={character.id}
           baseRevision={baseRevision}
-          currentClassRef={character.buildState.classRef}
-          onFinalized={(nextRevision, level) => {
-            setRevision(nextRevision);
+          currentClassRef={buildClassRef}
+          onFinalized={(payload: LevelUpFinalizedPayload) => {
+            setRevision(payload.revision);
+            setBuildLevel(payload.level);
+            setBuildClassRef(payload.classRef);
             markSaved(DRAFT_SCOPE, character.id, "save");
-            setBaseRevision(DRAFT_SCOPE, character.id, nextRevision, "save");
+            setBaseRevision(DRAFT_SCOPE, character.id, payload.revision, "save");
             clearConflict(DRAFT_SCOPE, character.id, "save");
-            if (level > character.buildState.level) {
-              patchDraft(DRAFT_SCOPE, character.id, { level }, "save");
-            }
+            patchDraft(DRAFT_SCOPE, character.id, { level: payload.level, classRef: payload.classRef }, "save");
           }}
         />
       ) : null}
@@ -462,6 +509,8 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
             setNotes(serverCharacter.buildState.notes ?? "");
             setInventory(serverCharacter.inventory ?? []);
             setSpells(serverCharacter.spells ?? []);
+            setBuildLevel(serverCharacter.buildState.level);
+            setBuildClassRef(serverCharacter.buildState.classRef);
             setRevision(serverCharacter.revision);
             clearConflict(DRAFT_SCOPE, character.id, "save");
             markSaved(DRAFT_SCOPE, character.id, "save");

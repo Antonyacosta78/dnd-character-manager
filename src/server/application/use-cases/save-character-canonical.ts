@@ -62,6 +62,19 @@ export function createSaveCharacterCanonicalUseCase({
       });
     }
 
+    if (input.draft.level < existing.buildState.level) {
+      throw new CharacterRequestValidationError({
+        hardIssues: [
+          {
+            code: "CHARACTER_CORE_LEVEL_REGRESSION_BLOCKED",
+            path: "level",
+            message: "Character level cannot be lowered during canonical save.",
+          },
+        ],
+        warnings: validation.warnings,
+      });
+    }
+
     const unacknowledgedWarningCodes = validation.warnings
       .map((warning) => warning.code)
       .filter((code) => !input.acknowledgedWarningCodes.includes(code));
