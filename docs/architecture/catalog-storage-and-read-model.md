@@ -13,13 +13,14 @@ This decision prevents:
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `accepted`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked storage/read-model architecture as accepted after merged publish/runtime-reader implementation and verification. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created architecture note for catalog storage/read-model boundaries.
 - `2026-04-04` - `Antony Acosta` - Resolved publish strategy, transaction boundary, payload size policy, and v1 runtime read posture decisions. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Finalized v1 canonical row layout decision to keep one canonical table with compound indexes. Made with OpenCode.

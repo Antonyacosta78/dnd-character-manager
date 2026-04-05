@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `completed`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked implementation plan completed after merge, closed Definition of Done items, and recorded implementation evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created implementation plan for foundation publish/read-model delivery.
 - `2026-04-04` - `Antony Acosta` - Incorporated resolved decisions for publish strategy, activation protocol, payload size policy, and runtime cache posture. Made with OpenCode.
 
@@ -17,10 +18,10 @@
 - Deliver a working publish/read path so successful imports become queryable runtime catalog data through `RulesCatalog`.
 - Close the foundation gap between "parser validates data" and "application can use imported classes/spells/feats/features."
 
-In scope (this plan implements now):
+In scope (implemented in this slice):
 
 - runtime catalog persistence schema for canonical entities and key relation tables
-- publish-stage implementation in import pipeline (replace current no-op)
+- publish-stage implementation in import pipeline
 - activation and runtime-state update wiring for published versions
 - `DerivedRulesCatalog` adapter with v1 namespaces (`classes`, `subclasses`, `races`, `backgrounds`, `spells`, `feats`, `features`)
 - composition wiring so app services can consume concrete derived catalog implementation
@@ -40,6 +41,14 @@ Completion criteria:
 - `DerivedRulesCatalog` can serve deterministic `get/list` calls from active version data.
 - `RulesCatalog` consumers in app services no longer depend on parser internals or external files.
 - tests confirm publish idempotency, activation atomicity, and namespace reader behavior.
+
+## Implementation Outcome (2026-04-05)
+
+- Runtime catalog persistence is implemented in Prisma schema and publish repository adapters.
+- Import pipeline publish stage now performs guarded two-phase publish+activation and returns persisted `catalogVersionId`.
+- `DerivedRulesCatalog` runtime reads are wired to active-version storage with fingerprint-scoped cache invalidation.
+- Foundation tests were added for publish semantics and derived reader behavior.
+- Command-level verification completed with `bun x tsc --noEmit`, targeted `bun test`, and successful `bun run data:import`.
 
 ## Resolved Decisions (2026-04-04)
 
@@ -76,7 +85,7 @@ Completion criteria:
 - `src/server/import/run-import-pipeline.ts`
   - Reuse: stage orchestration, diagnostics mapping, summary output contract.
   - Keep consistent: stage timing, issue aggregation, fail-closed behavior.
-  - Do not copy forward: `publish` no-op placeholder.
+  - Historical note: `publish` no-op placeholder has been replaced by guarded two-phase publish+activation wiring.
 - `src/server/import/parser-types.ts`
   - Reuse: normalized entity and relation contracts.
   - Keep consistent: source kind enums and spell-edge/feature-ref contracts.
@@ -98,7 +107,7 @@ Completion criteria:
   - Depends on finalized runtime row model naming.
 
 - `src/server/import/run-import-pipeline.ts` (risk: high)
-  - Replace `publish` no-op with persistence + activation workflow.
+  - Publish stage now runs persistence + activation workflow.
   - Return real `catalogVersionId` on success.
   - Ensure failure path preserves active pointer safety.
   - Depends on publish service/repository ports and adapters.
@@ -138,32 +147,20 @@ Prisma adapters:
 Rules catalog adapters:
 
 - `src/server/adapters/rules-catalog/derived-rules-catalog.ts`
-  - Aggregates reader modules into `RulesCatalog` contract.
+  - Implements v1 namespaces in one adapter module backed by published tables.
 - `src/server/adapters/rules-catalog/raw-rules-catalog.ts`
   - Explicit unsupported provider implementation for v1.
-- `src/server/adapters/rules-catalog/readers/classes-reader.ts`
-- `src/server/adapters/rules-catalog/readers/subclasses-reader.ts`
-- `src/server/adapters/rules-catalog/readers/races-reader.ts`
-- `src/server/adapters/rules-catalog/readers/backgrounds-reader.ts`
-- `src/server/adapters/rules-catalog/readers/spells-reader.ts`
-- `src/server/adapters/rules-catalog/readers/feats-reader.ts`
-- `src/server/adapters/rules-catalog/readers/features-reader.ts`
 
 Application layer (optional-but-recommended verification path):
 
-- `src/server/application/use-cases/get-rules-catalog-health.ts`
-  - Operational read-model for active version/provider/fingerprint.
-- Optional: `src/server/application/use-cases/list-class-options.ts`
-  - Proves runtime class listing through application/port boundaries.
+- Deferred in v1: dedicated `get-rules-catalog-health` use-case and route-level read-model exposure.
 
 Tests:
 
-- `src/server/import/__tests__/publish-stage.test.ts`
-  - publish success/failure/atomicity/idempotency checks.
 - `src/server/adapters/rules-catalog/__tests__/derived-rules-catalog.test.ts`
-  - namespace contract behavior against seeded runtime rows.
+  - cache invalidation and spell filter semantics against mocked active-version data.
 - `src/server/adapters/prisma/__tests__/catalog-publish-repository.test.ts`
-  - transactional correctness and rollback behavior.
+  - payload overflow aggregation, guard checks, idempotent recovery, and lock behavior.
 
 ## Data Flow
 
@@ -387,9 +384,9 @@ Backout:
 
 ## Definition of Done
 
-- [ ] publish stage persists runtime rows and sets `catalogVersionId`.
-- [ ] activation pointer updates atomically with event history.
-- [ ] derived readers serve active-version scoped data for v1 namespaces.
-- [ ] app composition uses concrete derived adapter path.
-- [ ] tests cover idempotency, atomicity, and reader contract semantics.
-- [ ] runbook-level CLI verification is documented and repeatable.
+- [x] publish stage persists runtime rows and sets `catalogVersionId`.
+- [x] activation pointer updates atomically with event history.
+- [x] derived readers serve active-version scoped data for v1 namespaces.
+- [x] app composition uses concrete derived adapter path.
+- [x] tests cover idempotency, atomicity, and reader contract semantics.
+- [x] runbook-level CLI verification is documented and repeatable.

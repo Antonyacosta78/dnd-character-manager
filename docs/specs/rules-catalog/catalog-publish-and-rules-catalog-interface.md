@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `approved`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked the foundation rules-catalog publish/read spec as approved after merged implementation and verification evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created the foundation spec for catalog publish and `RulesCatalog` reader wiring.
 - `2026-04-04` - `Antony Acosta` - Resolved blocking and non-blocking publish/read-model decisions for v1 implementation scope. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Updated context to reflect implemented publish persistence and derived runtime reader wiring. Made with OpenCode.
@@ -26,6 +27,15 @@
 - Result: successful imports can be consumed through `RulesCatalog` namespaces for foundation v1 domains.
 
 This spec defines the first publishable runtime catalog implementation and reader interface wiring.
+
+Implementation evidence for approval:
+
+- `src/server/import/run-import-pipeline.ts`
+- `src/server/adapters/prisma/catalog-publish-repository.ts`
+- `src/server/adapters/rules-catalog/derived-rules-catalog.ts`
+- `src/server/composition/create-app-services.ts`
+- `src/server/adapters/prisma/__tests__/catalog-publish-repository.test.ts`
+- `src/server/adapters/rules-catalog/__tests__/derived-rules-catalog.test.ts`
 
 ## Current Plan
 
