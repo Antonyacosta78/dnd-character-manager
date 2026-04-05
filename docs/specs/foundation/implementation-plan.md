@@ -68,7 +68,7 @@ Completion criteria:
   - Defines external source trust model and lineage requirements.
 - `docs/architecture/parsing-pipeline.md`
   - Defines required import stages, deterministic behavior, and failure semantics.
-- `docs/specs/foundation/option-complete-data-source-parsing.md`
+- `docs/specs/parsing/option-complete-data-source-parsing.md`
   - Defines mandatory parser behavior to prevent false negatives and option loss.
 - `docs/architecture/parser-option-completeness.md`
   - Defines shared parser completeness policy and fail-closed semantics.

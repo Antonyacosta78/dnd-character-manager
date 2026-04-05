@@ -217,7 +217,7 @@ Minimum verification required before this policy is considered adopted in code:
 
 ## Related Specs
 
-- `docs/specs/foundation/option-complete-data-source-parsing.md`
+- `docs/specs/parsing/option-complete-data-source-parsing.md`
 - `docs/specs/foundation/implementation-plan.md`
 
 ## Related Features
