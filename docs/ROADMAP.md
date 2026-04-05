@@ -32,29 +32,29 @@ Last verified: 2026-04-05 (full-project evidence pass + auth/characters smoke te
 
 Detailed evidence and checklist: `docs/STATUS.md`
 
-- Phase 0 - Foundation: completed
-- Phase 1 - Authentication And Identity: completed
-- Phase 2 - Character Core: planned
-- Phase 3 - Global Settings: completed
-- Phase 4 - Progression Planning: planned
-- Phase 5 - Branching And Timelines: planned
-- Phase 6 - Adventures, Worlds, And Snapshots: planned
-- Phase 7 - Playable Output: planned
-- Phase 8 - Roster And Navigation: planned
-- Phase 9 - History And Comparison: planned
+- Phase 0 - Foundation
+- Phase 1 - Authentication And Identity
+- Phase 2 - Character Core
+- Phase 3 - Global Settings
+- Phase 4 - Progression Planning
+- Phase 5 - Branching And Timelines
+- Phase 6 - Adventures, Worlds, And Snapshots
+- Phase 7 - Playable Output
+- Phase 8 - Roster And Navigation
+- Phase 9 - History And Comparison
 
 ```mermaid
 flowchart LR
-  P0["Phase 0 Foundation (Built)"]
-  P1["Phase 1 Auth & Identity (Built)"]
-  P3["Phase 3 Global Settings (Built)"]
-  P2["Phase 2 Character Core (Planned)"]
-  P4["Phase 4 Progression Planning (Planned)"]
-  P5["Phase 5 Branching & Timelines (Planned)"]
-  P6["Phase 6 Adventures/Worlds/Snapshots (Planned)"]
-  P7["Phase 7 Playable Output (Planned)"]
-  P8["Phase 8 Roster & Navigation (Planned)"]
-  P9["Phase 9 History & Comparison (Planned)"]
+  P0["Phase 0 Foundation"]
+  P1["Phase 1 Auth & Identity"]
+  P3["Phase 3 Global Settings"]
+  P2["Phase 2 Character Core"]
+  P4["Phase 4 Progression Planning"]
+  P5["Phase 5 Branching & Timelines"]
+  P6["Phase 6 Adventures/Worlds/Snapshots"]
+  P7["Phase 7 Playable Output"]
+  P8["Phase 8 Roster & Navigation"]
+  P9["Phase 9 History & Comparison"]
   P0 --> P2
   P2 --> P4
   P4 --> P5
@@ -92,8 +92,6 @@ Goal: establish the project shape, vocabulary, and constraints before feature wo
 - docs workflow for feature rundowns, specs, and implementation plans
 - architecture notes for app shape, parsing, and data sources
 - i18n foundation direction (locale strategy, fallback behavior, and doc linkage)
-
-Status: completed
 
 ## Phase 1 - Authentication And Identity
 
