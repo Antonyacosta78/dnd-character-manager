@@ -29,3 +29,9 @@
 - **What changed:** Extended draft/domain types for optional rule references + inventory/spells payloads, added validation coverage for custom/invalid row states, and introduced sheet editors plus inventory/spells update use-cases for canonical save-path integration.
 - **Verification run:** `bun run lint`; `bun test src/server/domain/character-core/__tests__/validation.test.ts`
 - **Known limitations/deferred:** Optional/variant selection UI is MVP-minimal and currently model-driven via refs without dedicated catalog browsing UX.
+
+## Phase 5 - sharing + PDF export
+
+- **What changed:** Added owner share-toggle use-case + endpoint, public read-only share-token endpoint, PDF export use-case + endpoint (`official` and `summary` modes), and sheet-side share/export action cards.
+- **Verification run:** `bun run lint`; `bun test src/app/api/characters/[id]/share/__tests__/route.test.ts src/app/api/characters/[id]/export/__tests__/route.test.ts`
+- **Known limitations/deferred:** Export currently uses text-backed PDF bytes until dedicated renderer is introduced.
