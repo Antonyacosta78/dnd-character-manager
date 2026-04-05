@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Updated current-state notes to match accepted implementation reality and removed stale parser-incomplete wording. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked parser option-completeness policy as accepted after merged implementation and parity-validation evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Initial document created.
@@ -130,8 +131,8 @@ This architecture note does not govern:
 
 Current state:
 
-- import pipeline exists as a staged foundation skeleton
-- parsing semantics are not fully implemented yet
+- import pipeline implements staged foundation flow through `validate_source`, `resolve`, `normalize`, `validate_domain`, and `publish`
+- parser completeness semantics for mandatory v1 option-critical paths are implemented with strict/warn parity validation coverage
 
 Adoption strategy:
 

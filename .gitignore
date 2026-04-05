@@ -51,6 +51,7 @@ rulesync.local.jsonc
 
 # rulesync generated outputs
 AGENTS.md
+CLAUDE.md
 
 # temporal files created by humans and agents
 temp/

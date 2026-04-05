@@ -219,6 +219,75 @@
       "invalid": "Invalid state rune"
     }
   },
+  "appShellNavigation": {
+    "primaryAriaLabel": "Primary navigation",
+    "topUtilityAriaLabel": "Account menu",
+    "utilityAriaLabel": "Navigation utilities",
+    "mobileMenuOpen": "Open menu",
+    "mobileMenuClose": "Close menu",
+    "mobileBack": "Back",
+    "submenuExpand": "Expand submenu",
+    "submenuCollapse": "Collapse submenu",
+    "locked": {
+      "reason": "Locked.",
+      "guidance": "You do not currently have access."
+    },
+    "account": {
+      "label": "Account",
+      "tooltip": "Sign out of this account.",
+      "openMenu": "Open account menu",
+      "signOut": "Sign out",
+      "signOutPending": "Signing out..."
+    },
+    "items": {
+      "characters": {
+        "label": "Characters",
+        "tooltip": "View and manage your character roster."
+      },
+      "branches": {
+        "label": "Branches",
+        "tooltip": "Open alternate builds and timeline branches for a character."
+      },
+      "worlds": {
+        "label": "Worlds",
+        "tooltip": "Manage shared world continuity and context."
+      },
+      "adventures": {
+        "label": "Adventures",
+        "tooltip": "Browse all your campaigns, one-shots, and short arcs."
+      },
+      "sessions": {
+        "label": "Sessions",
+        "tooltip": "View sessions for each adventure and prepare playable versions."
+      },
+      "settings": {
+        "label": "Settings",
+        "tooltip": "Open global app preferences such as theme and language."
+      }
+    },
+    "routeTitles": {
+      "worlds": "Worlds",
+      "adventures": "Adventures",
+      "characterBranches": "Character branches",
+      "adventureSessions": "Adventure sessions"
+    },
+    "routeSubtitles": {
+      "worlds": "Shared continuity and campaign context.",
+      "adventures": "Campaigns, one-shots, and short arcs.",
+      "characterBranches": "Alternate character timelines.",
+      "adventureSessions": "Session preparation and playable versions.",
+      "characterEntityBranches": "Branches for character {id}.",
+      "adventureEntitySessions": "Sessions for adventure {id}."
+    },
+    "routeBody": {
+      "worlds": "World management views will appear here in a later phase.",
+      "adventures": "Adventure browsing views will appear here in a later phase.",
+      "characterBranches": "Browse and compare character branch timelines from this route.",
+      "adventureSessions": "Session planning and preparation for adventures will appear here.",
+      "characterEntityBranches": "Branch timeline details for character {id} will appear here.",
+      "adventureEntitySessions": "Session details for adventure {id} will appear here."
+    }
+  },
   "auth": {
     "signIn": {
       "eyebrow": "Authentication",

@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `accepted`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked API/error contract as accepted for Phase 0 surfaces (`ops:catalog:health` plus optional example rules-read route) while keeping full rules-entity endpoint definitions intentionally deferred. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; contract surfaces are partially implemented and still in progress. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
