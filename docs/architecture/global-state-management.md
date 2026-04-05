@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Updated v1 conflict policy baseline: user-authored canonical draft conflicts now require explicit resolution choice with machine-readable conflict details, while timestamp LWW is limited to low-stakes non-canonical state.
 - `2026-04-05` - `Antony Acosta` - Updated state ownership vocabulary from game to adventure for planned play-instance terminology consistency. (Made with OpenCode)
 - `2026-04-04` - `OpenCode` - Created initial architecture skeleton for global state ownership, persistence, and rollout.
 - `2026-04-04` - `OpenCode` - Clarified architecture-first sequencing and moved Rulesync rule generation requirement into Current Plan.
@@ -103,16 +104,23 @@ Phase 2 (planned): server draft persistence
 - Sync policy: optimistic local-first updates with action-based save triggers.
 - Initial action triggers: input blur and explicit submit/save interactions.
 
-Conflict policy (initial)
+Conflict policy (v1 baseline)
 
-- Use timestamp-based last-write-wins by `updatedAt`.
-- Keep only the newer draft payload; do not show conflict warnings in v1.
-- If timestamps are equal, keep existing persisted payload to avoid churn.
+- For user-authored, draft-backed canonical records (for example Character Core), use explicit conflict resolution on revision mismatch.
+- Conflict resolution UX must provide three actions:
+  - Keep Local (overwrite canonical server state with local draft)
+  - Keep Server (discard local draft)
+  - Review Differences (section-level diff before final choice)
+- Conflict responses must return machine-readable details suitable for UI branching, including revision metadata and changed sections.
+- Default conflict action must be non-destructive (Review Differences); never silently discard local draft.
+- Timestamp-based last-write-wins by `updatedAt` is still allowed for low-stakes non-canonical state (for example ephemeral UI workflow caches).
+- If timestamps are equal for LWW-eligible state, keep existing persisted payload to avoid churn.
 
 ### Failure and Error Semantics
 
 - Local rehydrate failure: fail open for UI, fail closed for invalid draft payload use.
 - Save failure to server (phase 2): retain local dirty draft and show recoverable warning.
+- Revision conflict on canonical save: return recoverable conflict response with machine-readable details; require explicit user choice before overwrite/discard.
 - Domain validation failure on submit: preserve draft, map errors to explicit field/state surfaces.
 
 ### Guardrails
@@ -142,7 +150,7 @@ Conflict policy (initial)
 ### Tradeoffs
 
 - `Zustand` reduces ceremony and speeds early delivery, but requires explicit team discipline to avoid ad-hoc store drift.
-- Local-first draft persistence improves resilience and UX immediately, but conflict semantics stay intentionally simple in v1.
+- Local-first draft persistence improves resilience and UX immediately, but explicit conflict choice on canonical records adds implementation complexity to prevent silent data loss.
 
 ### Migration Trigger to Redux Toolkit
 
