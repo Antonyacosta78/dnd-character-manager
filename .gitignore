@@ -54,6 +54,7 @@ AGENTS.md
 
 # temporal files created by humans and agents
 temp/
+.playwright-mcp/
 .vscode/
 
 # local sqlite db
