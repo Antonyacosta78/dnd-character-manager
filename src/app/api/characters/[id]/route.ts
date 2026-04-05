@@ -5,19 +5,20 @@ import { NextResponse } from "next/server";
 import { AuthSessionContext } from "@/server/adapters/auth/auth-session-context";
 import { createPrismaCharacterRepository } from "@/server/adapters/prisma/character-repository";
 import { createDerivedRulesCatalog, RulesCatalogUnavailableError } from "@/server/adapters/rules-catalog/derived-rules-catalog";
+import { AuthUnauthenticatedError } from "@/server/application/errors/auth-errors";
 import {
-  AuthForbiddenError,
-  AuthUnauthenticatedError,
-} from "@/server/application/errors/auth-errors";
-import { CharacterRequestValidationError } from "@/server/application/errors/character-core-errors";
+  CharacterNotFoundError,
+  CharacterRequestValidationError,
+  CharacterSaveConflictError,
+} from "@/server/application/errors/character-core-errors";
 import {
-  createCreateCharacterUseCase,
-  type CreateCharacterUseCase,
-} from "@/server/application/use-cases/create-character";
+  createGetOwnerCharacterByIdUseCase,
+  type GetOwnerCharacterByIdUseCase,
+} from "@/server/application/use-cases/get-owner-character-by-id";
 import {
-  createListOwnerCharactersUseCase,
-  type ListOwnerCharactersUseCase,
-} from "@/server/application/use-cases/list-owner-characters";
+  createSaveCharacterCanonicalUseCase,
+  type SaveCharacterCanonicalUseCase,
+} from "@/server/application/use-cases/save-character-canonical";
 import type { CharacterDraftPayload, CharacterInventoryEntry, CharacterSpellEntry } from "@/server/ports/character-repository";
 
 interface ResponseMeta {
@@ -34,7 +35,6 @@ interface ApiErrorResponse {
   error: {
     code:
       | "AUTH_UNAUTHENTICATED"
-      | "AUTH_FORBIDDEN"
       | "REQUEST_VALIDATION_FAILED"
       | "RULES_CATALOG_UNAVAILABLE"
       | "INTERNAL_ERROR";
@@ -45,55 +45,54 @@ interface ApiErrorResponse {
   meta: ResponseMeta;
 }
 
-interface CreateCharacterRequestBody {
+interface SaveCharacterRequestBody {
+  baseRevision: number;
   draft: CharacterDraftPayload;
   acknowledgedWarningCodes?: string[];
 }
 
-export interface CharactersRouteDeps {
-  listOwnerCharacters: ListOwnerCharactersUseCase;
-  createCharacter: CreateCharacterUseCase;
+export interface CharacterByIdRouteDeps {
+  getOwnerCharacterById: GetOwnerCharacterByIdUseCase;
+  saveCharacterCanonical: SaveCharacterCanonicalUseCase;
   now?: () => Date;
   createRequestId?: () => string;
 }
 
-export function createCharactersRoute({
-  listOwnerCharacters,
-  createCharacter,
+export function createCharacterByIdRoute({
+  getOwnerCharacterById,
+  saveCharacterCanonical,
   now = () => new Date(),
   createRequestId = () => `req_${randomUUID()}`,
-}: CharactersRouteDeps) {
+}: CharacterByIdRouteDeps) {
   return {
-    async GET(request: Request) {
+    async GET(
+      request: Request,
+      context: { params: Promise<{ id: string }> },
+    ) {
       const requestId = resolveRequestId(request, createRequestId);
       const timestamp = now().toISOString();
+      const { id } = await context.params;
 
       try {
-        const items = await listOwnerCharacters();
+        const character = await getOwnerCharacterById({ characterId: id });
 
-        return createSuccessResponse(
-          requestId,
-          200,
-          {
-            data: {
-              items,
-            },
-            meta: {
-              requestId,
-              timestamp,
-            },
-          },
-        );
+        return createSuccessResponse(requestId, 200, {
+          data: { character },
+          meta: { requestId, timestamp },
+        });
       } catch (error) {
         return createErrorResponse(requestId, timestamp, mapRouteError(error));
       }
     },
 
-    async POST(request: Request) {
+    async PATCH(
+      request: Request,
+      context: { params: Promise<{ id: string }> },
+    ) {
       const requestId = resolveRequestId(request, createRequestId);
       const timestamp = now().toISOString();
-
-      const parsedBody = await parseCreateCharacterRequestBody(request);
+      const { id } = await context.params;
+      const parsedBody = await parseSaveCharacterRequestBody(request);
 
       if (!parsedBody.ok) {
         return createErrorResponse(requestId, timestamp, {
@@ -107,24 +106,23 @@ export function createCharactersRoute({
       }
 
       try {
-        const created = await createCharacter({
+        const saved = await saveCharacterCanonical({
+          characterId: id,
+          baseRevision: parsedBody.value.baseRevision,
           draft: parsedBody.value.draft,
           acknowledgedWarningCodes: parsedBody.value.acknowledgedWarningCodes,
         });
 
-        return createSuccessResponse(
-          requestId,
-          201,
-          {
-            data: {
-              character: created,
-            },
-            meta: {
-              requestId,
-              timestamp,
-            },
+        return createSuccessResponse(requestId, 200, {
+          data: {
+            character: saved.character,
+            warnings: saved.warnings,
           },
-        );
+          meta: {
+            requestId,
+            timestamp,
+          },
+        });
       } catch (error) {
         return createErrorResponse(requestId, timestamp, mapRouteError(error));
       }
@@ -132,22 +130,23 @@ export function createCharactersRoute({
   };
 }
 
-export const { GET, POST } = createCharactersRoute({
-  listOwnerCharacters: createListOwnerCharactersUseCase({
+export const { GET, PATCH } = createCharacterByIdRoute({
+  getOwnerCharacterById: createGetOwnerCharacterByIdUseCase({
     sessionContext: new AuthSessionContext(),
     characterRepository: createPrismaCharacterRepository(),
   }),
-  createCharacter: createCreateCharacterUseCase({
+  saveCharacterCanonical: createSaveCharacterCanonicalUseCase({
     sessionContext: new AuthSessionContext(),
     characterRepository: createPrismaCharacterRepository(),
     rulesCatalog: createDerivedRulesCatalog(),
   }),
 });
 
-type ParsedCreateCharacterBody =
+type ParsedSaveCharacterBody =
   | {
       ok: true;
       value: {
+        baseRevision: number;
         draft: CharacterDraftPayload;
         acknowledgedWarningCodes: string[];
       };
@@ -157,11 +156,11 @@ type ParsedCreateCharacterBody =
       fields: Record<string, string[]>;
     };
 
-async function parseCreateCharacterRequestBody(request: Request): Promise<ParsedCreateCharacterBody> {
-  let body: CreateCharacterRequestBody;
+async function parseSaveCharacterRequestBody(request: Request): Promise<ParsedSaveCharacterBody> {
+  let body: SaveCharacterRequestBody;
 
   try {
-    body = (await request.json()) as CreateCharacterRequestBody;
+    body = (await request.json()) as SaveCharacterRequestBody;
   } catch {
     return {
       ok: false,
@@ -180,23 +179,22 @@ async function parseCreateCharacterRequestBody(request: Request): Promise<Parsed
     };
   }
 
+  if (typeof body.baseRevision !== "number" || !Number.isInteger(body.baseRevision) || body.baseRevision < 1) {
+    return {
+      ok: false,
+      fields: {
+        baseRevision: ["invalidType"],
+      },
+    };
+  }
+
   const draft = body.draft;
-  const acknowledgedWarningCodes = body.acknowledgedWarningCodes ?? [];
 
   if (!draft || typeof draft !== "object") {
     return {
       ok: false,
       fields: {
         draft: ["required"],
-      },
-    };
-  }
-
-  if (!Array.isArray(acknowledgedWarningCodes) || !acknowledgedWarningCodes.every((code) => typeof code === "string")) {
-    return {
-      ok: false,
-      fields: {
-        acknowledgedWarningCodes: ["invalidType"],
       },
     };
   }
@@ -266,9 +264,21 @@ async function parseCreateCharacterRequestBody(request: Request): Promise<Parsed
       }))
     : [];
 
+  const acknowledgedWarningCodes = body.acknowledgedWarningCodes ?? [];
+
+  if (!Array.isArray(acknowledgedWarningCodes) || !acknowledgedWarningCodes.every((item) => typeof item === "string")) {
+    return {
+      ok: false,
+      fields: {
+        acknowledgedWarningCodes: ["invalidType"],
+      },
+    };
+  }
+
   return {
     ok: true,
     value: {
+      baseRevision: body.baseRevision,
       draft: {
         name: String(draftRecord.name ?? ""),
         concept: String(draftRecord.concept ?? ""),
@@ -339,11 +349,14 @@ function mapRouteError(error: unknown): ApiErrorResponse["error"] {
     };
   }
 
-  if (error instanceof AuthForbiddenError) {
+  if (error instanceof CharacterNotFoundError) {
     return {
-      code: "AUTH_FORBIDDEN",
-      message: "You are not allowed to access this resource.",
-      status: 403,
+      code: "REQUEST_VALIDATION_FAILED",
+      message: "Character was not found.",
+      status: 400,
+      details: {
+        characterId: "notFound",
+      },
     };
   }
 
@@ -353,6 +366,22 @@ function mapRouteError(error: unknown): ApiErrorResponse["error"] {
       message: error.message,
       status: 400,
       details: error.details,
+    };
+  }
+
+  if (error instanceof CharacterSaveConflictError) {
+    return {
+      code: "REQUEST_VALIDATION_FAILED",
+      message: error.message,
+      status: 400,
+      details: {
+        conflict: {
+          characterId: error.details.characterId,
+          baseRevision: error.details.baseRevision,
+          serverRevision: error.details.serverRevision,
+          changedSections: error.details.changedSections,
+        },
+      },
     };
   }
 
