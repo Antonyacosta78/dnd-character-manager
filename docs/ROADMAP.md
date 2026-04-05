@@ -43,6 +43,46 @@ Detailed evidence and checklist: `docs/STATUS.md`
 - Phase 8 - Roster And Navigation: planned
 - Phase 9 - History And Comparison: planned
 
+```mermaid
+flowchart LR
+  P0["Phase 0 Foundation (Built)"]
+  P1["Phase 1 Auth & Identity (Built)"]
+  P3["Phase 3 Global Settings (Built)"]
+  P2["Phase 2 Character Core (Planned)"]
+  P4["Phase 4 Progression Planning (Planned)"]
+  P5["Phase 5 Branching & Timelines (Planned)"]
+  P6["Phase 6 Adventures/Worlds/Snapshots (Planned)"]
+  P7["Phase 7 Playable Output (Planned)"]
+  P8["Phase 8 Roster & Navigation (Planned)"]
+  P9["Phase 9 History & Comparison (Planned)"]
+  P0 --> P2
+  P2 --> P4
+  P4 --> P5
+  P5 --> P6
+  P6 --> P7
+  P2 --> P8
+  P4 --> P8
+  P5 --> P8
+  P6 --> P8
+  P5 --> P9
+  P6 --> P9
+  P4 --> P9
+  P1 --> P2
+  P1 --> P4
+  P1 --> P5
+  P1 --> P6
+  P1 --> P7
+  P1 --> P8
+  P1 --> P9
+  P3 -. cross-route UX/prefs .-> P2
+  P3 -. cross-route UX/prefs .-> P4
+  P3 -. cross-route UX/prefs .-> P5
+  P3 -. cross-route UX/prefs .-> P6
+  P3 -. output UX consistency .-> P7
+  P3 -. navbar placement follow-up .-> P8
+  P3 -. history-view UX consistency .-> P9 
+```
+
 ## Phase 0 - Foundation
 
 Goal: establish the project shape, vocabulary, and constraints before feature work gets too wide.
