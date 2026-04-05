@@ -1,5 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { DraftStoreDemo } from "@/app/draft-store-demo";
+
 export default async function Home() {
   const [locale, t] = await Promise.all([
     getLocale(),
@@ -23,6 +25,8 @@ export default async function Home() {
           <dd>{t("supportedLocalesLabel")}</dd>
         </div>
       </dl>
+
+      <DraftStoreDemo />
     </main>
   );
 }
