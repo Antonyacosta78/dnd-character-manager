@@ -48,6 +48,13 @@ export interface GlobalSettingsModalLabels {
   feedbackFailed: string;
 }
 
+export interface GlobalSettingsModalProps {
+  labels: GlobalSettingsModalLabels;
+  triggerStyle?: "icon" | "utility";
+  triggerText?: string;
+  triggerTitle?: string;
+}
+
 function getFocusableElements(container: HTMLElement): HTMLElement[] {
   const focusableSelector =
     'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -57,7 +64,12 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   );
 }
 
-export function GlobalSettingsModal({ labels }: { labels: GlobalSettingsModalLabels }) {
+export function GlobalSettingsModal({
+  labels,
+  triggerStyle = "icon",
+  triggerText,
+  triggerTitle,
+}: GlobalSettingsModalProps) {
   const [open, setOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<GlobalSettingsSection>("appearance");
   const titleId = useId();
@@ -184,10 +196,17 @@ export function GlobalSettingsModal({ labels }: { labels: GlobalSettingsModalLab
         ref={triggerRef}
         type="button"
         aria-label={labels.triggerLabel}
+        title={triggerTitle ?? labels.triggerLabel}
         onClick={() => setOpen(true)}
-        className="inline-flex min-h-8 items-center justify-center gap-2 rounded-radius-sm border border-transparent bg-transparent px-2 py-1.5 text-xs font-medium text-fg-secondary shadow-shadow-soft transition-colors motion-reduce:transition-none hover:bg-bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-brass focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas"
+        className={cn(
+          "inline-flex min-h-8 items-center justify-center gap-2 rounded-radius-sm border shadow-shadow-soft transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas",
+          triggerStyle === "utility"
+            ? "w-full border-transparent bg-transparent px-3 py-2 text-left text-sm font-medium text-fg-secondary hover:bg-bg-muted focus-visible:ring-accent-rubric"
+            : "border-transparent bg-transparent px-2 py-1.5 text-xs font-medium text-fg-secondary hover:bg-bg-muted focus-visible:ring-accent-brass",
+        )}
       >
         <AppIcon name="settings" label={labels.triggerLabel} className="size-4" />
+        {triggerStyle === "utility" ? <span className="truncate">{triggerText ?? labels.triggerLabel}</span> : null}
       </button>
 
       {open ? (
