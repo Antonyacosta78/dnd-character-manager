@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -18,22 +19,25 @@ interface RegisterApiError {
 export interface SignUpFormCopy {
   usernameLabel: string;
   passwordLabel: string;
+  confirmPasswordLabel: string;
   emailLabel: string;
   usernamePlaceholder: string;
   passwordPlaceholder: string;
+  confirmPasswordPlaceholder: string;
   emailPlaceholder: string;
   submit: string;
   pending: string;
-  success: string;
   genericError: string;
   payloadError: string;
   usernameRequiredError: string;
   usernameDuplicateError: string;
   passwordRequiredError: string;
+  passwordMismatchError: string;
   emailInvalidError: string;
 }
 
 export function SignUpForm({ copy }: { copy: SignUpFormCopy }) {
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [feedback, setFeedback] = useState<{ intent: "danger" | "neutral"; message: string } | null>(null);
 
@@ -42,16 +46,29 @@ export function SignUpForm({ copy }: { copy: SignUpFormCopy }) {
       className="space-y-4"
       onSubmit={async (event) => {
         event.preventDefault();
+        const form = event.currentTarget;
         setIsPending(true);
         setFeedback(null);
 
-        const formData = new FormData(event.currentTarget);
+        const formData = new FormData(form);
         const username = formData.get("username");
         const password = formData.get("password");
+        const confirmPassword = formData.get("confirmPassword");
         const email = formData.get("email");
 
-        if (typeof username !== "string" || typeof password !== "string" || typeof email !== "string") {
+        if (
+          typeof username !== "string" ||
+          typeof password !== "string" ||
+          typeof confirmPassword !== "string" ||
+          typeof email !== "string"
+        ) {
           setFeedback({ intent: "danger", message: copy.payloadError });
+          setIsPending(false);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setFeedback({ intent: "danger", message: copy.passwordMismatchError });
           setIsPending(false);
           return;
         }
@@ -79,9 +96,8 @@ export function SignUpForm({ copy }: { copy: SignUpFormCopy }) {
           return;
         }
 
-        event.currentTarget.reset();
-        setFeedback({ intent: "neutral", message: copy.success });
-        setIsPending(false);
+        router.push("/characters");
+        router.refresh();
       }}
     >
       <div className="space-y-2">
@@ -100,6 +116,20 @@ export function SignUpForm({ copy }: { copy: SignUpFormCopy }) {
           name="password"
           type="password"
           placeholder={copy.passwordPlaceholder}
+          autoComplete="new-password"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="sign-up-confirm-password" className="text-sm font-medium text-fg-primary">
+          {copy.confirmPasswordLabel}
+        </label>
+        <Input
+          id="sign-up-confirm-password"
+          name="confirmPassword"
+          type="password"
+          placeholder={copy.confirmPasswordPlaceholder}
           autoComplete="new-password"
           required
         />

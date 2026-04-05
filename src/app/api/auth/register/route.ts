@@ -35,7 +35,11 @@ interface ApiErrorResponse {
   meta: ResponseMeta;
 }
 
-type CreateAccount = (input: RegisterBody, requestHeaders: Headers) => Promise<void>;
+interface AccountCreationResult {
+  setCookieHeaders: string[];
+}
+
+type CreateAccount = (input: RegisterBody, requestHeaders: Headers) => Promise<AccountCreationResult>;
 
 export interface RegisterRouteDeps {
   createAccount: CreateAccount;
@@ -73,9 +77,9 @@ export function createRegisterPostRoute({
     }
 
     try {
-      await createAccount(payloadValidation.value, request.headers);
+      const creationResult = await createAccount(payloadValidation.value, request.headers);
 
-      return NextResponse.json<ApiSuccess<{ created: true }>>(
+      const response = NextResponse.json<ApiSuccess<{ created: true }>>(
         {
           data: {
             created: true,
@@ -87,11 +91,16 @@ export function createRegisterPostRoute({
         },
         {
           status: 200,
-          headers: {
-            "x-request-id": requestId,
-          },
         },
       );
+
+      response.headers.set("x-request-id", requestId);
+
+      for (const setCookieHeader of creationResult.setCookieHeaders) {
+        response.headers.append("set-cookie", setCookieHeader);
+      }
+
+      return response;
     } catch (error) {
       if (isDuplicateUsernameError(error)) {
         return createValidationErrorResponse({
@@ -249,13 +258,14 @@ function validateRegisterBody(body: unknown):
   };
 }
 
-async function createAccountWithAuthProvider(input: RegisterBody, requestHeaders: Headers): Promise<void> {
+async function createAccountWithAuthProvider(input: RegisterBody, requestHeaders: Headers): Promise<AccountCreationResult> {
   const authApi = auth.api as Record<string, unknown>;
   const signUpUsername = authApi.signUpUsername;
   const signUpEmail = authApi.signUpEmail;
 
   if (typeof signUpUsername === "function") {
     const result = await signUpUsername({
+      asResponse: true,
       body: {
         username: input.username,
         password: input.password,
@@ -267,11 +277,12 @@ async function createAccountWithAuthProvider(input: RegisterBody, requestHeaders
 
     assertAuthResultSucceeded(result);
 
-    return;
+    return createSessionAfterRegistration(authApi, input, requestHeaders);
   }
 
   if (typeof signUpEmail === "function") {
     const result = await signUpEmail({
+      asResponse: true,
       body: {
         email: input.email ?? undefined,
         password: input.password,
@@ -283,10 +294,77 @@ async function createAccountWithAuthProvider(input: RegisterBody, requestHeaders
 
     assertAuthResultSucceeded(result);
 
-    return;
+    return createSessionAfterRegistration(authApi, input, requestHeaders);
   }
 
   throw new Error("Auth provider registration API is unavailable.");
+}
+
+async function createSessionAfterRegistration(
+  authApi: Record<string, unknown>,
+  input: RegisterBody,
+  requestHeaders: Headers,
+): Promise<AccountCreationResult> {
+  const signInUsername = authApi.signInUsername;
+  const signInEmail = authApi.signInEmail;
+
+  if (typeof signInUsername === "function") {
+    const result = await signInUsername({
+      asResponse: true,
+      body: {
+        username: input.username,
+        password: input.password,
+      },
+      headers: requestHeaders,
+    });
+
+    return resolveSessionCreationResult(result);
+  }
+
+  if (typeof signInEmail === "function" && input.email) {
+    const result = await signInEmail({
+      asResponse: true,
+      body: {
+        email: input.email,
+        password: input.password,
+      },
+      headers: requestHeaders,
+    });
+
+    return resolveSessionCreationResult(result);
+  }
+
+  throw new Error("Auth provider sign-in API is unavailable.");
+}
+
+function resolveSessionCreationResult(result: unknown): AccountCreationResult {
+  assertAuthResultSucceeded(result);
+
+  if (result instanceof Response) {
+    return {
+      setCookieHeaders: getSetCookieHeaders(result),
+    };
+  }
+
+  return {
+    setCookieHeaders: [],
+  };
+}
+
+function getSetCookieHeaders(response: Response): string[] {
+  const responseHeaders = response.headers as Headers & { getSetCookie?: () => string[] };
+
+  if (typeof responseHeaders.getSetCookie === "function") {
+    return responseHeaders.getSetCookie().filter((value) => value.length > 0);
+  }
+
+  const singleSetCookieHeader = response.headers.get("set-cookie");
+
+  if (!singleSetCookieHeader) {
+    return [];
+  }
+
+  return [singleSetCookieHeader];
 }
 
 function assertAuthResultSucceeded(result: unknown): void {

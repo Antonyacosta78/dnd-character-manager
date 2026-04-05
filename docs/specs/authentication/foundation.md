@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Extended registration contract with client-side password confirmation and automatic post-registration session establishment so successful sign-up continues directly into authenticated flows.
 - `2026-04-05` - `Antony Acosta` - Expanded Phase 1 auth foundation scope to treat MVP registration as a first-class authentication flow alongside sign-in, clarifying acceptance criteria and data flow so implementation and validation stay in one authoritative contract.
 - `2026-04-05` - `Antony Acosta` - Linked the implementation plan artifact for Phase 1 execution sequencing and verification tracking.
 - `2026-04-05` - `Antony Acosta` - Created the Phase 1 authentication and identity foundation spec with scope, acceptance criteria, error behavior, and sequencing notes so implementation planning can start from a stable contract. (Made with OpenCode)
@@ -29,6 +30,7 @@
 ### In scope
 
 - Username/password credential paths for MVP registration and sign-in.
+- Registration UX includes a basic client-side password confirmation check before API submission.
 - User model behavior where:
   - `username` is required and unique.
   - `email` is optional/nullable and does not block account creation/sign-in.
@@ -54,7 +56,9 @@
 
 2. **Authentication contract**
    - Authentication entry flows accept `username + password` for both registration and sign-in.
+   - Registration UI requires `password` and `confirmPassword` to match before server submission.
    - Successful registration creates a new user record with required credentials and optional/nullable `email`.
+   - Successful registration also establishes an authenticated session for the created user (no separate sign-in step required).
    - Successful sign-in establishes a session resolvable through `SessionContextPort#getSessionContext()`.
    - Signed-out state resolves to `{ userId: null, isAdmin: false }` and must be handled explicitly.
 
@@ -89,7 +93,7 @@
 ### Acceptance criteria (testable)
 
 1. **Registration success (valid payload)**
-   - Given a valid registration payload with unique `username` and required `password`, user creation succeeds and the account can sign in through the same credential path.
+   - Given a valid registration payload with unique `username` and required `password`, user creation succeeds and the flow establishes an authenticated session without requiring a separate sign-in action.
 
 2. **Registration duplicate username failure**
    - Given an existing account with username `u1`, when a registration attempt is made with `u1`, creation fails with `REQUEST_VALIDATION_FAILED` and no duplicate user is persisted.
@@ -97,33 +101,36 @@
 3. **Registration invalid payload failure**
    - Given a registration payload missing required credentials or with invalid field values, creation fails with `REQUEST_VALIDATION_FAILED` (`400`) using the shared error envelope and safe field-level details.
 
-4. **Nullable email behavior**
+4. **Registration password confirmation mismatch (client-side)**
+   - Given registration input where `password` and `confirmPassword` differ, the UI blocks submission and shows clear mismatch feedback without calling the registration API.
+
+5. **Nullable email behavior**
    - Given account creation without `email`, user creation succeeds and the persisted `email` value is `null` (or equivalent nullable representation).
 
-5. **Session resolution contract**
+6. **Session resolution contract**
    - Given a valid authenticated request, `SessionContextPort#getSessionContext()` returns the current `userId`.
    - Given no valid session, it returns `userId: null` and `isAdmin: false`.
 
-6. **Application-layer guard order**
+7. **Application-layer guard order**
    - For character-scoped use-cases, authn/authz checks execute before repository access.
 
-7. **`/characters` protected behavior (unauthenticated)**
+8. **`/characters` protected behavior (unauthenticated)**
    - Given a signed-out request to `/characters`, the response is explicit signed-out behavior and does not include character payloads.
 
-8. **`/characters` owner scoping (authenticated)**
+9. **`/characters` owner scoping (authenticated)**
    - Given an authenticated user with characters, `/characters` and its backing data operations return only records owned by that user.
 
-9. **Cross-user denial**
+10. **Cross-user denial**
    - Given authenticated user A requesting user B's character resource through protected APIs/use-cases, the request fails with `AUTH_FORBIDDEN` and no resource payload.
 
-10. **No email verification gate in MVP**
+11. **No email verification gate in MVP**
    - Given a newly created account with unverified or absent email, the user can still sign in via username/password and access `/characters` under normal ownership rules.
 
 ## Data and Flow
 
 Inputs:
 
-- Registration input (`username`, `password`, optional `email`) from auth entry flow.
+- Registration input (`username`, `password`, `confirmPassword`, optional `email`) from auth entry flow.
 - Sign-in credential input (`username`, `password`) from auth entry flow.
 - Session token/cookie headers on server requests.
 - Character operation input (route params/body/query).
@@ -131,12 +138,13 @@ Inputs:
 Transformation path:
 
 1. Auth route handler (`/api/auth/[...all]`) handles credential registration/sign-in endpoints via Better Auth.
-2. Registration path validates payload, enforces username uniqueness, persists user identity fields (`username`, `password`, optional/nullable `email`) and returns contract-aligned success/validation failure behavior.
-3. Sign-in path exchanges valid credentials for session state via Better Auth.
-4. Server operation resolves session through `SessionContextPort`.
-5. Application layer validates authn (`userId` presence) and authz (owner match).
-6. Only authorized operations call repository adapters.
-7. Route/page renders authorized data or returns contract-aligned denial behavior.
+2. Registration UI performs password confirmation (`password === confirmPassword`) before submission.
+3. Registration path validates payload, enforces username uniqueness, persists user identity fields (`username`, `password`, optional/nullable `email`), and establishes session state for the new user.
+4. Sign-in path exchanges valid credentials for session state via Better Auth.
+5. Server operation resolves session through `SessionContextPort`.
+6. Application layer validates authn (`userId` presence) and authz (owner match).
+7. Only authorized operations call repository adapters.
+8. Route/page renders authorized data or returns contract-aligned denial behavior.
 
 Trust boundaries:
 

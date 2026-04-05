@@ -201,13 +201,14 @@
       "description": "Crea tu cuenta para empezar a crear y administrar personajes.",
       "usernameLabel": "Nombre de usuario",
       "passwordLabel": "Contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
       "emailLabel": "Correo electrónico (opcional)",
       "usernamePlaceholder": "Elige un nombre de usuario",
       "passwordPlaceholder": "Crea una contraseña",
+      "confirmPasswordPlaceholder": "Vuelve a ingresar tu contraseña",
       "emailPlaceholder": "Ingresa tu correo (opcional)",
       "submit": "Crear cuenta",
       "pending": "Creando cuenta...",
-      "success": "Cuenta creada. Ahora puedes iniciar sesión.",
       "signInCta": "¿Ya tienes una cuenta? Inicia sesión",
       "backHome": "Volver al inicio",
       "errors": {
@@ -216,6 +217,7 @@
         "usernameRequired": "El nombre de usuario es obligatorio.",
         "usernameDuplicate": "Ese nombre de usuario ya está en uso.",
         "passwordRequired": "La contraseña es obligatoria.",
+        "passwordMismatch": "Las contraseñas no coinciden.",
         "emailInvalid": "Ingresa un correo válido o déjalo vacío."
       }
     },

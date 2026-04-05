@@ -19,18 +19,20 @@ export default async function SignUpPage() {
           copy={{
             usernameLabel: t("auth.signUp.usernameLabel"),
             passwordLabel: t("auth.signUp.passwordLabel"),
+            confirmPasswordLabel: t("auth.signUp.confirmPasswordLabel"),
             emailLabel: t("auth.signUp.emailLabel"),
             usernamePlaceholder: t("auth.signUp.usernamePlaceholder"),
             passwordPlaceholder: t("auth.signUp.passwordPlaceholder"),
+            confirmPasswordPlaceholder: t("auth.signUp.confirmPasswordPlaceholder"),
             emailPlaceholder: t("auth.signUp.emailPlaceholder"),
             submit: t("auth.signUp.submit"),
             pending: t("auth.signUp.pending"),
-            success: t("auth.signUp.success"),
             genericError: t("auth.signUp.errors.generic"),
             payloadError: t("auth.signUp.errors.payload"),
             usernameRequiredError: t("auth.signUp.errors.usernameRequired"),
             usernameDuplicateError: t("auth.signUp.errors.usernameDuplicate"),
             passwordRequiredError: t("auth.signUp.errors.passwordRequired"),
+            passwordMismatchError: t("auth.signUp.errors.passwordMismatch"),
             emailInvalidError: t("auth.signUp.errors.emailInvalid"),
           }}
         />

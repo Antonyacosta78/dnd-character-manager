@@ -11,6 +11,7 @@
 
 - `2026-04-05` - `Antony Acosta` - Created the Phase 1 implementation plan with sequenced vertical slices for username/password auth, ownership enforcement, `/characters` protection, and API-error-contract-aligned deny behavior.
 - `2026-04-05` - `Antony Acosta` - Updated Phase 1 scope to explicitly include MVP self-service registration (username + password, optional email), plus registration-focused flow, edge-case, and verification coverage.
+- `2026-04-05` - `Antony Acosta` - Updated registration execution details to include client-side password confirmation and automatic post-registration session establishment with direct transition to authenticated routes.
 
 ## Goal
 
@@ -23,6 +24,8 @@ In scope (this plan implements now):
 
 - Better Auth credential flow configured for username + password.
 - Self-service registration surface wired end-to-end (UI/client submission + server handling) for `username` + `password` with optional `email`.
+- Registration UX performs basic password confirmation before API submission.
+- Successful registration immediately establishes session state and transitions user into authenticated route behavior.
 - Identity schema updates for unique usernames and nullable emails.
 - Session resolution and owner checks enforced in application use-cases before repository calls.
 - First character ownership repository/use-case path for `/characters`.
@@ -41,6 +44,8 @@ Completion criteria:
 
 - User persistence enforces unique `username` and allows `email = null` without blocking account creation.
 - Registration creates an account for valid `username` + `password` (+ optional `email`) and rejects malformed payloads/duplicate usernames with contract-aligned validation errors.
+- Registration UI blocks password mismatch (`password` vs `confirmPassword`) before API submission.
+- Successful registration yields an authenticated session (cookie/session artifacts present) without requiring manual sign-in.
 - Username/password sign-in establishes a session that resolves through `SessionContextPort#getSessionContext()`.
 - Character-scoped use-cases perform authn then authz checks before repository access.
 - `/characters` denies signed-out requests with explicit challenge behavior and renders only owner-scoped records for signed-in requests.
@@ -118,7 +123,8 @@ Completion criteria:
   - Depends on: updated Prisma user fields.
 
 - `src/app/sign-up/page.tsx` (risk: medium, if already present)
-  - Add a minimal registration UI that collects `username`, `password`, and optional `email`, then calls the registration server path.
+  - Add a minimal registration UI that collects `username`, `password`, `confirmPassword`, and optional `email`, then calls the registration server path.
+  - Ensure client-side password confirmation mismatch blocks submission with localized feedback.
   - Must show contract-safe validation feedback for malformed payload and duplicate username.
   - Why risk: incorrect client/server integration can create confusing account-creation failure states.
   - Depends on: finalized registration API behavior and i18n keys.
@@ -174,7 +180,7 @@ Transport/UI:
 
 - `src/app/api/auth/register/route.ts`
   - Registration endpoint for MVP payload validation and contract error mapping (`REQUEST_VALIDATION_FAILED`, safe `INTERNAL_ERROR`).
-  - Delegates account creation to configured auth provider behavior while preserving API envelope semantics.
+  - Delegates account creation and immediate session establishment to configured auth provider behavior while preserving API envelope semantics.
 
 - `src/app/api/characters/route.ts`
   - Contract route for owner-scoped character list using API error envelope semantics.
@@ -186,7 +192,7 @@ Transport/UI:
   - Minimal username/password entry path that uses the configured Better Auth credential surface.
 
 - `src/app/sign-up/page.tsx`
-  - Minimal self-service registration entry path for username/password with optional email.
+  - Minimal self-service registration entry path for username/password confirmation with optional email.
 
 Tests:
 
@@ -221,9 +227,9 @@ Registration flow:
 
 ```mermaid
 flowchart TD
-  U2[Browser submit from /sign-up] --> R2[/api/auth/register route]
-  R2 --> V2[Payload validation]
-  V2 --> BA2[Better Auth registration call]
+  U2[Browser submit from /sign-up] --> V2[Client password confirmation check]
+  V2 --> R2[/api/auth/register route]
+  R2 --> BA2[Better Auth registration + sign-in call]
   BA2 --> DB2[(SQLite/Postgres)]
   DB2 --> BA2 --> R2 --> U2
 ```
@@ -233,6 +239,7 @@ Trust boundaries and validation:
 - Untrusted: request params, cookies, headers, body payloads.
 - Validated boundary 1 (authentication): `SessionContextPort` resolves `userId` or signed-out null state.
 - Validated boundary 1a (registration input): registration route validates `username` + `password` required and `email` optional/nullable before provider call.
+- Validated boundary 1b (registration UX): client checks `password === confirmPassword` before request submission.
 - Validated boundary 2 (authorization): application use-case validates owner scope before any repository call.
 - Trusted internal: repository queries constrained by validated `ownerUserId`.
 
@@ -267,17 +274,23 @@ sequenceDiagram
   participant C as Client
   participant R as /api/auth/register route
   participant B as Better Auth
-  C->>R: POST /api/auth/register { username, password, email? }
-  alt malformed payload
-    R-->>C: 400 REQUEST_VALIDATION_FAILED envelope
-  else valid payload
-    R->>B: create account
-    alt username already exists
-      B-->>R: duplicate username error
+  C->>C: validate password == confirmPassword
+  alt mismatch
+    C-->>C: show mismatch error, do not call API
+  else matches
+    C->>R: POST /api/auth/register { username, password, email? }
+    alt malformed payload
       R-->>C: 400 REQUEST_VALIDATION_FAILED envelope
-    else created
-      B-->>R: user/session result
-      R-->>C: 200 success envelope
+    else valid payload
+      R->>B: create account + establish session
+      alt username already exists
+        B-->>R: duplicate username error
+        R-->>C: 400 REQUEST_VALIDATION_FAILED envelope
+      else created
+        B-->>R: success + session cookie
+        R-->>C: 200 success envelope
+        C->>C: navigate to /characters
+      end
     end
   end
 ```
@@ -298,6 +311,7 @@ Validation failure path:
 
 - Duplicate username on account creation maps to `REQUEST_VALIDATION_FAILED` (`400`) with safe field detail (`username`) and no SQL/provider internals.
 - Malformed registration payload format (missing username/password, invalid value types) maps to `REQUEST_VALIDATION_FAILED` (`400`).
+- Client-side password mismatch maps to localized inline error and no API request.
 
 Dependency unavailable path:
 
@@ -309,6 +323,7 @@ Known edge cases:
 - Cross-user identifier attempt via protected API/use-case -> `AUTH_FORBIDDEN` (`403`) and no record payload.
 - Existing users without username during migration -> migration must be fail-closed with explicit remediation script or backfill step before enforcing `NOT NULL` + unique index.
 - Registration payload includes empty/whitespace-only username -> reject as `REQUEST_VALIDATION_FAILED` (`400`) without provider/internal details.
+- Registration success without session cookie artifact -> treat as `INTERNAL_ERROR` (`500`) and do not claim successful auto sign-in.
 
 Fail-open vs fail-closed decisions:
 
@@ -433,8 +448,8 @@ Rollout gating:
    - Merge safety: yes if existing routes remain backward compatible.
 
 3. Add registration route and minimal sign-up UI
-   - Output: `/api/auth/register` route + `src/app/sign-up/page.tsx` with contract-safe validation/error display.
-   - Verify: registration route tests for happy path + malformed payload + duplicate username.
+   - Output: `/api/auth/register` route + `src/app/sign-up/page.tsx` with contract-safe validation/error display and password confirmation.
+   - Verify: registration route tests for happy path + malformed payload + duplicate username, plus manual check that successful registration reaches `/characters` authenticated.
    - Merge safety: yes (additive auth surface aligned to MVP contract).
 
 4. Add owner-scoped character port and Prisma adapter
@@ -483,7 +498,9 @@ Manual scenarios:
 - Create account with username/password and no email -> success.
 - Attempt second account with same username -> `400 REQUEST_VALIDATION_FAILED`.
 - Submit malformed registration payload (missing/invalid username or password) -> `400 REQUEST_VALIDATION_FAILED`.
+- Submit mismatched password and confirm password -> inline mismatch error and no registration API request.
 - Signed-out access to `/characters` -> explicit signed-out behavior, no character payload.
+- Successful registration -> user is immediately authenticated and reaches `/characters` without separate sign-in.
 - Signed-in owner access to `/characters` -> only owner records visible.
 - Cross-user attempt via API/use-case fixture -> `403 AUTH_FORBIDDEN`.
 

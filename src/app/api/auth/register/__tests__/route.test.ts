@@ -10,6 +10,9 @@ describe("POST /api/auth/register", () => {
     const postRoute = createRegisterPostRoute({
       createAccount: async (input) => {
         capturedInput = input;
+        return {
+          setCookieHeaders: ["better-auth.session_token=abc123; Path=/; HttpOnly"],
+        };
       },
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_register_success",
@@ -32,6 +35,7 @@ describe("POST /api/auth/register", () => {
     assert.equal(response.status, 200);
     assert.equal(payload.data.created, true);
     assert.equal(payload.meta.requestId, "req_register_success");
+    assert.match(response.headers.get("set-cookie") ?? "", /better-auth\.session_token=abc123/);
     assert.deepEqual(capturedInput, {
       username: "darrel",
       password: "s3cret",

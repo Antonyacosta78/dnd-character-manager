@@ -201,13 +201,14 @@
       "description": "Create your account to start building and managing characters.",
       "usernameLabel": "Username",
       "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm password",
       "emailLabel": "Email (optional)",
       "usernamePlaceholder": "Choose a username",
       "passwordPlaceholder": "Create a password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
       "emailPlaceholder": "Enter your email (optional)",
       "submit": "Create account",
       "pending": "Creating account...",
-      "success": "Account created. You can now sign in.",
       "signInCta": "Already have an account? Sign in",
       "backHome": "Back to home",
       "errors": {
@@ -216,6 +217,7 @@
         "usernameRequired": "Username is required.",
         "usernameDuplicate": "That username is already taken.",
         "passwordRequired": "Password is required.",
+        "passwordMismatch": "Passwords do not match.",
         "emailInvalid": "Enter a valid email or leave it empty."
       }
     },
