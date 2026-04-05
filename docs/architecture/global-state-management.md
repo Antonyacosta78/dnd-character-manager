@@ -13,6 +13,7 @@
 - `2026-04-04` - `OpenCode` - Clarified architecture-first sequencing and moved Rulesync rule generation requirement into Current Plan.
 - `2026-04-04` - `OpenCode` - Resolved autosave, retention, and conflict-handling decisions from review.
 - `2026-04-04` - `OpenCode` - Added implementation-plan reference after architecture question closure.
+- `2026-04-04` - `OpenCode` - Removed feature-spec placeholder and documented architecture-driven implementation rationale.
 
 ## Purpose
 
@@ -161,7 +162,11 @@ Revisit store choice if two or more conditions are true:
 - `docs/specs/design-system/foundation.md`
 - `docs/specs/design-system/implementation-plan.md`
 - `docs/specs/foundation/global-state-management-implementation-plan.md`
-- Placeholder: `docs/specs/foundation/global-state-management.md`
+
+Note:
+
+- This is an architecture-driven foundation decision, not a user-facing feature spec.
+- The implementation plan exists to operationalize this architecture safely in code.
 
 ## Related Features
 

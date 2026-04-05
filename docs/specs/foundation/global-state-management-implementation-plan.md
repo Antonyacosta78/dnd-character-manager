@@ -10,6 +10,7 @@
 ## Changelog
 
 - `2026-04-04` - `OpenCode` - Created initial implementation plan from accepted architecture decisions for draft/workflow global state.
+- `2026-04-04` - `OpenCode` - Clarified that this plan directly implements the architecture decision and intentionally does not require a separate feature spec.
 
 ## Goal
 
@@ -49,12 +50,17 @@ Completion criteria:
 
 - `docs/architecture/global-state-management.md`
   - Source of truth for boundaries, conflict policy, and retention decisions.
+  - Why: this work lays technical groundwork for a cross-cutting architecture decision rather than a single feature.
 - `docs/architecture/app-architecture.md`
   - Enforces layer direction and server/client responsibilities.
 - `docs/architecture/feature-workflow.md`
   - Defines spec/plan handoff expectations.
 - `docs/specs/design-system/foundation.md`
   - Requires explicit loading/empty/validation/recoverable-failure states.
+
+Decision note:
+
+- No standalone feature spec is required for this slice because the scope is foundational architecture enablement.
 
 ## Existing Code References
 
