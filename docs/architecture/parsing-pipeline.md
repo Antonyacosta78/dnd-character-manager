@@ -280,4 +280,4 @@ This is guidance, not a hard requirement; equivalent structure is acceptable if 
 - `docs/architecture/app-architecture.md`
 - `docs/architecture/parser-option-completeness.md`
 - `docs/architecture/generated-lookup-case-definition-protocol.md`
-- `docs/specs/foundation/option-complete-data-source-parsing.md`
+- `docs/specs/parsing/option-complete-data-source-parsing.md`

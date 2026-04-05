@@ -26,3 +26,8 @@ That keeps `.rulesync/` as the source of truth while letting other tools consume
 
 - `bun run ai:check` verifies generated files are up to date.
 - `bun run lint` verifies the app code after changes that touch the product.
+
+## Progress Tracking
+
+- Keep `docs/STATUS.md` aligned with roadmap-impacting docs and implementation changes.
+- Use `/update-roadmap-progress --apply` to audit and apply status updates when needed.
