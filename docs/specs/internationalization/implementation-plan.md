@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `draft`
+- Status: `completed`
 - Created At: `2026-04-04`
 - Last Updated: `2026-04-04`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; i18n foundation implementation plan is completed for this slice. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Initial i18n implementation plan created from approved architecture/spec decisions. (Made with OpenCode)
 
 ## Goal

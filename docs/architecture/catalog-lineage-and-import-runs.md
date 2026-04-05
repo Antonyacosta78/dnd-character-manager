@@ -9,11 +9,11 @@
 
 ## Changelog
 
+- `2026-04-04` - `Antony Acosta` - Resolved v1 source metadata, metrics modeling, and activation governance decisions for lineage operations. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Recorded guarded two-phase publish/activation protocol for foundation catalog decisions. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-02` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
-- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. Made with OpenCode.
-- `2026-04-04` - `Antony Acosta` - Recorded guarded two-phase publish/activation protocol for foundation catalog decisions. Made with OpenCode.
-- `2026-04-04` - `Antony Acosta` - Resolved v1 source metadata, metrics modeling, and activation governance decisions for lineage operations. Made with OpenCode.
 
 ## Purpose
 

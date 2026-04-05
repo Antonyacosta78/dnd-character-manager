@@ -9,9 +9,9 @@
 
 ## Changelog
 
+- `2026-04-04` - `Antony Acosta` - Recorded v1 fingerprint-scoped reader cache policy. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-02` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
-- `2026-04-04` - `Antony Acosta` - Recorded v1 fingerprint-scoped reader cache policy. Made with OpenCode.
 
 ## Purpose
 

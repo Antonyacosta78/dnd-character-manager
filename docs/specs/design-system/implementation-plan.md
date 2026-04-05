@@ -2,15 +2,16 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `draft`
 - Created At: `2026-04-03`
 - Last Updated: `2026-04-04`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; plan remains draft because design-system implementation has not started in code. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-04-03` - `Antony Acosta` - Initial document created.
 
 ## Goal
 
