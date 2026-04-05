@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Added a control-density contract for navigation chrome: keep primary wayfinding label-first, prefer icon-only auxiliary controls, and require accessible naming on icon-only affordances. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Documented resolved implementation decisions for split route surfaces, runtime schema validation in this slice, and v1 rune/icon semantics. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-03` - `Antony Acosta` - Initial document created.
@@ -110,6 +111,10 @@ Shared references:
   - `prefers-reduced-motion` and app override behavior are required where motion exists.
 - **Long labels/content**
   - Long names/titles must wrap without breaking key stat blocks or control alignment.
+- **Navigation chrome density**
+  - Keep primary wayfinding controls label-first.
+  - Use icon-only treatment for auxiliary chrome controls when text causes clutter.
+  - Icon-only controls must preserve accessibility semantics (for example `aria-label` and hover title text).
 - **Error clarity**
   - Validation and recoverable failures must be explicit; no silent blank panels.
 - **Style drift risk**
