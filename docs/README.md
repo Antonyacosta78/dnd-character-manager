@@ -4,6 +4,7 @@ This folder keeps the project notes that are worth preserving.
 
 ## Structure
 
+- `STATUS.md` tracks implementation progress against the roadmap with evidence links.
 - `features/` describes what each user-facing feature should do.
 - `specs/` contains technical notes tied to a single feature.
 - `architecture/` contains shared technical notes used by multiple features.

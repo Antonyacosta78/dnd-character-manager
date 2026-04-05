@@ -26,6 +26,21 @@ The product should feel strongest at three things:
 
 ## Current Roadmap
 
+## Implementation Snapshot
+
+Last verified: 2026-04-04
+
+Detailed evidence and checklist: `docs/STATUS.md`
+
+- Phase 0 - Foundation: in progress (major foundation slices implemented)
+- Phase 1 - Character Core: planned
+- Phase 2 - Progression Planning: planned
+- Phase 3 - Branching And Timelines: planned
+- Phase 4 - Games, Worlds, And Snapshots: planned
+- Phase 5 - Playable Output: planned
+- Phase 6 - Roster And Navigation: planned
+- Phase 7 - History And Comparison: planned
+
 ## Phase 0 - Foundation
 
 Goal: establish the project shape, vocabulary, and constraints before feature work gets too wide.
@@ -202,3 +217,4 @@ Do not cut the core promise first: branching character progression with playable
 - `docs/features/internationalization.md`
 - `docs/specs/internationalization/foundation.md`
 - `docs/architecture/internationalization.md`
+- `docs/STATUS.md`
