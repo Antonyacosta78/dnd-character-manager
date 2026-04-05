@@ -19,7 +19,7 @@ Checklist markers:
 ## Snapshot
 
 - Last verified: 2026-04-05
-- Evidence method: docs + code audit (high-confidence only)
+- Evidence method: docs + code audit + API/browser smoke test (high-confidence only)
 
 ## Phase Checklist
 
@@ -66,14 +66,14 @@ Checklist markers:
 
 ### Phase 1 - Authentication And Identity
 
-- Status: `in-progress`
+- Status: `completed`
 - Confidence: `high`
 - Checklist
   - [x] Authentication entry and session lifecycle flow (sign-in implemented; registration now auto-signs users into an authenticated session)
   - [x] Self-service registration entry flow (`username`, `password`, optional `email`) with client-side password confirmation
   - [x] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
-  - [~] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
-  - [~] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
+  - [x] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
+  - [x] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
 - Evidence
   - `docs/features/authentication-and-identity-foundation.md`
   - `docs/ROADMAP.md`
@@ -95,6 +95,8 @@ Checklist markers:
   - `src/server/ports/character-repository.ts`
   - `src/server/adapters/prisma/character-repository.ts`
   - `src/server/adapters/auth/auth-session-context.ts`
+  - `GET /api/characters` smoke checks: `401` while signed out, `200` after sign-up session
+  - Playwright smoke: sign-up (`/sign-up`) redirects to `/characters` with authenticated empty state
 
 ### Phase 2 - Character Core
 
@@ -107,6 +109,10 @@ Checklist markers:
   - [ ] Mechanical template duplication flow
 - Evidence
   - `docs/ROADMAP.md`
+  - `src/app/api/characters/route.ts` (GET handler only; no creation endpoint)
+  - `src/server/ports/character-repository.ts` (owner-list contract only)
+  - `src/server/adapters/prisma/character-repository.ts` (owner-list adapter only)
+  - `prisma/schema.prisma` (Character model has only `id`, `name`, owner linkage, timestamps)
 
 ### Phase 3 - Global Settings
 
@@ -116,7 +122,7 @@ Checklist markers:
   - [x] Global Settings modal exists in primary navigation with section navigation + content panel layout
   - [x] User-level preferences are centralized here (theme and language included in MVP scope)
   - [x] Preference persistence + hydration is deterministic with fallback
-  - [x] Scope stays global-only (no character/world/game-specific overrides)
+  - [x] Scope stays global-only (no character/world/adventure-specific overrides)
 - Evidence
   - `docs/ROADMAP.md`
   - `docs/features/global-settings.md`
@@ -161,15 +167,15 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 6 - Games, Worlds, And Snapshots
+### Phase 6 - Adventures, Worlds, And Snapshots
 
 - Status: `planned`
 - Confidence: `high`
 - Checklist
-  - [ ] World and game creation
+  - [ ] World and adventure creation
   - [ ] Assign character flow for sessions
   - [ ] Frozen snapshots from branch + level
-  - [ ] Snapshot history linked to games
+  - [ ] Snapshot history linked to adventures
 - Evidence
   - `docs/ROADMAP.md`
 
@@ -202,7 +208,7 @@ Checklist markers:
 - Status: `planned`
 - Confidence: `high`
 - Checklist
-  - [ ] Branch history with games and sessions
+  - [ ] Branch history with adventures and sessions
   - [ ] Chronology inference and manual ordering
   - [ ] Level/version diffs
   - [ ] Optional notes on branches and versions

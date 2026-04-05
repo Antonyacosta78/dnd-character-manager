@@ -4,16 +4,16 @@ This document captures the current product roadmap for the D&D Character Manager
 
 It is a planning guide, not a promise. The goal is to keep the project focused on the core loop we agreed on:
 
-`create character -> plan progression -> branch when needed -> assign to game -> freeze snapshot -> export playable sheet`
+`create character -> plan progression -> branch when needed -> assign to adventure -> freeze snapshot -> export playable sheet`
 
 ## Product Direction
 
-The app is a character-first D&D 5e 2014 manager for a group that plays mostly one-shots, short arcs, and shared-world games with rotating players.
+The app is a character-first D&D 5e 2014 manager for a group that plays mostly one-shots, short arcs, and shared-world adventures with rotating players.
 
 The product should feel strongest at three things:
 
 - creating a character cleanly and confidently
-- managing multiple versions of that character across levels, worlds, and games
+- managing multiple versions of that character across levels, worlds, and adventures
 - producing a trustworthy sheet that is ready for play
 
 ## Planning Rules
@@ -28,17 +28,17 @@ The product should feel strongest at three things:
 
 ## Implementation Snapshot
 
-Last verified: 2026-04-05 (post-registration smoke test sync)
+Last verified: 2026-04-05 (full-project evidence pass + auth/characters smoke test)
 
 Detailed evidence and checklist: `docs/STATUS.md`
 
 - Phase 0 - Foundation: completed
-- Phase 1 - Authentication And Identity: in-progress
+- Phase 1 - Authentication And Identity: completed
 - Phase 2 - Character Core: planned
 - Phase 3 - Global Settings: completed
 - Phase 4 - Progression Planning: planned
 - Phase 5 - Branching And Timelines: planned
-- Phase 6 - Games, Worlds, And Snapshots: planned
+- Phase 6 - Adventures, Worlds, And Snapshots: planned
 - Phase 7 - Playable Output: planned
 - Phase 8 - Roster And Navigation: planned
 - Phase 9 - History And Comparison: planned
@@ -48,7 +48,7 @@ Detailed evidence and checklist: `docs/STATUS.md`
 Goal: establish the project shape, vocabulary, and constraints before feature work gets too wide.
 
 - product thesis and README
-- shared terminology for character, branch, world, game, and snapshot
+- shared terminology for character, branch, world, adventure, and snapshot
 - docs workflow for feature rundowns, specs, and implementation plans
 - architecture notes for app shape, parsing, and data sources
 - i18n foundation direction (locale strategy, fallback behavior, and doc linkage)
@@ -77,7 +77,7 @@ Goal: make it possible to create a real character and manage it as a persistent 
 - allow character statuses such as active, retired, backup, dead, and concept-only
 - duplicate a character's mechanical template into a new separate record
 
-This phase should end with the app feeling like a usable character library, even before branching and games are fully present.
+This phase should end with the app feeling like a usable character library, even before branching and adventures are fully present.
 
 ## Phase 3 - Global Settings
 
@@ -87,7 +87,7 @@ Goal: establish a reliable app-wide settings foundation as the central home for 
 - centralize user-level preferences such as theme and language
 - keep preference behavior global and consistent across routes
 - persist preferences with safe validation and fallback behavior
-- separate prep-time preferences from in-session game-state actions
+- separate prep-time preferences from in-session adventure-state actions
 
 This phase is intentionally small. It prevents settings sprawl and establishes one predictable control point for app-level configuration.
 
@@ -119,23 +119,23 @@ Goal: deliver the product's signature behavior.
 
 This phase is the heart of the app. If it is weak, the product becomes just another sheet builder.
 
-## Phase 6 - Games, Worlds, And Snapshots
+## Phase 6 - Adventures, Worlds, And Snapshots
 
 Goal: connect characters to actual play.
 
 - create worlds as shared continuity containers
-- create games with at least `name`, `DM`, and `world`
-- prepare for a session with the flow `pick game -> assign character -> choose or create version`
-- generate a frozen snapshot from a branch and level when a character joins a game
-- allow the same branch to appear in multiple games within the same world
+- create adventures with at least `name`, `DM`, and `world`
+- prepare for a session with the flow `pick adventure -> assign character -> choose or create version`
+- generate a frozen snapshot from a branch and level when a character joins an adventure
+- allow the same branch to appear in multiple adventures within the same world
 - keep snapshots stable even if the source branch changes later
-- record which versions were used in which games
+- record which versions were used in which adventures
 
 This phase turns progression planning into real table history.
 
 ## Phase 7 - Playable Output
 
-Goal: make the app usable as a real pre-game tool.
+Goal: make the app usable as a real pre-adventure tool.
 
 - generate a playable version from any fully defined level
 - support the standard 4-page printable 5e character sheet
@@ -162,12 +162,12 @@ This phase matters because the product is not only for one hero in one campaign.
 
 Goal: help players understand how a character changed over time.
 
-- branch history views with games and sessions in chronological order
+- branch history views with adventures and sessions in chronological order
 - infer chronology where possible from level progression
 - allow manual ordering when chronology is ambiguous
 - show diffs between levels and versions
 - make it easy to answer "what changed from level 4 to level 5?"
-- optional notes on branches, games, or versions
+- optional notes on branches, adventures, or versions
 
 This phase deepens the product's identity, but it should not block the core create-plan-play-print loop.
 
@@ -180,8 +180,8 @@ The first version should include the minimum needed to become a real primary too
 - progression planning to level `N`
 - multiclass-aware calculations
 - branching from earlier levels
-- world and game creation
-- frozen game snapshots
+- world and adventure creation
+- frozen adventure snapshots
 - printable/exportable 4-page sheet
 - basic roster search and filtering
 - i18n foundation support (locale resolution, persisted preference, and fallback for `en`/`es`)

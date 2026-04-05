@@ -4,11 +4,12 @@
 
 - Status: `accepted`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Updated state ownership vocabulary from game to adventure for planned play-instance terminology consistency. (Made with OpenCode)
 - `2026-04-04` - `OpenCode` - Created initial architecture skeleton for global state ownership, persistence, and rollout.
 - `2026-04-04` - `OpenCode` - Clarified architecture-first sequencing and moved Rulesync rule generation requirement into Current Plan.
 - `2026-04-04` - `OpenCode` - Resolved autosave, retention, and conflict-handling decisions from review.
@@ -38,7 +39,7 @@
 ### State Ownership Rules
 
 - **Server truth:**
-  - character, branch, world, game, snapshot records
+  - character, branch, world, adventure, snapshot records
   - rules-catalog derived domain values
   - authorization and policy decisions
 - **Global client store:**

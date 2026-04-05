@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Updated out-of-scope terminology from game-level to adventure-level overrides for planned instance naming consistency. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Synced spec to shipped behavior: per-control feedback overlays, eased `900ms` save-feedback cycle, reduced-motion fallback semantics, and hook stability guidance to prevent snapshot identity update loops. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Extended MVP theme contract with an experimental border-radius setting (`none` to `pronounced`) and updated types, validation, persistence/fallback, and verification expectations while preserving the unified API + i18n ownership split model. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Locked implementation-level decisions for persistence ownership split, save-feedback animation behavior, app-shell trigger placement, and verification matrix expectations. (Made with OpenCode)
@@ -48,7 +49,7 @@ This spec keeps scope intentionally narrow: one stable Global Settings modal, on
 
 ### Out of scope (explicitly deferred)
 
-- Character/world/game/branch-level overrides.
+- Character/world/adventure/branch-level overrides.
 - Custom theme authoring, token editing, or arbitrary user theme uploads.
 - Account/cloud sync of preferences.
 - Expanding to broad settings categories beyond what is required for MVP stability.

@@ -4,11 +4,12 @@
 
 - Status: `completed`
 - Created At: `2026-03-18`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Renamed planned domain terminology from game/games to adventure/adventures for instance-level play context consistency. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-03-18` - `Antony Acosta` - Initial document created.
 
@@ -162,9 +163,9 @@ The following modules are first-class boundaries and should remain explicit:
 - `worlds`
   - continuity grouping
   - world-level context and constraints
-- `games`
+- `adventures`
   - playable context metadata
-  - association between game and chosen snapshot/version
+  - association between adventure and chosen snapshot/version
 - `snapshots`
   - immutable freeze records
   - provenance from branch and level at freeze time
@@ -175,11 +176,11 @@ Cross-module workflows belong in application services, not ad-hoc imports from o
 
 These invariants are architecture-level requirements, not optional validations:
 
-1. Character identity is independent from any game instance.
+1. Character identity is independent from any adventure instance.
 2. A branch, once created, is world-locked.
 3. Generating a playable output at level N requires required inputs for levels `1..N`.
 4. Snapshots are immutable after creation.
-5. Game history references frozen snapshots, never mutable planning data.
+5. Adventure history references frozen snapshots, never mutable planning data.
 
 If a feature conflicts with these invariants, the feature design must change.
 
