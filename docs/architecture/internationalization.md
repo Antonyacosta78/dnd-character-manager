@@ -2,16 +2,17 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `accepted`
 - Created At: `2026-04-04`
 - Last Updated: `2026-04-04`
 - Owner: `foundation architecture`
 
 ## Changelog
 
-- `2026-04-04` - `Antony Acosta` - Initial i18n architecture document created. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Updated metadata and changelog format to match template updates. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; i18n architecture direction is accepted and now reflected by foundation code. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Aligned architecture scope with resolved product decisions by deferring switcher placement to Global Settings and adding pseudolocalization enforcement timing before first real UI beta. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Updated metadata and changelog format to match template updates. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Initial i18n architecture document created. (Made with OpenCode)
 
 ## Purpose
 

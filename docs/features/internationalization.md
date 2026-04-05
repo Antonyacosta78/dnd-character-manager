@@ -2,17 +2,18 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `completed`
 - Created At: `2026-04-04`
 - Last Updated: `2026-04-04`
 - Owner: `product foundation`
 
 ## Changelog
 
-- `2026-04-04` - `Antony Acosta` - Initial i18n feature rundown created. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Updated metadata and changelog format to match template updates. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Resolved open product decisions for Spanish copy ownership, first language switcher placement, and pseudolocalization enforcement trigger. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; internationalization foundation slice is completed in code. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Deferred language switcher placement to a future Global Settings feature and kept i18n foundation scope focused on locale behavior only. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Resolved open product decisions for Spanish copy ownership, first language switcher placement, and pseudolocalization enforcement trigger. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Updated metadata and changelog format to match template updates. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Initial i18n feature rundown created. (Made with OpenCode)
 
 ## Summary
 

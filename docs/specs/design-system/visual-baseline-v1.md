@@ -9,8 +9,8 @@
 
 ## Changelog
 
-- `2026-04-03` - `Antony Acosta` - Initial document created.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-04-03` - `Antony Acosta` - Initial document created.
 
 ## Related Feature
 

@@ -2,15 +2,16 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `proposed`
 - Created At: `2026-04-03`
 - Last Updated: `2026-04-04`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-04-03` - `Antony Acosta` - Initial document created.
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; design-system foundation remains proposed while implementation has not started. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-04-03` - `Antony Acosta` - Initial document created.
 
 ## Summary
 

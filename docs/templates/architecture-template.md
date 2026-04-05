@@ -9,7 +9,9 @@
 
 ## Changelog
 
-- `YYYY-MM-DD` - `<author>` - <what changed and why>
+- Order entries from most recent to oldest.
+- `YYYY-MM-DD` - `<author>` - <most recent change and why>
+- `YYYY-MM-DD` - `<author>` - <older change and why>
 
 ## Purpose
 

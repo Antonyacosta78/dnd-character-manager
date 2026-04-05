@@ -2,16 +2,17 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `approved`
 - Created At: `2026-04-04`
 - Last Updated: `2026-04-04`
 - Owner: `foundation architecture`
 
 ## Changelog
 
-- `2026-04-04` - `Antony Acosta` - Initial i18n foundation spec created. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Updated metadata and changelog format to match template updates. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; foundation spec is approved and implemented for the current slice. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Refined scope alignment by deferring switcher placement to Global Settings and adding the pseudolocalization enforcement trigger before first UI beta. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Updated metadata and changelog format to match template updates. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Initial i18n foundation spec created. (Made with OpenCode)
 
 ## Related Feature
 
