@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { getLocale } from "next-intl/server";
 
 import { LocalePreferenceConverger } from "@/app/locale-preference-converger";
+import { DraftStoreProvider } from "@/client/state/draft-store.provider";
 
 import "./globals.css";
 
@@ -34,7 +35,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LocalePreferenceConverger />
-        {children}
+        <DraftStoreProvider>{children}</DraftStoreProvider>
       </body>
     </html>
   );

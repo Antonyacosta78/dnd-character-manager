@@ -31,7 +31,7 @@ function createFakeDb() {
 
   const db: {
     [key: string]: unknown;
-    $transaction: <T>(callback: (tx: any) => Promise<T>) => Promise<T>;
+    $transaction: <T>(callback: (tx: unknown) => Promise<T>) => Promise<T>;
   } = {
     catalogVersion: {
       async findFirst() {
@@ -141,7 +141,7 @@ function createFakeDb() {
         activationEvents.push(args.data);
       },
     },
-    async $transaction<T>(callback: (tx: typeof db) => Promise<T>): Promise<T> {
+    async $transaction<T>(callback: (tx: unknown) => Promise<T>): Promise<T> {
       return callback(db);
     },
   };

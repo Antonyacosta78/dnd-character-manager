@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // External source tree is treated as untrusted input and not first-party code.
+    "external/**",
+    // Temporary investigation artifacts are not part of app source.
+    "temp/**",
   ]),
 ]);
 
