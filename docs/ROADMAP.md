@@ -28,7 +28,7 @@ The product should feel strongest at three things:
 
 ## Implementation Snapshot
 
-Last verified: 2026-04-05
+Last verified: 2026-04-05 (post-registration smoke test sync)
 
 Detailed evidence and checklist: `docs/STATUS.md`
 

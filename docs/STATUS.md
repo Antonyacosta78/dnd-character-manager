@@ -69,8 +69,8 @@ Checklist markers:
 - Status: `in-progress`
 - Confidence: `high`
 - Checklist
-  - [~] Authentication entry and session lifecycle flow (sign-in implemented, registration pending)
-  - [ ] Self-service registration entry flow (`username`, `password`, optional `email`)
+  - [x] Authentication entry and session lifecycle flow (sign-in implemented; registration now auto-signs users into an authenticated session)
+  - [x] Self-service registration entry flow (`username`, `password`, optional `email`) with client-side password confirmation
   - [x] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
   - [~] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
   - [~] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
@@ -81,8 +81,12 @@ Checklist markers:
   - `docs/specs/authentication/implementation-plan.md`
   - `src/auth.ts`
   - `src/app/api/auth/[...all]/route.ts`
+  - `src/app/api/auth/register/route.ts`
+  - `src/app/api/auth/register/__tests__/route.test.ts`
   - `src/app/sign-in/page.tsx`
   - `src/app/sign-in/sign-in-form.tsx`
+  - `src/app/sign-up/page.tsx`
+  - `src/app/sign-up/sign-up-form.tsx`
   - `src/app/characters/page.tsx`
   - `src/app/api/characters/route.ts`
   - `src/app/api/characters/__tests__/route.test.ts`
