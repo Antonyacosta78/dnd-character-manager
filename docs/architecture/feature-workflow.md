@@ -4,11 +4,12 @@
 
 - Status: `accepted`
 - Created At: `2026-03-18`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Added `ux-guide.md` as a default recurring UX artifact for user-facing features.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-03-18` - `Antony Acosta` - Initial document created.
 
@@ -19,7 +20,7 @@ Define how feature ideas move from rough concept to implementation-ready work, a
 ## Current Plan
 
 - Start with a feature rundown that defines the product intent.
-- Review that rundown for UX gaps before technical design goes too far.
+- Review that rundown for UX gaps and document user-facing UX decisions in `docs/specs/<feature>/ux-guide.md` by default (unless explicitly out of scope).
 - Turn the feature into feature-specific specs and architecture updates only where needed.
 - Create an implementation plan that explains exactly how the code should be written.
 - Implement from the plan, then review the result for UX and architecture sanity when appropriate.
@@ -50,7 +51,9 @@ Define how feature ideas move from rough concept to implementation-ready work, a
 ### 2. UX Review
 
 - Owner: `Darrel`
-- Main output: updates to the feature rundown or UX-specific notes inside the relevant docs
+- Main output:
+  - `docs/specs/<feature>/ux-guide.md` for user-facing features (default)
+  - updates to the feature rundown when clarification belongs with product intent
 - Goal: make sure the feature is usable, clear, and realistic in actual tabletop use
 - Focus areas:
   - information hierarchy
@@ -133,6 +136,7 @@ Subagents should ask the user questions only when a blocking ambiguity remains a
 
 - Feature rundown is ready when the feature goal, scope, acceptance criteria, and open questions are clear enough to design against.
 - UX review is ready when key usability expectations and presentation concerns are explicit.
+- For user-facing features, UX review is ready when `docs/specs/<feature>/ux-guide.md` exists or the doc is explicitly marked out of scope.
 - Specs are ready when the feature's technical behavior and boundaries are clear enough to plan in code.
 - Implementation plan is ready when a coding agent can identify the files, data flow, interfaces, and order of work without guessing.
 - Implementation is ready when the feature matches the docs closely enough, or any differences are documented and justified.
@@ -147,5 +151,4 @@ Subagents should ask the user questions only when a blocking ambiguity remains a
 
 ## Open Questions
 
-- Whether to add a dedicated UX spec template later if Darrel's work becomes a recurring structured artifact.
 - Whether to formalize discovery notes as their own document type or keep them folded into specs.

@@ -32,6 +32,7 @@ This repository is a Next.js App Router application for a Dungeons and Dragons c
 - Run the smallest useful verification command after changes, usually `bun run lint` for code edits.
 - Keep instructions portable: describe capabilities and constraints in neutral terms, then let Rulesync map them to specific tools.
 - For documentation requests, treat phrases like "create the draft", "draft the doc", or "make the document" as instructions to create/update real files in `docs/` by default, not just provide inline text.
+- For user-facing features, create/update `docs/specs/<feature>/ux-guide.md` by default unless the task explicitly marks it out of scope.
 - Only return inline-only draft text when the user explicitly asks for text-only output.
 
 ## External Source Safety (Hard Rule)
