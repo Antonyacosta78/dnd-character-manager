@@ -10,7 +10,7 @@
 ## Changelog
 
 - `2026-04-04` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
 ## Purpose
 
 Define the shared parser policy that prevents silent option loss when importing Data Source content.
@@ -23,7 +23,6 @@ This note exists to prevent:
 - inconsistent failure handling for option-critical parsing gaps
 
 ## Decision Details
-
 - Decision owner: foundation architecture
 - Scope: import pipeline stages `validate_source`, `resolve`, `normalize`, `validate_domain`
 - Primary audience: senior developers and AI coding agents implementing import/parser flows
@@ -211,6 +210,10 @@ Minimum verification required before this policy is considered adopted in code:
 
 - This policy intentionally favors explicit failure over silent partial success when option integrity is at risk.
 - Canonical input remains non-generated source files; generated files are consistency signals, not primary data.
+
+## Related Architecture
+
+- `docs/architecture/generated-lookup-case-definition-protocol.md`
 
 ## Related Specs
 

@@ -14,12 +14,29 @@ export type ImportOutcome = "running" | "succeeded" | "failed" | "cancelled";
 
 export type ImportIssueSeverity = "info" | "warn" | "error";
 
+export const PARSER_REASON_CODES = [
+  "PARSER_UNRESOLVED_REFERENCE",
+  "PARSER_UNSUPPORTED_ADDITIONAL_SPELLS_SHAPE",
+  "PARSER_META_DIRECTIVE_UNSUPPORTED",
+  "PARSER_COPY_RESOLUTION_FAILED",
+  "PARSER_GENERATED_LOOKUP_MISMATCH",
+  "PARSER_UNMODELED_SEMANTIC_CASE",
+  "PARSER_IDENTITY_COLLISION",
+] as const;
+
+export type ParserReasonCode = (typeof PARSER_REASON_CODES)[number];
+
+export interface ImportIssueDetails {
+  [key: string]: unknown;
+}
+
 export interface ImportIssue {
   stage: ImportStage;
   severity: ImportIssueSeverity;
   code: string;
   message: string;
   filePath?: string;
+  details?: ImportIssueDetails;
 }
 
 export type ImportStageDurations = Record<ImportStage, number>;

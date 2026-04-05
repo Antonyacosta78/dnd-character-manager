@@ -80,11 +80,18 @@ model CatalogVersion {
   createdAt          DateTime             @default(now())
   validatedAt        DateTime?
   publishedAt        DateTime?
+  phase1CompletedAt  DateTime?
+  phase1Fingerprint  String?
+  activatedAt        DateTime?
 
   importRuns           CatalogImportRun[]
   runtimeStates        CatalogRuntimeState[]    @relation("ActiveCatalogVersion")
   activationEventsFrom CatalogActivationEvent[] @relation("CatalogActivationFromVersion")
   activationEventsTo   CatalogActivationEvent[] @relation("CatalogActivationToVersion")
+  entities             CatalogEntity[]
+  featureReferences    CatalogFeatureReference[]
+  spellSourceEdges     CatalogSpellSourceEdge[]
+  publishLocks         CatalogVersionPublishLock[]
 
   @@unique([providerKind, datasetFingerprint, importerVersion])
 }
@@ -155,4 +162,77 @@ model CatalogActivationEvent {
   run                CatalogImportRun? @relation(fields: [runId], references: [id])
 
   @@index([createdAt])
+}
+
+model CatalogEntity {
+  id               String   @id @default(cuid())
+  catalogVersionId String
+  kind             String
+  identity         String
+  name             String
+  source           String
+  edition          String?
+  payloadJson      String
+  createdAt        DateTime @default(now())
+
+  catalogVersion CatalogVersion @relation(fields: [catalogVersionId], references: [id], onDelete: Cascade)
+
+  @@unique([catalogVersionId, kind, identity])
+  @@index([catalogVersionId, kind, name, source])
+  @@index([catalogVersionId, kind, source])
+}
+
+model CatalogFeatureReference {
+  id                  String   @id @default(cuid())
+  catalogVersionId    String
+  ownerKind           String
+  ownerName           String
+  ownerSource         String
+  ownerClassName      String?
+  ownerClassSource    String?
+  featureKind         String
+  featureUid          String
+  featureName         String?
+  featureSource       String?
+  flagsJson           String?
+  createdAt           DateTime @default(now())
+
+  catalogVersion CatalogVersion @relation(fields: [catalogVersionId], references: [id], onDelete: Cascade)
+
+  @@index([catalogVersionId, ownerKind, ownerName, ownerSource])
+  @@index([catalogVersionId, featureKind, featureUid])
+}
+
+model CatalogSpellSourceEdge {
+  id                     String   @id @default(cuid())
+  catalogVersionId       String
+  spellName              String
+  spellSource            String
+  grantType              String
+  ownerName              String
+  ownerSource            String
+  ownerClassName         String?
+  ownerClassSource       String?
+  ownerSubclassShortName String?
+  additionType           String?
+  definedInSource        String?
+  definedInSourcesJson   String?
+  createdAt              DateTime @default(now())
+
+  catalogVersion CatalogVersion @relation(fields: [catalogVersionId], references: [id], onDelete: Cascade)
+
+  @@index([catalogVersionId, spellName, spellSource])
+  @@index([catalogVersionId, ownerName, ownerSource])
+  @@index([catalogVersionId, grantType, ownerName])
+}
+
+model CatalogVersionPublishLock {
+  catalogVersionId   String   @id
+  datasetFingerprint String
+  runId              String
+  acquiredAt         DateTime @default(now())
+
+  catalogVersion CatalogVersion @relation(fields: [catalogVersionId], references: [id], onDelete: Cascade)
+
+  @@index([datasetFingerprint])
 }
