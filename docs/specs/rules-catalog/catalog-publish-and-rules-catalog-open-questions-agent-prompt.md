@@ -8,8 +8,8 @@ You are helping finalize foundation decisions for catalog publish and runtime `R
 
 ## Context to read first
 
-1. `docs/specs/foundation/catalog-publish-and-rules-catalog-interface.md`
-2. `docs/specs/foundation/catalog-publish-and-rules-catalog-interface-implementation-plan.md`
+1. `docs/specs/rules-catalog/catalog-publish-and-rules-catalog-interface.md`
+2. `docs/specs/rules-catalog/catalog-publish-and-rules-catalog-interface-implementation-plan.md`
 3. `docs/architecture/catalog-storage-and-read-model.md`
 4. `docs/architecture/rules-catalog-provider.md`
 5. `docs/architecture/catalog-lineage-and-import-runs.md`

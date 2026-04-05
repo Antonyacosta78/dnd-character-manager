@@ -221,9 +221,9 @@ Minimum required before adoption:
 
 ## Related Specs
 
-- `docs/specs/foundation/catalog-publish-and-rules-catalog-interface.md`
-- `docs/specs/foundation/catalog-publish-and-rules-catalog-interface-implementation-plan.md`
-- `docs/specs/foundation/option-complete-data-source-parsing.md`
+- `docs/specs/rules-catalog/catalog-publish-and-rules-catalog-interface.md`
+- `docs/specs/rules-catalog/catalog-publish-and-rules-catalog-interface-implementation-plan.md`
+- `docs/specs/parsing/option-complete-data-source-parsing.md`
 
 ## Related Features
 

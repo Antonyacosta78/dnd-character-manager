@@ -58,7 +58,7 @@ Completion criteria:
 
 ## Related Docs
 
-- `docs/specs/foundation/catalog-publish-and-rules-catalog-interface.md`
+- `docs/specs/rules-catalog/catalog-publish-and-rules-catalog-interface.md`
   - Feature-level behavior and open decisions for publish/read model work.
 - `docs/architecture/catalog-storage-and-read-model.md`
   - Shared storage/read-model policy and boundary rules.
@@ -68,7 +68,7 @@ Completion criteria:
   - Existing lineage/run/activation persistence model this work extends.
 - `docs/architecture/parsing-pipeline.md`
   - Stage semantics and fail-closed behavior for publish/activation.
-- `docs/specs/foundation/option-complete-data-source-parsing.md`
+- `docs/specs/parsing/option-complete-data-source-parsing.md`
   - Parser completeness context; publish must preserve normalized semantics.
 
 ## Existing Code References

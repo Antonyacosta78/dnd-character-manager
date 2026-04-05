@@ -154,4 +154,4 @@ Non-blocking:
 
 ## Related Implementation Plan
 
-- `docs/specs/foundation/catalog-publish-and-rules-catalog-interface-implementation-plan.md`
+- `docs/specs/rules-catalog/catalog-publish-and-rules-catalog-interface-implementation-plan.md`
