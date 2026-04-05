@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `proposed`
+- Status: `accepted`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked parser option-completeness policy as accepted after merged implementation and parity-validation evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Initial document created.
 

@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `approved`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked parser option-completeness spec as approved after merged implementation and strict/warn import verification. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Initial document created.
@@ -20,7 +21,7 @@
 
 ## Context
 
-- The current import pipeline is intentionally skeletal for foundation setup and does not yet implement full parsing semantics.
+- The import pipeline implements foundation parser semantics required for option-complete class, subclass, spell, race, background, feat, and optional-feature coverage.
 - Investigation of the current Data Source format confirmed that option availability is distributed across canonical files, meta directives, and cross-entity references.
 - The highest product risk in this area is false negatives: options that should be available but are silently omitted by incomplete parsing.
 - Option gaps directly damage trust in future features (character creation, progression planning, spell selection), so parser completeness is a correctness concern, not an enhancement.
