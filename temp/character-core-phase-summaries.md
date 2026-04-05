@@ -47,3 +47,9 @@
 - **What changed:** Extended draft store contracts with `character-sheet` scope plus base-revision/conflict metadata, added workflow selectors + conflict store tests, and integrated `ConflictResolutionDialog` with Keep Local / Keep Server / Review Differences behavior in sheet save flow.
 - **Verification run:** `bun run lint`; `bun test src/client/state/__tests__/draft-store.test.ts src/client/state/__tests__/draft-store.storage.test.ts src/client/state/__tests__/draft-store.character-core-conflict.test.ts`
 - **Known limitations/deferred:** Section-level diff drill-down is currently section-list only (no field-level compare view yet).
+
+## Phase 8 - stabilization and readiness
+
+- **What changed:** Ran full repository lint/test stabilization pass, validated all Character Core route/use-case/domain/store tests in the full suite, and executed browser smoke navigation against Character Core route path (auth guard redirect observed as expected for signed-out session).
+- **Verification run:** `bun run lint && bun test`; Playwright navigation to `http://127.0.0.1:3000/characters/new` (redirected to `/sign-in` under unauthenticated state).
+- **Known limitations/deferred:** Authenticated browser E2E flow and export visual fidelity checks still require seeded signed-in test account automation.
