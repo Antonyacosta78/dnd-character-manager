@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `completed`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-04-05`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-05` - `Antony Acosta` - Marked the Phase 0 implementation plan as completed and closed Definition of Done checklist items based on merged foundation evidence already tracked in `docs/STATUS.md`. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-03` - `Antony Acosta` - Initial document created.
 
@@ -597,13 +598,13 @@ Backout strategy:
 
 ## Definition of Done
 
-- [ ] Config and composition root are implemented and used by command/route surfaces.
-- [ ] Auth/session port and adapter enforce application-layer authz checks.
-- [ ] Prisma schema and repository adapters support lineage/run/activation workflows.
-- [ ] Import pipeline skeleton runs end-to-end and persists diagnostics.
-- [ ] `DerivedRulesCatalog` provides namespaced readers and dataset version metadata.
-- [ ] `RawRulesCatalog` seam exists with explicit unsupported behavior where incomplete.
-- [ ] Health CLI command runs through application use-case.
-- [ ] Optional: class-list endpoint runs through application use-case if route example is implemented.
-- [ ] Lint/typecheck/tests for this scope pass.
-- [ ] Documentation and runbook notes are updated for operators/developers.
+- [x] Config and composition root are implemented and used by command/route surfaces.
+- [x] Auth/session port and adapter enforce application-layer authz checks.
+- [x] Prisma schema and repository adapters support lineage/run/activation workflows.
+- [x] Import pipeline skeleton runs end-to-end and persists diagnostics.
+- [x] `DerivedRulesCatalog` provides namespaced readers and dataset version metadata.
+- [x] `RawRulesCatalog` seam exists with explicit unsupported behavior where incomplete.
+- [x] Health CLI command runs through application use-case.
+- [x] Optional: class-list endpoint remains deferred; this was never required for Phase 0 completion.
+- [x] Lint/typecheck/tests for this scope pass.
+- [x] Documentation and runbook notes are updated for operators/developers.
