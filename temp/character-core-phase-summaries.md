@@ -17,3 +17,9 @@
 - **What changed:** Replaced sheet placeholder with `CharacterSheetLayout` (sticky summary, section navigation, editable core/notes sections), wired validation summary with explicit warning acknowledgments, and connected save-state indicators to draft store envelope state.
 - **Verification run:** `bun run lint`; `bun test src/app/(core)/characters/__tests__/character-core-mobile-smoke.test.tsx`
 - **Known limitations/deferred:** Field-level focus jump on validation errors is still a follow-up; current UI keeps summary-first presentation.
+
+## Phase 3 - level-up planning/finalize including multiclass
+
+- **What changed:** Added deterministic level-planning domain logic (including multiclass confirmation requirement), implemented plan/finalize use-cases + API endpoints, and wired `LevelUpPanel` into the sheet progression section.
+- **Verification run:** `bun run lint`; `bun test src/server/domain/character-core/__tests__/leveling.test.ts src/server/application/use-cases/__tests__/finalize-level-up.test.ts src/app/api/characters/[id]/level/__tests__/plan-finalize.route.test.ts`
+- **Known limitations/deferred:** Required choice-node graph is currently represented as empty list; deep choice resolution is deferred to richer catalog progression modeling.
