@@ -218,5 +218,54 @@
       "snapshotFrozen": "Runa de Instantánea Congelada",
       "invalid": "Runa de estado inválido"
     }
+  },
+  "auth": {
+    "signIn": {
+      "eyebrow": "Autenticación",
+      "title": "Iniciar sesión",
+      "description": "Usa tu nombre de usuario y contraseña para acceder a tu biblioteca de personajes.",
+      "usernameLabel": "Nombre de usuario",
+      "passwordLabel": "Contraseña",
+      "usernamePlaceholder": "Ingresa tu nombre de usuario",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "submit": "Iniciar sesión",
+      "pending": "Iniciando sesión...",
+      "error": "No se pudo iniciar sesión. Revisa tus credenciales e inténtalo de nuevo.",
+      "createAccountCta": "¿Necesitas una cuenta? Créala",
+      "backHome": "Volver al inicio"
+    },
+    "signUp": {
+      "eyebrow": "Autenticación",
+      "title": "Crear cuenta",
+      "description": "Crea tu cuenta para empezar a crear y administrar personajes.",
+      "usernameLabel": "Nombre de usuario",
+      "passwordLabel": "Contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "emailLabel": "Correo electrónico (opcional)",
+      "usernamePlaceholder": "Elige un nombre de usuario",
+      "passwordPlaceholder": "Crea una contraseña",
+      "confirmPasswordPlaceholder": "Vuelve a ingresar tu contraseña",
+      "emailPlaceholder": "Ingresa tu correo (opcional)",
+      "submit": "Crear cuenta",
+      "pending": "Creando cuenta...",
+      "signInCta": "¿Ya tienes una cuenta? Inicia sesión",
+      "backHome": "Volver al inicio",
+      "errors": {
+        "generic": "No se pudo crear tu cuenta. Inténtalo de nuevo.",
+        "payload": "Revisa tus datos e inténtalo de nuevo.",
+        "usernameRequired": "El nombre de usuario es obligatorio.",
+        "usernameDuplicate": "Ese nombre de usuario ya está en uso.",
+        "passwordRequired": "La contraseña es obligatoria.",
+        "passwordMismatch": "Las contraseñas no coinciden.",
+        "emailInvalid": "Ingresa un correo válido o déjalo vacío."
+      }
+    },
+    "characters": {
+      "protectedLabel": "Ruta protegida",
+      "title": "Tus personajes",
+      "emptyState": "Aún no tienes personajes.",
+      "lastUpdated": "Última actualización: {updatedAt}",
+      "backHome": "Volver al inicio"
+    }
   }
 }

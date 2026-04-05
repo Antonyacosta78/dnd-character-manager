@@ -64,7 +64,39 @@ Checklist markers:
   - `package.json`
   - `src/server/cli/ops-catalog-health.ts`
 
-### Phase 1 - Character Core
+### Phase 1 - Authentication And Identity
+
+- Status: `in-progress`
+- Confidence: `high`
+- Checklist
+  - [x] Authentication entry and session lifecycle flow (sign-in implemented; registration now auto-signs users into an authenticated session)
+  - [x] Self-service registration entry flow (`username`, `password`, optional `email`) with client-side password confirmation
+  - [x] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
+  - [~] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
+  - [~] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
+- Evidence
+  - `docs/features/authentication-and-identity-foundation.md`
+  - `docs/ROADMAP.md`
+  - `docs/specs/authentication/foundation.md`
+  - `docs/specs/authentication/implementation-plan.md`
+  - `src/auth.ts`
+  - `src/app/api/auth/[...all]/route.ts`
+  - `src/app/api/auth/register/route.ts`
+  - `src/app/api/auth/register/__tests__/route.test.ts`
+  - `src/app/sign-in/page.tsx`
+  - `src/app/sign-in/sign-in-form.tsx`
+  - `src/app/sign-up/page.tsx`
+  - `src/app/sign-up/sign-up-form.tsx`
+  - `src/app/characters/page.tsx`
+  - `src/app/api/characters/route.ts`
+  - `src/app/api/characters/__tests__/route.test.ts`
+  - `src/server/application/use-cases/list-owner-characters.ts`
+  - `src/server/application/use-cases/__tests__/list-owner-characters.authz.test.ts`
+  - `src/server/ports/character-repository.ts`
+  - `src/server/adapters/prisma/character-repository.ts`
+  - `src/server/adapters/auth/auth-session-context.ts`
+
+### Phase 2 - Character Core
 
 - Status: `planned`
 - Confidence: `high`
@@ -76,7 +108,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 2 - Global Settings
+### Phase 3 - Global Settings
 
 - Status: `completed`
 - Confidence: `high`
@@ -105,7 +137,7 @@ Checklist markers:
   - `src/client/state/__tests__/global-settings.theme-storage.test.ts`
   - `src/components/settings/__tests__/setting-save-feedback.test.tsx`
 
-### Phase 3 - Progression Planning
+### Phase 4 - Progression Planning
 
 - Status: `planned`
 - Confidence: `high`
@@ -117,7 +149,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 4 - Branching And Timelines
+### Phase 5 - Branching And Timelines
 
 - Status: `planned`
 - Confidence: `high`
@@ -129,7 +161,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 5 - Games, Worlds, And Snapshots
+### Phase 6 - Games, Worlds, And Snapshots
 
 - Status: `planned`
 - Confidence: `high`
@@ -141,7 +173,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 6 - Playable Output
+### Phase 7 - Playable Output
 
 - Status: `planned`
 - Confidence: `high`
@@ -153,7 +185,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 7 - Roster And Navigation
+### Phase 8 - Roster And Navigation
 
 - Status: `planned`
 - Confidence: `high`
@@ -165,7 +197,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 8 - History And Comparison
+### Phase 9 - History And Comparison
 
 - Status: `planned`
 - Confidence: `high`

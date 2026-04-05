@@ -28,19 +28,20 @@ The product should feel strongest at three things:
 
 ## Implementation Snapshot
 
-Last verified: 2026-04-05
+Last verified: 2026-04-05 (post-registration smoke test sync)
 
 Detailed evidence and checklist: `docs/STATUS.md`
 
 - Phase 0 - Foundation: completed
-- Phase 1 - Character Core: planned
-- Phase 2 - Global Settings: planned
-- Phase 3 - Progression Planning: planned
-- Phase 4 - Branching And Timelines: planned
-- Phase 5 - Games, Worlds, And Snapshots: planned
-- Phase 6 - Playable Output: planned
-- Phase 7 - Roster And Navigation: planned
-- Phase 8 - History And Comparison: planned
+- Phase 1 - Authentication And Identity: in-progress
+- Phase 2 - Character Core: planned
+- Phase 3 - Global Settings: completed
+- Phase 4 - Progression Planning: planned
+- Phase 5 - Branching And Timelines: planned
+- Phase 6 - Games, Worlds, And Snapshots: planned
+- Phase 7 - Playable Output: planned
+- Phase 8 - Roster And Navigation: planned
+- Phase 9 - History And Comparison: planned
 
 ## Phase 0 - Foundation
 
@@ -54,7 +55,19 @@ Goal: establish the project shape, vocabulary, and constraints before feature wo
 
 Status: completed
 
-## Phase 1 - Character Core
+## Phase 1 - Authentication And Identity
+
+Goal: make user identity and ownership first-class before character records become persistent player libraries.
+
+- support account registration and sign-in plus session lifecycle via the app auth surface
+- enforce ownership boundaries so character and related records are scoped to the signed-in user
+- define clear unauthenticated behavior for page and API access
+- provide a minimal authentication entry flow that can be expanded later without data model churn
+- keep auth focused on single-user ownership and safety, not social or collaboration features
+
+This phase should end with app behavior that treats identity as real from day one, while keeping the first UI slice intentionally lean.
+
+## Phase 2 - Character Core
 
 Goal: make it possible to create a real character and manage it as a persistent identity.
 
@@ -66,7 +79,7 @@ Goal: make it possible to create a real character and manage it as a persistent 
 
 This phase should end with the app feeling like a usable character library, even before branching and games are fully present.
 
-## Phase 2 - Global Settings
+## Phase 3 - Global Settings
 
 Goal: establish a reliable app-wide settings foundation as the central home for user-level preferences.
 
@@ -78,7 +91,7 @@ Goal: establish a reliable app-wide settings foundation as the central home for 
 
 This phase is intentionally small. It prevents settings sprawl and establishes one predictable control point for app-level configuration.
 
-## Phase 3 - Progression Planning
+## Phase 4 - Progression Planning
 
 Goal: let players define a character from level 1 up to a target level `N`.
 
@@ -92,7 +105,7 @@ Goal: let players define a character from level 1 up to a target level `N`.
 
 This is the first point where the product starts feeling better than a static sheet.
 
-## Phase 4 - Branching And Timelines
+## Phase 5 - Branching And Timelines
 
 Goal: deliver the product's signature behavior.
 
@@ -106,7 +119,7 @@ Goal: deliver the product's signature behavior.
 
 This phase is the heart of the app. If it is weak, the product becomes just another sheet builder.
 
-## Phase 5 - Games, Worlds, And Snapshots
+## Phase 6 - Games, Worlds, And Snapshots
 
 Goal: connect characters to actual play.
 
@@ -120,7 +133,7 @@ Goal: connect characters to actual play.
 
 This phase turns progression planning into real table history.
 
-## Phase 6 - Playable Output
+## Phase 7 - Playable Output
 
 Goal: make the app usable as a real pre-game tool.
 
@@ -132,7 +145,7 @@ Goal: make the app usable as a real pre-game tool.
 
 This is the point where the tool can replace a paper-first or ad hoc workflow for the group.
 
-## Phase 7 - Roster And Navigation
+## Phase 8 - Roster And Navigation
 
 Goal: make many-character play manageable.
 
@@ -145,7 +158,7 @@ Goal: make many-character play manageable.
 
 This phase matters because the product is not only for one hero in one campaign. It is for a personal library of protagonists.
 
-## Phase 8 - History And Comparison
+## Phase 9 - History And Comparison
 
 Goal: help players understand how a character changed over time.
 
@@ -163,6 +176,7 @@ This phase deepens the product's identity, but it should not block the core crea
 The first version should include the minimum needed to become a real primary tool for the group.
 
 - character creation
+- authentication and user ownership guardrails for character data
 - progression planning to level `N`
 - multiclass-aware calculations
 - branching from earlier levels
@@ -228,6 +242,7 @@ Do not cut the core promise first: branching character progression with playable
 - `docs/architecture/data-sources.md`
 - `docs/architecture/feature-workflow.md`
 - `docs/features/global-settings.md`
+- `docs/features/authentication-and-identity-foundation.md`
 - `docs/features/internationalization.md`
 - `docs/specs/internationalization/foundation.md`
 - `docs/architecture/internationalization.md`
