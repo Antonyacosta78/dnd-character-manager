@@ -65,6 +65,7 @@ Version 1 focuses on the core loop of creating, planning, versioning, and playin
 - Game records tied to frozen character snapshots
 - Accurate calculations for playable character output
 - PDF export of the standard 4-page playable character sheet
+- Internationalization (i18n) foundation support: deterministic locale resolution, persisted preference, and fallback behavior for `en`/`es`
 
 The initial product is single-user-first. It is meant to work well for one person managing their own characters and their own table history before any collaboration features are introduced.
 
@@ -80,6 +81,13 @@ For v1, it is not focused on:
 - Broad marketplace-style support for every table's custom workflow
 - Replacing a full virtual tabletop
 - Solving every homebrew rule system out of the gate
+- Full translation polish and copy QA for every feature surface at launch
+
+See also:
+
+- `docs/features/internationalization.md`
+- `docs/specs/internationalization/foundation.md`
+- `docs/architecture/internationalization.md`
 
 ## Local Development
 

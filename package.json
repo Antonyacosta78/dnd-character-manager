@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "bun test",
+    "i18n:check-catalog": "bun run scripts/check-i18n-catalog.ts",
     "db:generate": "prisma generate",
     "db:migrate:dev": "prisma migrate dev",
     "db:push": "prisma db push",
@@ -24,6 +25,7 @@
     "@prisma/client": "^5.22.0",
     "better-auth": "^1.4.2",
     "next": "16.1.7",
+    "next-intl": "^4.9.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

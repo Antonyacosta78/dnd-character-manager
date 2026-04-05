@@ -1,0 +1,7 @@
+{
+  "appName": "D&D Character Manager",
+  "homeTitle": "Build and manage your adventurers",
+  "homeDescription": "This starter surface confirms i18n wiring with locale-neutral routing.",
+  "activeLocaleLabel": "Resolved locale",
+  "supportedLocalesLabel": "Supported locales: en, es"
+}
