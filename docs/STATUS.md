@@ -64,7 +64,24 @@ Checklist markers:
   - `package.json`
   - `src/server/cli/ops-catalog-health.ts`
 
-### Phase 1 - Character Core
+### Phase 1 - Authentication And Identity
+
+- Status: `planned`
+- Confidence: `high`
+- Checklist
+  - [ ] Authentication entry and session lifecycle flow
+  - [ ] App/API access behavior for unauthenticated users
+  - [ ] Ownership scoping for user-linked records
+  - [ ] Application-layer authz checks at operation boundaries
+- Evidence
+  - `docs/features/authentication-and-identity-foundation.md`
+  - `docs/ROADMAP.md`
+  - `docs/specs/foundation/implementation-plan.md`
+  - `src/auth.ts`
+  - `src/app/api/auth/[...all]/route.ts`
+  - `src/server/adapters/auth/auth-session-context.ts`
+
+### Phase 2 - Character Core
 
 - Status: `planned`
 - Confidence: `high`
@@ -76,7 +93,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 2 - Progression Planning
+### Phase 3 - Progression Planning
 
 - Status: `planned`
 - Confidence: `high`
@@ -88,7 +105,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 3 - Branching And Timelines
+### Phase 4 - Branching And Timelines
 
 - Status: `planned`
 - Confidence: `high`
@@ -100,7 +117,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 4 - Games, Worlds, And Snapshots
+### Phase 5 - Games, Worlds, And Snapshots
 
 - Status: `planned`
 - Confidence: `high`
@@ -112,7 +129,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 5 - Playable Output
+### Phase 6 - Playable Output
 
 - Status: `planned`
 - Confidence: `high`
@@ -124,7 +141,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 6 - Roster And Navigation
+### Phase 7 - Roster And Navigation
 
 - Status: `planned`
 - Confidence: `high`
@@ -136,7 +153,7 @@ Checklist markers:
 - Evidence
   - `docs/ROADMAP.md`
 
-### Phase 7 - History And Comparison
+### Phase 8 - History And Comparison
 
 - Status: `planned`
 - Confidence: `high`

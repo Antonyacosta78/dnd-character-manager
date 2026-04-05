@@ -179,5 +179,27 @@
       "snapshotFrozen": "Snapshot frozen rune",
       "invalid": "Invalid state rune"
     }
+  },
+  "auth": {
+    "signIn": {
+      "eyebrow": "Authentication",
+      "title": "Sign in",
+      "description": "Use your username and password to access your character library.",
+      "usernameLabel": "Username",
+      "passwordLabel": "Password",
+      "usernamePlaceholder": "Enter your username",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign in",
+      "pending": "Signing in...",
+      "error": "Sign-in failed. Check your credentials and try again.",
+      "backHome": "Back to home"
+    },
+    "characters": {
+      "protectedLabel": "Protected route",
+      "title": "Your characters",
+      "emptyState": "You do not have any characters yet.",
+      "lastUpdated": "Last updated: {updatedAt}",
+      "backHome": "Back to home"
+    }
   }
 }
