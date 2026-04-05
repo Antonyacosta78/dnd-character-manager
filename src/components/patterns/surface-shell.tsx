@@ -44,7 +44,14 @@ export interface SurfaceShellProps {
 
 export function SurfaceShell({ mode, activeRoute, labels, children }: SurfaceShellProps) {
   return (
-    <main className={cn("min-h-screen px-4 py-6 sm:px-6 lg:px-8", SURFACE_CLASS_BY_MODE[mode])}>
+    <main
+      className={cn("relative min-h-screen px-4 py-6 sm:px-6 lg:px-8", SURFACE_CLASS_BY_MODE[mode])}
+    >
+      {/* TODO(phase-8-roster-and-navigation): Move this trigger into the primary navbar once the shared navbar ships. */}
+      <div className="absolute right-4 top-4 z-20 sm:right-6 lg:right-8">
+        <GlobalSettingsModal labels={labels.globalSettings} />
+      </div>
+
       <div className="mx-auto max-w-7xl space-y-4">
         <header className="rounded-radius-sm border border-border-strong bg-bg-surface px-4 py-3 shadow-shadow-soft">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -124,8 +131,6 @@ export function SurfaceShell({ mode, activeRoute, labels, children }: SurfaceShe
                     },
                   ]}
                 />
-
-                <GlobalSettingsModal labels={labels.globalSettings} />
               </div>
             </aside>
 

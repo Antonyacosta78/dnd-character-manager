@@ -33,7 +33,8 @@ This spec keeps scope intentionally narrow: one stable Global Settings modal, on
 ### Scope for this spec
 
 - Add a dedicated Global Settings modal reachable from primary app navigation.
-- Modal trigger location: small cog icon at the end of the primary navigation bar.
+- Modal trigger location for current slice: small cog icon anchored at top-right of the app shell.
+- Navigation follow-up: once the shared navbar ships (roadmap Phase 8), move this trigger into navbar-end placement.
 - Use a two-pane information architecture:
   - left rail: settings sections
   - right panel: active section controls
@@ -230,12 +231,13 @@ Interface ownership:
   - Keep settings state separate from domain draft-state concerns; no domain entity ownership transfer.
   - Consumers read/write settings through centralized hooks/selectors/actions; avoid ad-hoc storage access in UI components.
 - **App shell/layout**
-  - Global Settings is opened from a cog icon control at the end of primary navigation.
+  - Global Settings is opened from a top-right anchored cog control in the current shell.
+  - This placement is temporary; migrate trigger into navbar-end placement in roadmap Phase 8.
   - Theme/locale application must be compatible with root layout hydration behavior.
 
 ## Behavior Expectations
 
-- Global Settings is easy to discover from primary navigation.
+- Global Settings is easy to discover from the top-right trigger placement.
 - Opening the modal always shows current effective preferences.
 - Selecting a new theme updates visible app styling immediately.
 - Selecting a new radius option updates app-wide corner radius styling immediately within approved presets.
@@ -254,7 +256,7 @@ Automated checks:
 
 Manual behavior scenarios:
 
-- Open Global Settings from nav cog trigger and verify modal semantics.
+- Open Global Settings from top-right cog trigger and verify modal semantics.
 - Change theme palette, font, and radius; verify immediate visual application and persisted restoration after reload.
 - Change language; verify locale update consistency with existing i18n behavior and persistence.
 - Verify inline save feedback overlay appears on changed control only and runs eased fade cycle around `900ms`.
@@ -292,7 +294,7 @@ Accessibility checks:
 - Behavior is auto-apply with immediate persistence and visible save-completion feedback.
 - Save feedback uses inline control overlay with eased `900ms` cycle timing and reduced-motion fallback.
 - Persistence ownership is split internally (theme via Global Settings modules, locale via i18n path) behind one unified settings consumer API.
-- Global Settings trigger is a cog icon at the end of primary navigation.
+- Global Settings trigger is currently top-right anchored; move to navbar-end placement in roadmap Phase 8.
 - Account-sync is deferred.
 
 ## Related Implementation Plan

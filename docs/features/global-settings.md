@@ -28,7 +28,8 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - Use a **two-pane settings modal**:
   - left pane: section navigation (settings categories)
   - right pane: section content with form controls
-- Global Settings modal trigger is a small cog icon at the end of the primary navigation bar.
+- Current trigger placement is a small cog icon anchored at top-right of the app shell.
+- Navigation follow-up: move trigger into navbar-end placement once roadmap Phase 8 navigation is implemented.
 - Keep this as the canonical entry point for user-level app preferences.
 - Prefer clear section labels and predictable grouping over deep nested flows.
 
@@ -153,7 +154,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 ## Acceptance Criteria
 
 - Global Settings is discoverable from app navigation and opens a dedicated two-pane modal.
-- Global Settings is triggered by a cog icon at the end of primary navigation.
+- Global Settings is triggered by a top-right anchored cog icon in the current shell.
 - The modal provides section navigation in a left rail and section form content in the main panel.
 - Theme and language preferences are available as user-level settings within this modal.
 - Theme controls present only supported global options and default safely when no selection exists.
@@ -175,7 +176,7 @@ This feature is primarily a prep-time quality-of-life layer for both players and
 - Settings UI must provide clear non-blocking completion feedback when preference save succeeds (and explicit fallback guidance if save fails).
 - Settings growth path remains centralized: extend sections and typed settings contracts over time; do not scatter user-level controls across unrelated routes.
 - Settings ownership uses one unified Global Settings consumer API, with internal persistence delegation allowed (locale via i18n path, theme via Global Settings modules).
-- Modal trigger placement is a small cog icon at the end of primary navigation.
+- Modal trigger is currently top-right anchored and should move into navbar-end placement in roadmap Phase 8.
 - Global settings feedback animation uses per-control overlays with eased `900ms` cycle timing and reduced-motion fallback.
 - Settings action consumers must use stable selector/action hook usage so snapshot identity does not trigger render loops.
 

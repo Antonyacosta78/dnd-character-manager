@@ -21,7 +21,8 @@
 
 In scope (implement now):
 
-- Add a small cog trigger at the end of primary navigation that opens Global Settings.
+- Add a small cog trigger anchored at top-right of the current app shell that opens Global Settings.
+- Record TODO to migrate trigger to navbar-end placement once roadmap Phase 8 navigation lands.
 - Build a two-pane modal information architecture:
   - left pane: settings section navigation
   - right pane: section content controls
@@ -45,7 +46,7 @@ Out of scope (defer intentionally):
 
 Completion criteria:
 
-- Global Settings opens from nav-end cog icon and renders a two-pane modal.
+- Global Settings opens from top-right cog icon and renders a two-pane modal.
 - Theme and language are editable only through Global Settings in MVP.
 - Theme includes an experimental border-radius preset control with typed options (`none`, `subtle`, `moderate`, `pronounced`).
 - Changes auto-apply and persist immediately with visible save feedback.
@@ -107,8 +108,8 @@ Completion criteria:
 ## Files to Change
 
 - `src/components/patterns/surface-shell.tsx` (risk: medium)
-  - Add nav-end cog trigger and wire modal open state.
-  - Integrate Global Settings modal trigger placement contract.
+  - Add top-right anchored cog trigger and wire modal open state.
+  - Include TODO note for future navbar-end migration once roadmap Phase 8 navigation ships.
   - Why risk: shared shell component impacts primary app navigation experience.
   - Depends on: new Global Settings modal component and labels.
 
@@ -207,7 +208,7 @@ Note:
 
 ## Data Flow
 
-1. User clicks nav-end cog trigger.
+1. User clicks top-right cog trigger.
 2. Global Settings modal opens with section rail (`appearance`, `language`) and current effective values.
 3. User changes theme palette/font/radius or language.
 4. Action validates candidate value against allowlist.
@@ -399,7 +400,8 @@ Runtime validation ownership:
   - Supported locale source remains `src/i18n/locales.ts`.
 
 - **App shell / navigation**
-  - Cog trigger appears at end of primary navigation in shell header.
+  - Cog trigger is currently anchored top-right in the shell.
+  - Trigger moves to navbar-end placement once roadmap Phase 8 navigation is implemented.
   - Modal opens from this control consistently across routes using shared shell pattern.
 
 - **Persistence modules**
@@ -434,9 +436,9 @@ Runtime validation ownership:
    - Verify: keyboard navigation, focus trap, feedback visibility, reduced-motion behavior
    - Merge safety: medium (new shared UI surface)
 
-6. Add nav cog trigger and route label wiring
+6. Add top-right cog trigger and route label wiring
    - Output: `surface-shell.tsx`, `workbench/page.tsx`, `codex/page.tsx`
-   - Verify: trigger placement at nav end and modal open/close behavior
+   - Verify: top-right trigger placement and modal open/close behavior
    - Merge safety: medium (primary navigation change)
 
 7. Add i18n message keys and parity checks
@@ -462,7 +464,7 @@ Automated checks:
 
 Manual checks:
 
-- Open modal from nav-end cog on both workbench and codex routes.
+- Open modal from top-right cog on both workbench and codex routes.
 - Confirm two-pane IA: section rail left, form content right.
 - Change palette/font and verify immediate visual apply + persisted restore after reload.
 - Change radius and verify immediate corner-style apply + persisted restore after reload.
@@ -500,7 +502,8 @@ Assumptions for implementation:
 
 - Existing design-system token setup can represent all five palettes, four fonts, and the four experimental radius presets without re-architecting token layers.
 - Existing i18n locale update utility can be invoked from Global Settings bridge without changing i18n fallback contract.
-- `SurfaceShell` remains the correct shared app-shell integration point for primary-nav trigger placement.
+- `SurfaceShell` remains the correct shared app-shell integration point for current top-right trigger placement.
+- Trigger should migrate to navbar-end placement once roadmap Phase 8 navigation implementation begins.
 - Selector/action API usage must preserve stable snapshot identity (avoid object-literal selector returns in action hooks).
 
 Deferred follow-ups (explicitly out of MVP):
@@ -511,7 +514,7 @@ Deferred follow-ups (explicitly out of MVP):
 
 ## Definition of Done
 
-- [x] Global Settings modal is available from a nav-end cog icon on primary routes.
+- [x] Global Settings modal is available from a top-right cog icon on primary routes.
 - [x] Two-pane IA is implemented and keyboard-accessible.
 - [x] MVP settings scope is limited to theme + language.
 - [x] Theme options exactly match locked set (`2A-2E`, `baseline/serifUi/bookish/times`, radius: `none/subtle/moderate/pronounced`).
