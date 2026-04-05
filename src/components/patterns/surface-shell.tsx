@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 
 import { AppIcon } from "@/components/domain/rune-icon";
+import {
+  GlobalSettingsModal,
+  type GlobalSettingsModalLabels,
+} from "@/components/settings/global-settings-modal";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Drawer } from "@/components/ui/drawer";
@@ -33,6 +37,7 @@ export interface SurfaceShellProps {
     drawerInputPlaceholder: string;
     drawerTextareaLabel: string;
     drawerTextareaPlaceholder: string;
+    globalSettings: GlobalSettingsModalLabels;
   };
   children: ReactNode;
 }
@@ -99,24 +104,29 @@ export function SurfaceShell({ mode, activeRoute, labels, children }: SurfaceShe
 
           <div className="mt-3 grid gap-3 lg:grid-cols-[16rem_1fr]">
             <aside className="rounded-radius-sm border border-border-default bg-bg-elevated p-2">
-              <Tabs
-                ariaLabel={labels.navAriaLabel}
-                activeValue={activeRoute}
-                items={[
-                  {
-                    value: "workbench",
-                    label: labels.workbench,
-                    href: "/workbench",
-                    icon: <AppIcon name="workbench" label={labels.workbench} />,
-                  },
-                  {
-                    value: "codex",
-                    label: labels.codex,
-                    href: "/codex",
-                    icon: <AppIcon name="codex" label={labels.codex} />,
-                  },
-                ]}
-              />
+              <div className="flex items-center gap-2">
+                <Tabs
+                  ariaLabel={labels.navAriaLabel}
+                  activeValue={activeRoute}
+                  className="flex-1"
+                  items={[
+                    {
+                      value: "workbench",
+                      label: labels.workbench,
+                      href: "/workbench",
+                      icon: <AppIcon name="workbench" label={labels.workbench} />,
+                    },
+                    {
+                      value: "codex",
+                      label: labels.codex,
+                      href: "/codex",
+                      icon: <AppIcon name="codex" label={labels.codex} />,
+                    },
+                  ]}
+                />
+
+                <GlobalSettingsModal labels={labels.globalSettings} />
+              </div>
             </aside>
 
             <div className="rounded-radius-sm border border-border-default bg-bg-elevated px-3 py-2 text-xs uppercase tracking-[0.08em] text-fg-muted">

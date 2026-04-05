@@ -61,7 +61,7 @@ export function RuneIcon({ name, label, className, ...props }: RuneIconProps) {
   );
 }
 
-type AppIconName = "workbench" | "codex" | "refresh" | "warning";
+type AppIconName = "workbench" | "codex" | "refresh" | "warning" | "settings";
 
 export interface AppIconProps extends Omit<SVGProps<SVGSVGElement>, "name"> {
   name: AppIconName;
@@ -76,7 +76,9 @@ export function AppIcon({ name, label, className, ...props }: AppIconProps) {
         ? "M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 0-3 3V4Zm0 0h10a3 3 0 0 1 3 3"
         : name === "refresh"
           ? "M4 12a8 8 0 0 1 13.2-6l2.3 2.2M20 12a8 8 0 0 1-13.2 6L4.5 15.8"
-          : "M12 4 4 20h16L12 4Zm0 5v5m0 3h.01";
+          : name === "settings"
+            ? "M11 3h2l.4 2.2a6.9 6.9 0 0 1 1.6.7l1.9-1 1.4 1.4-1 1.9c.3.5.5 1 .7 1.6L21 11v2l-2.2.4a6.9 6.9 0 0 1-.7 1.6l1 1.9-1.4 1.4-1.9-1a6.9 6.9 0 0 1-1.6.7L13 21h-2l-.4-2.2a6.9 6.9 0 0 1-1.6-.7l-1.9 1-1.4-1.4 1-1.9a6.9 6.9 0 0 1-.7-1.6L3 13v-2l2.2-.4c.2-.6.4-1.1.7-1.6l-1-1.9L6.3 5l1.9 1c.5-.3 1-.5 1.6-.7L11 3Zm1 6.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"
+            : "M12 4 4 20h16L12 4Zm0 5v5m0 3h.01";
 
   return (
     <svg

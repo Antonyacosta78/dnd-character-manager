@@ -78,18 +78,32 @@ Checklist markers:
 
 ### Phase 2 - Global Settings
 
-- Status: `planned`
+- Status: `completed`
 - Confidence: `high`
 - Checklist
-  - [ ] Global Settings modal exists in primary navigation with section navigation + content panel layout
-  - [ ] User-level preferences are centralized here (theme and language included in MVP scope)
-  - [ ] Preference persistence + hydration is deterministic with fallback
-  - [ ] Scope stays global-only (no character/world/game-specific overrides)
+  - [x] Global Settings modal exists in primary navigation with section navigation + content panel layout
+  - [x] User-level preferences are centralized here (theme and language included in MVP scope)
+  - [x] Preference persistence + hydration is deterministic with fallback
+  - [x] Scope stays global-only (no character/world/game-specific overrides)
 - Evidence
   - `docs/ROADMAP.md`
   - `docs/features/global-settings.md`
   - `docs/specs/global-settings/foundation.md`
   - `docs/specs/global-settings/implementation-plan.md`
+  - `src/components/patterns/surface-shell.tsx`
+  - `src/components/settings/global-settings-modal.tsx`
+  - `src/components/settings/theme-settings-panel.tsx`
+  - `src/components/settings/language-settings-panel.tsx`
+  - `src/components/settings/setting-save-feedback.tsx`
+  - `src/client/state/global-settings.types.ts`
+  - `src/client/state/global-settings.store.ts`
+  - `src/client/state/global-settings.provider.tsx`
+  - `src/client/state/global-settings.theme-storage.ts`
+  - `src/client/state/global-settings.theme-apply.ts`
+  - `src/client/state/global-settings.locale-bridge.ts`
+  - `src/client/state/__tests__/global-settings.store.test.ts`
+  - `src/client/state/__tests__/global-settings.theme-storage.test.ts`
+  - `src/components/settings/__tests__/setting-save-feedback.test.tsx`
 
 ### Phase 3 - Progression Planning
 
