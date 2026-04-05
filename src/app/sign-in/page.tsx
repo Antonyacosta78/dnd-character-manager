@@ -28,6 +28,10 @@ export default async function SignInPage() {
         />
       </div>
 
+      <Link href="/sign-up" className="text-sm text-accent-rubric underline-offset-2 hover:underline">
+        {t("auth.signIn.createAccountCta")}
+      </Link>
+
       <Link href="/" className="text-sm text-accent-rubric underline-offset-2 hover:underline">
         {t("auth.signIn.backHome")}
       </Link>

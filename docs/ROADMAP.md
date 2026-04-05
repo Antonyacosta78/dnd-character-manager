@@ -28,12 +28,12 @@ The product should feel strongest at three things:
 
 ## Implementation Snapshot
 
-Last verified: 2026-04-05
+Last verified: 2026-04-05 (post-registration smoke test sync)
 
 Detailed evidence and checklist: `docs/STATUS.md`
 
 - Phase 0 - Foundation: completed
-- Phase 1 - Authentication And Identity: planned (next)
+- Phase 1 - Authentication And Identity: in-progress
 - Phase 2 - Character Core: planned
 - Phase 3 - Progression Planning: planned
 - Phase 4 - Branching And Timelines: planned
@@ -58,7 +58,7 @@ Status: completed
 
 Goal: make user identity and ownership first-class before character records become persistent player libraries.
 
-- support account sign-in and session lifecycle via the app auth surface
+- support account registration and sign-in plus session lifecycle via the app auth surface
 - enforce ownership boundaries so character and related records are scoped to the signed-in user
 - define clear unauthenticated behavior for page and API access
 - provide a minimal authentication entry flow that can be expanded later without data model churn

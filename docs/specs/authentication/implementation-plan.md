@@ -10,21 +10,27 @@
 ## Changelog
 
 - `2026-04-05` - `Antony Acosta` - Created the Phase 1 implementation plan with sequenced vertical slices for username/password auth, ownership enforcement, `/characters` protection, and API-error-contract-aligned deny behavior.
+- `2026-04-05` - `Antony Acosta` - Updated Phase 1 scope to explicitly include MVP self-service registration (username + password, optional email), plus registration-focused flow, edge-case, and verification coverage.
+- `2026-04-05` - `Antony Acosta` - Updated registration execution details to include client-side password confirmation and automatic post-registration session establishment with direct transition to authenticated routes.
 
 ## Goal
 
 - Implement the first production-safe authentication and identity slice so the app can distinguish signed-out users from signed-in owners and enforce that boundary before character data access.
+- Include MVP self-service registration in the same foundation slice so new users can create accounts with `username` + `password` and optional `email`.
 - Deliver the first protected route (`/characters`) end-to-end with deterministic signed-out behavior and owner-scoped results.
 - Lock identity persistence rules for MVP (`username` unique, `email` nullable, no email-verification gate) so future character features can safely build on stable ownership semantics.
 
 In scope (this plan implements now):
 
 - Better Auth credential flow configured for username + password.
+- Self-service registration surface wired end-to-end (UI/client submission + server handling) for `username` + `password` with optional `email`.
+- Registration UX performs basic password confirmation before API submission.
+- Successful registration immediately establishes session state and transitions user into authenticated route behavior.
 - Identity schema updates for unique usernames and nullable emails.
 - Session resolution and owner checks enforced in application use-cases before repository calls.
 - First character ownership repository/use-case path for `/characters`.
 - API/route deny-path behavior mapped to `docs/architecture/api-error-contract.md` codes.
-- Tests and manual checks for signed-out, owner, and cross-user paths.
+- Tests and manual checks for registration validation plus signed-out, owner, and cross-user paths.
 
 Out of scope (intentionally deferred):
 
@@ -37,6 +43,9 @@ Out of scope (intentionally deferred):
 Completion criteria:
 
 - User persistence enforces unique `username` and allows `email = null` without blocking account creation.
+- Registration creates an account for valid `username` + `password` (+ optional `email`) and rejects malformed payloads/duplicate usernames with contract-aligned validation errors.
+- Registration UI blocks password mismatch (`password` vs `confirmPassword`) before API submission.
+- Successful registration yields an authenticated session (cookie/session artifacts present) without requiring manual sign-in.
 - Username/password sign-in establishes a session that resolves through `SessionContextPort#getSessionContext()`.
 - Character-scoped use-cases perform authn then authz checks before repository access.
 - `/characters` denies signed-out requests with explicit challenge behavior and renders only owner-scoped records for signed-in requests.
@@ -113,6 +122,13 @@ Completion criteria:
   - Why risk: incorrect provider config can silently break session creation.
   - Depends on: updated Prisma user fields.
 
+- `src/app/sign-up/page.tsx` (risk: medium, if already present)
+  - Add a minimal registration UI that collects `username`, `password`, `confirmPassword`, and optional `email`, then calls the registration server path.
+  - Ensure client-side password confirmation mismatch blocks submission with localized feedback.
+  - Must show contract-safe validation feedback for malformed payload and duplicate username.
+  - Why risk: incorrect client/server integration can create confusing account-creation failure states.
+  - Depends on: finalized registration API behavior and i18n keys.
+
 - `src/server/adapters/auth/auth-session-context.ts` (risk: medium)
   - Keep deterministic signed-out fallback.
   - Normalize adapter/provider failures into predictable authn-failed semantics for higher layers.
@@ -129,8 +145,8 @@ Completion criteria:
   - Why risk: App Router server/client boundaries can leak data if checks happen too late.
   - Depends on: authn/authz-protected character list use-case.
 
-- `messages/en.json` and `messages/es.json` (risk: low)
-  - Add translation keys for signed-out challenge and forbidden/error helper copy used by `/characters` flow.
+- `messages/en/common.json` and `messages/es/common.json` (risk: low)
+  - Add translation keys for registration form labels/errors and signed-out challenge/forbidden helper copy used by `/characters` flow.
   - Why risk: missing-key runtime behavior in production can degrade UX.
   - Depends on: final copy and component usage.
 
@@ -162,6 +178,10 @@ Application layer:
 
 Transport/UI:
 
+- `src/app/api/auth/register/route.ts`
+  - Registration endpoint for MVP payload validation and contract error mapping (`REQUEST_VALIDATION_FAILED`, safe `INTERNAL_ERROR`).
+  - Delegates account creation and immediate session establishment to configured auth provider behavior while preserving API envelope semantics.
+
 - `src/app/api/characters/route.ts`
   - Contract route for owner-scoped character list using API error envelope semantics.
 
@@ -171,7 +191,13 @@ Transport/UI:
 - Optional (if no existing auth entry UI): `src/app/sign-in/page.tsx`
   - Minimal username/password entry path that uses the configured Better Auth credential surface.
 
+- `src/app/sign-up/page.tsx`
+  - Minimal self-service registration entry path for username/password confirmation with optional email.
+
 Tests:
+
+- `src/app/api/auth/register/__tests__/route.test.ts`
+  - Covers registration happy path, malformed payload (`400 REQUEST_VALIDATION_FAILED`), duplicate username (`400 REQUEST_VALIDATION_FAILED`), and safe internal error mapping.
 
 - `src/server/application/use-cases/__tests__/list-owner-characters.authz.test.ts`
   - Signed-out deny, owner allow, and cross-user deny sequencing tests.
@@ -197,10 +223,23 @@ flowchart TD
   DB --> PR --> A --> P --> U
 ```
 
+Registration flow:
+
+```mermaid
+flowchart TD
+  U2[Browser submit from /sign-up] --> V2[Client password confirmation check]
+  V2 --> R2[/api/auth/register route]
+  R2 --> BA2[Better Auth registration + sign-in call]
+  BA2 --> DB2[(SQLite/Postgres)]
+  DB2 --> BA2 --> R2 --> U2
+```
+
 Trust boundaries and validation:
 
 - Untrusted: request params, cookies, headers, body payloads.
 - Validated boundary 1 (authentication): `SessionContextPort` resolves `userId` or signed-out null state.
+- Validated boundary 1a (registration input): registration route validates `username` + `password` required and `email` optional/nullable before provider call.
+- Validated boundary 1b (registration UX): client checks `password === confirmPassword` before request submission.
 - Validated boundary 2 (authorization): application use-case validates owner scope before any repository call.
 - Trusted internal: repository queries constrained by validated `ownerUserId`.
 
@@ -228,6 +267,34 @@ sequenceDiagram
   end
 ```
 
+Sequence (registration path):
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant R as /api/auth/register route
+  participant B as Better Auth
+  C->>C: validate password == confirmPassword
+  alt mismatch
+    C-->>C: show mismatch error, do not call API
+  else matches
+    C->>R: POST /api/auth/register { username, password, email? }
+    alt malformed payload
+      R-->>C: 400 REQUEST_VALIDATION_FAILED envelope
+    else valid payload
+      R->>B: create account + establish session
+      alt username already exists
+        B-->>R: duplicate username error
+        R-->>C: 400 REQUEST_VALIDATION_FAILED envelope
+      else created
+        B-->>R: success + session cookie
+        R-->>C: 200 success envelope
+        C->>C: navigate to /characters
+      end
+    end
+  end
+```
+
 ## Behavior and Edge Cases
 
 Success path:
@@ -243,7 +310,8 @@ Not found path:
 Validation failure path:
 
 - Duplicate username on account creation maps to `REQUEST_VALIDATION_FAILED` (`400`) with safe field detail (`username`) and no SQL/provider internals.
-- Invalid credential payload format (missing username/password) maps to `REQUEST_VALIDATION_FAILED` (`400`).
+- Malformed registration payload format (missing username/password, invalid value types) maps to `REQUEST_VALIDATION_FAILED` (`400`).
+- Client-side password mismatch maps to localized inline error and no API request.
 
 Dependency unavailable path:
 
@@ -254,6 +322,8 @@ Known edge cases:
 - Missing/expired/invalid session token -> treat as signed-out (`AUTH_UNAUTHENTICATED`, `401`).
 - Cross-user identifier attempt via protected API/use-case -> `AUTH_FORBIDDEN` (`403`) and no record payload.
 - Existing users without username during migration -> migration must be fail-closed with explicit remediation script or backfill step before enforcing `NOT NULL` + unique index.
+- Registration payload includes empty/whitespace-only username -> reject as `REQUEST_VALIDATION_FAILED` (`400`) without provider/internal details.
+- Registration success without session cookie artifact -> treat as `INTERNAL_ERROR` (`500`) and do not claim successful auto sign-in.
 
 Fail-open vs fail-closed decisions:
 
@@ -351,7 +421,7 @@ Type ownership:
 - Better Auth route surface: `src/app/api/auth/[...all]/route.ts` remains provider integration endpoint.
 - Composition root: register new character repository/use-case dependencies in `create-app-services`.
 - Persistence: Prisma migration and generated client update required before runtime verification.
-- i18n: add translation keys in both `messages/en.json` and `messages/es.json`; run catalog parity check when keys change.
+- i18n: add translation keys in both `messages/en/common.json` and `messages/es/common.json`; run catalog parity check when keys change.
 
 Environment/config dependencies:
 
@@ -363,6 +433,7 @@ Rollout gating:
 
 - `/characters` protection can ship once route + use-case + migration are wired.
 - Sign-in UI can be merged as a separate follow-up slice if API/session behavior is already testable.
+- Registration UI/route remain in-scope for Phase 1 and ship with the auth foundation slice.
 
 ## Implementation Order
 
@@ -373,35 +444,40 @@ Rollout gating:
 
 2. Configure credential auth behavior
    - Output: updated `src/auth.ts` (+ any provider-required user field mapping).
-   - Verify: targeted auth adapter/session tests for signed-in and signed-out states.
+   - Verify: targeted auth adapter/session tests for signed-in and signed-out states; registration accepts optional email.
    - Merge safety: yes if existing routes remain backward compatible.
 
-3. Add owner-scoped character port and Prisma adapter
+3. Add registration route and minimal sign-up UI
+   - Output: `/api/auth/register` route + `src/app/sign-up/page.tsx` with contract-safe validation/error display and password confirmation.
+   - Verify: registration route tests for happy path + malformed payload + duplicate username, plus manual check that successful registration reaches `/characters` authenticated.
+   - Merge safety: yes (additive auth surface aligned to MVP contract).
+
+4. Add owner-scoped character port and Prisma adapter
    - Output: `character-repository` port + adapter with owner-filtered query methods.
    - Verify: adapter tests for owner filtering and empty-result behavior.
    - Merge safety: yes (unused by UI until use-case wiring lands).
 
-4. Add auth-aware character use-case
+5. Add auth-aware character use-case
    - Output: `list-owner-characters` use-case + typed auth errors.
    - Verify: application tests prove guard order (no repository call when unauthenticated/forbidden).
    - Merge safety: yes (can ship without exposed route/page).
 
-5. Add API route with envelope/error mapping
+6. Add API route with envelope/error mapping
    - Output: `/api/characters` route with success/error envelope and status mappings.
    - Verify: route tests for `200`, `401`, `403`, `500`, and envelope shape.
    - Merge safety: yes (endpoint additive).
 
-6. Add `/characters` protected route
+7. Add `/characters` protected route
    - Output: server-rendered protected page using signed-out challenge behavior.
    - Verify: manual signed-out redirect/challenge and signed-in owner-list behavior.
    - Merge safety: yes (new route additive).
 
-7. Add minimal sign-in entry UI (only if needed for local/manual validation)
+8. Add minimal sign-in entry UI (only if needed for local/manual validation)
    - Output: optional `sign-in` page and i18n keys.
    - Verify: manual login/logout loop and `bun run i18n:check-catalog`.
    - Merge safety: yes (additive UX surface).
 
-8. Final contract checks and docs sync
+9. Final contract checks and docs sync
    - Output: tests/docs updated with evidence links.
    - Verify: `bun run lint`, targeted `bun test`, and any needed route tests.
    - Merge safety: yes (stabilization pass).
@@ -411,6 +487,7 @@ Rollout gating:
 Automated checks:
 
 - `bun run lint`
+- `bun test src/app/api/auth/register/__tests__/route.test.ts`
 - `bun test src/server/application/use-cases/__tests__/list-owner-characters.authz.test.ts`
 - `bun test src/app/api/characters/__tests__/route.test.ts`
 - `bun test src/server/adapters/auth/__tests__/auth-session-context.test.ts`
@@ -420,7 +497,10 @@ Manual scenarios:
 
 - Create account with username/password and no email -> success.
 - Attempt second account with same username -> `400 REQUEST_VALIDATION_FAILED`.
+- Submit malformed registration payload (missing/invalid username or password) -> `400 REQUEST_VALIDATION_FAILED`.
+- Submit mismatched password and confirm password -> inline mismatch error and no registration API request.
 - Signed-out access to `/characters` -> explicit signed-out behavior, no character payload.
+- Successful registration -> user is immediately authenticated and reaches `/characters` without separate sign-in.
 - Signed-in owner access to `/characters` -> only owner records visible.
 - Cross-user attempt via API/use-case fixture -> `403 AUTH_FORBIDDEN`.
 
@@ -447,8 +527,7 @@ Assumptions:
 
 Open questions to resolve during implementation kickoff:
 
-- Confirm preferred signed-out behavior for `/characters` in this repo: hard redirect to sign-in route vs in-page challenge view.
-- Confirm whether Phase 1 needs only list/read ownership proof or also first write operation guard in the same slice.
+- None.
 
 Deferred follow-ups (post-Phase 1):
 
@@ -473,6 +552,7 @@ Backout:
 ## Definition of Done
 
 - [ ] Prisma schema + migration enforce username uniqueness and nullable email contract.
+- [ ] Self-service registration is implemented in Phase 1 (`username` + `password`, optional `email`) with contract-aligned validation errors.
 - [ ] Username/password auth flow is configured and session resolution contract holds for signed-in/signed-out requests.
 - [ ] Authn/authz checks run before character repository access in app-layer use-cases.
 - [ ] `/characters` is protected end-to-end and owner-scoped.
