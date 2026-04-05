@@ -295,7 +295,9 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
             {character.buildState.classRef.name} · {character.buildState.level}
           </p>
         </div>
-        <p className="text-xs text-fg-secondary">{draftEnvelope?.isDirty ? copy.dirty : copy.saved}</p>
+        <p className="text-xs text-fg-secondary" aria-live="polite">
+          {draftEnvelope?.isDirty ? copy.dirty : copy.saved}
+        </p>
       </section>
 
       <Tabs
@@ -311,6 +313,7 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
             key={tab.value}
             density="compact"
             intent={activeTab === tab.value ? "primary" : "neutral"}
+            aria-label={tab.label}
             onClick={() => setActiveTab(tab.value as SheetTab)}
           >
             {tab.label}
@@ -407,15 +410,18 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
         />
       </div>
 
-      <Button
-        intent="primary"
-        disabled={isSaving || saveDisabled}
-        onClick={() => {
-          void saveDraft();
-        }}
-      >
-        {isSaving ? copy.saving : copy.save}
-      </Button>
+      <div className="sticky bottom-2 z-10 rounded-radius-sm border border-border-default bg-bg-surface/95 p-2 backdrop-blur-sm motion-reduce:backdrop-blur-none">
+        <Button
+          intent="primary"
+          className="w-full"
+          disabled={isSaving || saveDisabled}
+          onClick={() => {
+            void saveDraft();
+          }}
+        >
+          {isSaving ? copy.saving : copy.save}
+        </Button>
+      </div>
 
       <ConflictResolutionDialog
         copy={copy.conflict}

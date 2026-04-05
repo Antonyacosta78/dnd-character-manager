@@ -35,3 +35,9 @@
 - **What changed:** Added owner share-toggle use-case + endpoint, public read-only share-token endpoint, PDF export use-case + endpoint (`official` and `summary` modes), and sheet-side share/export action cards.
 - **Verification run:** `bun run lint`; `bun test src/app/api/characters/[id]/share/__tests__/route.test.ts src/app/api/characters/[id]/export/__tests__/route.test.ts`
 - **Known limitations/deferred:** Export currently uses text-backed PDF bytes until dedicated renderer is introduced.
+
+## Phase 6 - mobile hardening + accessibility pass
+
+- **What changed:** Hardened sheet interactions for mobile by introducing sticky bottom save CTA, tightened tap-target behavior through compact controls, and improved accessibility announcements (`aria-live` save-state updates, explicit section button labels).
+- **Verification run:** `bun run lint`; `bun test src/app/(core)/characters/__tests__/character-core-mobile-smoke.test.tsx`
+- **Known limitations/deferred:** Full real-device QA matrix (iOS/Android browser variance) remains a manual follow-up.
