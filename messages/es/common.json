@@ -219,6 +219,75 @@
       "invalid": "Runa de estado inválido"
     }
   },
+  "appShellNavigation": {
+    "primaryAriaLabel": "Navegación principal",
+    "topUtilityAriaLabel": "Menú de cuenta",
+    "utilityAriaLabel": "Utilidades de navegación",
+    "mobileMenuOpen": "Abrir menú",
+    "mobileMenuClose": "Cerrar menú",
+    "mobileBack": "Volver",
+    "submenuExpand": "Expandir submenú",
+    "submenuCollapse": "Contraer submenú",
+    "locked": {
+      "reason": "Bloqueado.",
+      "guidance": "Actualmente no tienes acceso."
+    },
+    "account": {
+      "label": "Cuenta",
+      "tooltip": "Cerrar sesión en esta cuenta.",
+      "openMenu": "Abrir menú de cuenta",
+      "signOut": "Cerrar sesión",
+      "signOutPending": "Cerrando sesión..."
+    },
+    "items": {
+      "characters": {
+        "label": "Personajes",
+        "tooltip": "Ver y administrar tu lista de personajes."
+      },
+      "branches": {
+        "label": "Ramas",
+        "tooltip": "Abrir builds alternativos y ramas temporales de un personaje."
+      },
+      "worlds": {
+        "label": "Mundos",
+        "tooltip": "Administrar la continuidad y el contexto compartido del mundo."
+      },
+      "adventures": {
+        "label": "Aventuras",
+        "tooltip": "Explora todas tus campañas, one-shots y arcos cortos."
+      },
+      "sessions": {
+        "label": "Sesiones",
+        "tooltip": "Ver sesiones de cada aventura y preparar versiones jugables."
+      },
+      "settings": {
+        "label": "Configuración",
+        "tooltip": "Abrir preferencias globales de la app como tema e idioma."
+      }
+    },
+    "routeTitles": {
+      "worlds": "Mundos",
+      "adventures": "Aventuras",
+      "characterBranches": "Ramas de personaje",
+      "adventureSessions": "Sesiones de aventura"
+    },
+    "routeSubtitles": {
+      "worlds": "Continuidad compartida y contexto de campaña.",
+      "adventures": "Campañas, one-shots y arcos cortos.",
+      "characterBranches": "Líneas temporales alternativas del personaje.",
+      "adventureSessions": "Preparación de sesiones y versiones jugables.",
+      "characterEntityBranches": "Ramas para el personaje {id}.",
+      "adventureEntitySessions": "Sesiones para la aventura {id}."
+    },
+    "routeBody": {
+      "worlds": "Las vistas de gestión de mundos aparecerán aquí en una fase posterior.",
+      "adventures": "Las vistas de exploración de aventuras aparecerán aquí en una fase posterior.",
+      "characterBranches": "Desde esta ruta podrás explorar y comparar líneas temporales de ramas.",
+      "adventureSessions": "La planificación y preparación de sesiones para aventuras aparecerá aquí.",
+      "characterEntityBranches": "Los detalles de la línea temporal de ramas para el personaje {id} aparecerán aquí.",
+      "adventureEntitySessions": "Los detalles de sesiones para la aventura {id} aparecerán aquí."
+    }
+  },
   "auth": {
     "signIn": {
       "eyebrow": "Autenticación",

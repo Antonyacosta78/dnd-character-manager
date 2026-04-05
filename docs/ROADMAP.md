@@ -187,6 +187,8 @@ This is the point where the tool can replace a paper-first or ad hoc workflow fo
 
 Goal: make many-character play manageable.
 
+Clarifying scope note: this phase covers roster discovery/navigation behavior inside character-library views (search, filters, grouping, recents). Global app-shell navigation IA (for example `Characters`, `Branches`, settings, and account access) is tracked separately as UX foundation work and does not count as Phase 8 progress on its own.
+
 - search across characters
 - recent-use views
 - group characters by world

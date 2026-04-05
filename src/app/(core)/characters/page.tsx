@@ -1,10 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-import { createPrismaCharacterRepository } from "@/server/adapters/prisma/character-repository";
 import { AuthSessionContext } from "@/server/adapters/auth/auth-session-context";
-import { AuthUnauthenticatedError } from "@/server/application/errors/auth-errors";
+import { createPrismaCharacterRepository } from "@/server/adapters/prisma/character-repository";
 import { createListOwnerCharactersUseCase } from "@/server/application/use-cases/list-owner-characters";
 
 export default async function CharactersPage() {
@@ -14,34 +12,18 @@ export default async function CharactersPage() {
     characterRepository: createPrismaCharacterRepository(),
   });
   let characters: Awaited<ReturnType<typeof listOwnerCharacters>> = [];
-
-  try {
-    characters = await listOwnerCharacters();
-  } catch (error) {
-    if (error instanceof AuthUnauthenticatedError) {
-      redirect("/sign-in");
-    }
-
-    throw error;
-  }
+  characters = await listOwnerCharacters();
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-6 px-6 py-12 font-ui sm:px-10">
-      <header className="space-y-2">
-        <p className="text-sm text-fg-muted">{t("auth.characters.protectedLabel")}</p>
-        <h1 className="font-display text-3xl tracking-tight text-fg-primary">{t("auth.characters.title")}</h1>
-      </header>
-
+    <div className="space-y-4 rounded-radius-sm border border-border-default bg-bg-surface p-4 shadow-shadow-soft">
       {characters.length === 0 ? (
-        <div className="rounded-radius-sm border border-border-default bg-bg-surface p-4 shadow-shadow-soft">
-          <p className="text-sm text-fg-secondary">{t("auth.characters.emptyState")}</p>
-        </div>
+        <p className="text-sm text-fg-secondary">{t("auth.characters.emptyState")}</p>
       ) : (
         <ul className="space-y-3">
           {characters.map((character) => (
             <li
               key={character.id}
-              className="rounded-radius-sm border border-border-default bg-bg-surface px-4 py-3 shadow-shadow-soft"
+              className="rounded-radius-sm border border-border-default bg-bg-elevated px-4 py-3 shadow-shadow-soft"
             >
               <p className="font-semibold text-fg-primary">{character.name}</p>
               <p className="mt-1 text-xs text-fg-muted">
@@ -59,6 +41,6 @@ export default async function CharactersPage() {
           {t("auth.characters.backHome")}
         </Link>
       </div>
-    </main>
+    </div>
   );
 }
