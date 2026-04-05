@@ -4,9 +4,9 @@
     "websearch": "allow",
   },
   "mcp": {
-    "browsermcp": {
+    "playwright": {
       "type": "local",
-      "command": ["bunx", "@browsermcp/mcp@latest"],
+      "command": ["bunx", "@playwright/mcp@latest", "--isolated", "--browser", "chrome"],
     },
   },
 }
