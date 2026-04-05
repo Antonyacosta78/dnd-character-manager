@@ -10,8 +10,8 @@
 ## Changelog
 
 - `2026-04-04` - `Antony Acosta` - Initial document created.
-- `2026-04-04` - `OpenCode` - Backfilled metadata and changelog sections for lifecycle tracking.
-- `2026-04-04` - `OpenCode` - Tuned status to reflect active implementation progress.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. Made with OpenCode.
 ## Related Feature
 
 - Placeholder: `docs/features/foundation.md` (feature rundown not created yet).
