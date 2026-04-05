@@ -228,6 +228,9 @@ Checklist markers:
   - [ ] Provide a simple issue-reporting path for reproducible bug context
 - Evidence
   - `docs/ROADMAP.md`
+  - `docs/features/observability-and-share-readiness.md`
+  - `docs/specs/observability/foundation.md`
+  - `docs/specs/observability/implementation-plan.md`
 
 ## Update Cadence
 
