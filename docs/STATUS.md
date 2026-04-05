@@ -18,31 +18,40 @@ Checklist markers:
 
 ## Snapshot
 
-- Last verified: 2026-04-04
+- Last verified: 2026-04-05
 - Evidence method: docs + code audit (high-confidence only)
 
 ## Phase Checklist
 
 ### Phase 0 - Foundation
 
-- Status: `in-progress`
+- Status: `completed`
 - Confidence: `high`
 - Checklist
   - [x] Product and architecture direction documented
   - [x] Feature/spec workflow and templates in place
   - [x] Rules import and catalog publish foundation wired
   - [x] i18n foundation wired for `en` and `es`
-  - [~] Global state management foundation (architecture/spec complete; store implementation and route wiring in progress)
-  - [ ] Operations health command wired (`ops-catalog-health`)
+  - [x] Global state management foundation (architecture/spec + store, persistence, provider wiring, and tests)
+  - [x] Operations health command wired (`ops-catalog-health`)
 - Evidence
   - `docs/architecture/feature-workflow.md`
   - `docs/specs/foundation/implementation-plan.md`
   - `docs/architecture/global-state-management.md`
   - `docs/specs/foundation/global-state-management-implementation-plan.md`
+  - `.rulesync/rules/25-global-state-management.md`
+  - `src/client/state/draft-store.ts`
+  - `src/client/state/draft-store.storage.ts`
+  - `src/client/state/draft-store.provider.tsx`
+  - `src/client/state/__tests__/draft-store.test.ts`
+  - `src/client/state/__tests__/draft-store.storage.test.ts`
+  - `src/app/layout.tsx`
+  - `src/app/draft-store-demo.tsx`
   - `src/server/import/run-import-pipeline.ts`
   - `src/server/cli/data-import.ts`
   - `src/server/adapters/rules-catalog/derived-rules-catalog.ts`
   - `src/i18n/index.ts`
+  - `package.json`
   - `src/server/cli/ops-catalog-health.ts`
 
 ### Phase 1 - Character Core

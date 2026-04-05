@@ -28,11 +28,11 @@ The product should feel strongest at three things:
 
 ## Implementation Snapshot
 
-Last verified: 2026-04-04
+Last verified: 2026-04-05
 
 Detailed evidence and checklist: `docs/STATUS.md`
 
-- Phase 0 - Foundation: in progress (major foundation slices implemented)
+- Phase 0 - Foundation: completed
 - Phase 1 - Character Core: planned
 - Phase 2 - Progression Planning: planned
 - Phase 3 - Branching And Timelines: planned
@@ -51,7 +51,7 @@ Goal: establish the project shape, vocabulary, and constraints before feature wo
 - architecture notes for app shape, parsing, and data sources
 - i18n foundation direction (locale strategy, fallback behavior, and doc linkage)
 
-Status: in progress
+Status: completed
 
 ## Phase 1 - Character Core
 
