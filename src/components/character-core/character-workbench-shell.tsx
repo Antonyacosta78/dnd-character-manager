@@ -64,20 +64,20 @@ export function CharacterWorkbenchShell({
         <div className="flex flex-wrap items-center gap-2">{actions}</div>
       </section>
 
-      <div className="grid gap-3 lg:grid-cols-[14rem_minmax(0,1fr)_18rem]">
-        <aside className="rounded-radius-sm border border-border-default bg-bg-surface p-2 lg:sticky lg:top-28 lg:self-start">
-          <ul className="flex gap-2 overflow-x-auto lg:flex-col">
+      <div className="grid items-stretch gap-3 lg:grid-cols-[14rem_minmax(0,1fr)_18rem]">
+        <aside className="h-full rounded-radius-sm border border-border-default bg-bg-surface p-2">
+          <ul className="flex gap-2 overflow-x-auto lg:h-full lg:flex-col lg:overflow-visible">
             {steps.map((step) => {
               const badge = statusBadge(step.status);
 
               return (
-                <li key={step.id}>
+                <li key={step.id} className="shrink-0 lg:w-full">
                   <Button
                     density="compact"
                     intent={step.isActive ? "primary" : "neutral"}
                     onClick={step.onSelect}
                     aria-current={step.isActive ? "step" : undefined}
-                    className="min-w-max justify-start"
+                    className="min-w-max justify-start lg:w-full lg:min-w-0"
                   >
                     <span className={`rounded-radius-sm border px-1 text-[10px] font-semibold ${badge.className}`}>
                       {badge.marker}

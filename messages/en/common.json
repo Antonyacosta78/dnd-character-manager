@@ -440,6 +440,12 @@
         "saveThenExport": "Save then export",
         "exportLastSaved": "Export last saved"
       },
+      "utilities": {
+        "trigger": "Share and export",
+        "title": "Sharing and export",
+        "description": "Manage read-only share access and PDF exports from one place.",
+        "dismiss": "Close"
+      },
       "conflict": {
         "title": "Save conflict detected",
         "description": "A newer server revision exists. Choose how to resolve this save.",

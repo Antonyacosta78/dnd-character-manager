@@ -99,6 +99,12 @@ export default async function CharacterSheetPage({
             saveThenExport: t("characterCore.sheet.export.saveThenExport"),
             exportLastSaved: t("characterCore.sheet.export.exportLastSaved"),
           },
+          utilities: {
+            trigger: t("characterCore.sheet.utilities.trigger"),
+            title: t("characterCore.sheet.utilities.title"),
+            description: t("characterCore.sheet.utilities.description"),
+            dismiss: t("characterCore.sheet.utilities.dismiss"),
+          },
           conflict: {
             title: t("characterCore.sheet.conflict.title"),
             description: t("characterCore.sheet.conflict.description"),

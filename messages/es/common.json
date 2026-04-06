@@ -440,6 +440,12 @@
         "saveThenExport": "Guardar y exportar",
         "exportLastSaved": "Exportar último guardado"
       },
+      "utilities": {
+        "trigger": "Compartir y exportar",
+        "title": "Compartir y exportar",
+        "description": "Gestiona el acceso de solo lectura y la exportación en PDF desde un solo lugar.",
+        "dismiss": "Cerrar"
+      },
       "conflict": {
         "title": "Se detectó un conflicto",
         "description": "Existe una revisión más reciente en el servidor. Elige cómo resolver el guardado.",

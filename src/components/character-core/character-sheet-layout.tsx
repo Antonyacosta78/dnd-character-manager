@@ -19,6 +19,7 @@ import { ShareToggleCard } from "@/components/character-core/share-toggle-card";
 import { SpellsEditor } from "@/components/character-core/spells-editor";
 import { ValidationSummary } from "@/components/character-core/validation-summary";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -101,6 +102,12 @@ interface CharacterSheetLayoutCopy {
     official: string;
     saveThenExport: string;
     exportLastSaved: string;
+  };
+  utilities: {
+    trigger: string;
+    title: string;
+    description: string;
+    dismiss: string;
   };
   conflict: {
     title: string;
@@ -351,9 +358,6 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
     { value: "spells", label: copy.tabs.spells },
     { value: "notes", label: copy.tabs.notes },
   ];
-  const activeTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
-  const previousTab = activeTabIndex > 0 ? tabs[activeTabIndex - 1] : null;
-  const nextTab = activeTabIndex < tabs.length - 1 ? tabs[activeTabIndex + 1] : null;
 
   return (
     <div className="space-y-4">
@@ -368,48 +372,37 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
         )}
         saveState={<>{draftEnvelope?.isDirty ? copy.dirty : copy.saved}</>}
         actions={(
-          <>
-            <Button
-              density="compact"
-              intent="neutral"
-              disabled={!previousTab || isProgressionBusy}
-              aria-label={previousTab?.label ?? copy.tabsAria}
-              onClick={() => {
-                if (!previousTab) {
-                  return;
-                }
+          <Dialog
+            triggerLabel={copy.utilities.trigger}
+            title={copy.utilities.title}
+            description={copy.utilities.description}
+            dismissLabel={copy.utilities.dismiss}
+          >
+            <div className="grid gap-3 lg:grid-cols-2">
+              <ShareToggleCard
+                copy={copy.share}
+                characterId={character.id}
+                enabled={shareEnabled}
+                shareToken={shareToken}
+                onChange={(payload) => {
+                  setShareEnabled(payload.enabled);
+                  setShareToken(payload.shareToken);
+                }}
+              />
+              <PdfExportActions
+                copy={copy.export}
+                characterId={character.id}
+                hasUnsavedChanges={Boolean(draftEnvelope?.isDirty)}
+                onRequestSaveBeforeExport={() => {
+                  if (isProgressionBusy) {
+                    return;
+                  }
 
-                setActiveTab(previousTab.value as SheetTab);
-              }}
-            >
-              ←
-            </Button>
-            <Button
-              density="compact"
-              intent="neutral"
-              disabled={!nextTab || isProgressionBusy}
-              aria-label={nextTab?.label ?? copy.tabsAria}
-              onClick={() => {
-                if (!nextTab) {
-                  return;
-                }
-
-                setActiveTab(nextTab.value as SheetTab);
-              }}
-            >
-              →
-            </Button>
-            <Button
-              intent="primary"
-              density="compact"
-              disabled={isSaving || saveDisabled || isProgressionBusy}
-              onClick={() => {
-                void saveDraft();
-              }}
-            >
-              {isSaving ? copy.saving : copy.save}
-            </Button>
-          </>
+                  void saveDraft();
+                }}
+              />
+            </div>
+          </Dialog>
         )}
         steps={tabs.map((tab) => ({
           id: tab.value,
@@ -518,31 +511,6 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
                 });
               }}
             />
-
-            <div className="grid gap-3 lg:grid-cols-2">
-              <ShareToggleCard
-                copy={copy.share}
-                characterId={character.id}
-                enabled={shareEnabled}
-                shareToken={shareToken}
-                onChange={(payload) => {
-                  setShareEnabled(payload.enabled);
-                  setShareToken(payload.shareToken);
-                }}
-              />
-              <PdfExportActions
-                copy={copy.export}
-                characterId={character.id}
-                hasUnsavedChanges={Boolean(draftEnvelope?.isDirty)}
-                onRequestSaveBeforeExport={() => {
-                  if (isProgressionBusy) {
-                    return;
-                  }
-
-                  void saveDraft();
-                }}
-              />
-            </div>
           </>
         )}
       />
