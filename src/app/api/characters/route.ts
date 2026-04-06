@@ -10,6 +10,7 @@ import {
   createListOwnerCharactersUseCase,
   type ListOwnerCharactersUseCase,
 } from "@/server/application/use-cases/list-owner-characters";
+import "@/server/observability/sentry-server-adapter";
 import { emitServerErrorLog } from "@/server/observability/server-error-log";
 import { captureServerException } from "@/server/observability/sentry-server";
 import {

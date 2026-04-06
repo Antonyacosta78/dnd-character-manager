@@ -5,6 +5,7 @@ import {
   type BugReportValidationFields,
   validateBugReportPayload,
 } from "@/server/observability/bug-report-schema";
+import "@/server/observability/sentry-server-adapter";
 import { emitServerErrorLog } from "@/server/observability/server-error-log";
 import { captureServerException } from "@/server/observability/sentry-server";
 import {

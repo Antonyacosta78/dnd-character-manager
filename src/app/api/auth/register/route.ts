@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import "@/server/observability/sentry-server-adapter";
 import { emitServerErrorLog } from "@/server/observability/server-error-log";
 import { captureServerException } from "@/server/observability/sentry-server";
 import {
