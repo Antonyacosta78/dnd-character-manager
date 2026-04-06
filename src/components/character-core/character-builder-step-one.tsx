@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { CharacterWorkbenchShell } from "@/components/character-core/character-workbench-shell";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +53,7 @@ interface ApiErrorPayload {
 
 const DRAFT_SCOPE = "character-create" as const;
 const DRAFT_ENTITY_ID = "new-character";
+const BUILDER_STEP_FORM_ID = "character-builder-step-one-form";
 
 export function CharacterBuilderStepOne({ copy }: CharacterBuilderStepOneProps) {
   const router = useRouter();
@@ -134,15 +136,47 @@ export function CharacterBuilderStepOne({ copy }: CharacterBuilderStepOneProps) 
   }, [className, classSource, concept, name, patchDraft]);
 
   return (
-    <section className="space-y-4 rounded-radius-sm border border-border-default bg-bg-surface p-4 shadow-shadow-soft">
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold text-fg-primary">{copy.title}</h1>
-        <p className="text-sm text-fg-secondary">{copy.description}</p>
-      </div>
-
-      <form
-        className="space-y-4"
-        onSubmit={async (event) => {
+    <CharacterWorkbenchShell
+      header={
+        <>
+          <h1 className="text-xl font-semibold text-fg-primary">{copy.title}</h1>
+          <p className="text-sm text-fg-secondary">{copy.description}</p>
+        </>
+      }
+      saveState={<>{draftEnvelope?.isDirty ? copy.unsavedDraft : copy.levelValue}</>}
+      actions={(
+        <Button
+          type="submit"
+          form={BUILDER_STEP_FORM_ID}
+          intent="primary"
+          density="compact"
+          disabled={isSubmitting || (hasConceptWarning && !acknowledgeWarning)}
+        >
+          {isSubmitting ? copy.saving : copy.save}
+        </Button>
+      )}
+      steps={[
+        {
+          id: "step-one",
+          label: copy.title,
+          status: hasConceptWarning && !acknowledgeWarning ? "warning" : "idle",
+          isActive: true,
+          onSelect: () => {},
+        },
+      ]}
+      pulse={(
+        <div className="space-y-2 text-sm text-fg-primary">
+          <p>
+            {copy.classLabel}: {className || copy.classPlaceholder}
+          </p>
+          <p>{copy.levelValue}</p>
+        </div>
+      )}
+      canvas={(
+        <form
+          id={BUILDER_STEP_FORM_ID}
+          className="space-y-4 rounded-radius-sm border border-border-default bg-bg-surface p-4 shadow-shadow-soft"
+          onSubmit={async (event) => {
           event.preventDefault();
           setFeedback(null);
           setIsSubmitting(true);
@@ -208,98 +242,95 @@ export function CharacterBuilderStepOne({ copy }: CharacterBuilderStepOneProps) 
           } finally {
             setIsSubmitting(false);
           }
-        }}
-      >
-        <div className="space-y-2">
-          <label htmlFor="character-name" className="text-sm font-medium text-fg-primary">
-            {copy.nameLabel}
-          </label>
-          <Input
-            id="character-name"
-            name="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder={copy.namePlaceholder}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="character-concept" className="text-sm font-medium text-fg-primary">
-            {copy.conceptLabel}
-          </label>
-          <textarea
-            id="character-concept"
-            name="concept"
-            className="min-h-28 w-full rounded-radius-sm border border-border-default bg-bg-elevated px-3 py-2 text-sm text-fg-primary shadow-shadow-soft placeholder:text-fg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-rubric focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas"
-            value={concept}
-            onChange={(event) => setConcept(event.target.value)}
-            placeholder={copy.conceptPlaceholder}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="character-class" className="text-sm font-medium text-fg-primary">
-            {copy.classLabel}
-          </label>
-          <select
-            id="character-class"
-            name="class"
-            value={className && classSource ? `${className}::${classSource}` : ""}
-            onChange={(event) => {
-              const [nextName, nextSource] = event.target.value.split("::");
-              setClassName(nextName ?? "");
-              setClassSource(nextSource ?? "");
-            }}
-            className="min-h-10 w-full rounded-radius-sm border border-border-default bg-bg-elevated px-3 py-2 text-sm text-fg-primary shadow-shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-rubric focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas"
-            disabled={classOptions.length === 0}
-            required
-          >
-            <option value="">{copy.classPlaceholder}</option>
-            {classOptions.map((option) => (
-              <option key={`${option.name}:${option.source}`} value={`${option.name}::${option.source}`}>
-                {option.name} ({option.source})
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-fg-muted">
-            {copy.classSourceLabel}: {classSource}
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-fg-primary">{copy.levelLabel}</p>
-          <p className="text-sm text-fg-secondary">{copy.levelValue}</p>
-        </div>
-
-        {hasConceptWarning ? (
-          <div className="space-y-2 rounded-radius-sm border border-border-default bg-bg-muted p-3">
-            <p className="text-sm text-fg-secondary">{copy.warningConceptShort}</p>
-            <label className="flex items-start gap-2 text-sm text-fg-primary">
-              <input
-                type="checkbox"
-                checked={acknowledgeWarning}
-                onChange={(event) => setAcknowledgeWarning(event.target.checked)}
-                className="mt-0.5"
-              />
-              <span>{copy.acknowledgeWarning}</span>
+          }}
+        >
+          <div className="space-y-2">
+            <label htmlFor="character-name" className="text-sm font-medium text-fg-primary">
+              {copy.nameLabel}
             </label>
+            <Input
+              id="character-name"
+              name="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder={copy.namePlaceholder}
+              required
+            />
           </div>
-        ) : null}
 
-        {classOptionsError ? <Alert intent="danger" description={classOptionsError} /> : null}
-        {feedback ? <Alert intent="danger" description={feedback} /> : null}
+          <div className="space-y-2">
+            <label htmlFor="character-concept" className="text-sm font-medium text-fg-primary">
+              {copy.conceptLabel}
+            </label>
+            <textarea
+              id="character-concept"
+              name="concept"
+              className="min-h-28 w-full rounded-radius-sm border border-border-default bg-bg-elevated px-3 py-2 text-sm text-fg-primary shadow-shadow-soft placeholder:text-fg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-rubric focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas"
+              value={concept}
+              onChange={(event) => setConcept(event.target.value)}
+              placeholder={copy.conceptPlaceholder}
+              required
+            />
+          </div>
 
-        {draftEnvelope?.isDirty ? (
-          <p className="text-xs text-fg-muted">{copy.unsavedDraft}</p>
-        ) : null}
+          <div className="space-y-2">
+            <label htmlFor="character-class" className="text-sm font-medium text-fg-primary">
+              {copy.classLabel}
+            </label>
+            <select
+              id="character-class"
+              name="class"
+              value={className && classSource ? `${className}::${classSource}` : ""}
+              onChange={(event) => {
+                const [nextName, nextSource] = event.target.value.split("::");
+                setClassName(nextName ?? "");
+                setClassSource(nextSource ?? "");
+              }}
+              className="min-h-10 w-full rounded-radius-sm border border-border-default bg-bg-elevated px-3 py-2 text-sm text-fg-primary shadow-shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-rubric focus-visible:ring-offset-2 focus-visible:ring-offset-bg-canvas"
+              disabled={classOptions.length === 0}
+              required
+            >
+              <option value="">{copy.classPlaceholder}</option>
+              {classOptions.map((option) => (
+                <option key={`${option.name}:${option.source}`} value={`${option.name}::${option.source}`}>
+                  {option.name} ({option.source})
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-fg-muted">
+              {copy.classSourceLabel}: {classSource}
+            </p>
+          </div>
 
-        <Button type="submit" intent="primary" disabled={isSubmitting || (hasConceptWarning && !acknowledgeWarning)}>
-          {isSubmitting ? copy.saving : copy.save}
-        </Button>
-      </form>
-    </section>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-fg-primary">{copy.levelLabel}</p>
+            <p className="text-sm text-fg-secondary">{copy.levelValue}</p>
+          </div>
+
+          {hasConceptWarning ? (
+            <div className="space-y-2 rounded-radius-sm border border-border-default bg-bg-muted p-3">
+              <p className="text-sm text-fg-secondary">{copy.warningConceptShort}</p>
+              <label className="flex items-start gap-2 text-sm text-fg-primary">
+                <input
+                  type="checkbox"
+                  checked={acknowledgeWarning}
+                  onChange={(event) => setAcknowledgeWarning(event.target.checked)}
+                  className="mt-0.5"
+                />
+                <span>{copy.acknowledgeWarning}</span>
+              </label>
+            </div>
+          ) : null}
+
+          {classOptionsError ? <Alert intent="danger" description={classOptionsError} /> : null}
+          {feedback ? <Alert intent="danger" description={feedback} /> : null}
+
+          {draftEnvelope?.isDirty ? (
+            <p className="text-xs text-fg-muted">{copy.unsavedDraft}</p>
+          ) : null}
+        </form>
+      )}
+    />
   );
 }
 

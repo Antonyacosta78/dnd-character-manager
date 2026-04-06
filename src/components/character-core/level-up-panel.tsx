@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import type { CharacterCatalogRef } from "@/server/ports/character-repository";
@@ -21,6 +21,7 @@ interface LevelUpPanelProps {
   baseRevision: number;
   currentClassRef: CharacterCatalogRef;
   onFinalized: (payload: LevelUpFinalizedPayload) => void;
+  onBusyStateChange?: (isBusy: boolean) => void;
 }
 
 export interface LevelUpFinalizedPayload {
@@ -46,11 +47,16 @@ export function LevelUpPanel({
   baseRevision,
   currentClassRef,
   onFinalized,
+  onBusyStateChange,
 }: LevelUpPanelProps) {
   const [plan, setPlan] = useState<LevelPlanPayload["data"]["plan"] | null>(null);
   const [isPlanning, setIsPlanning] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [confirmClassChange, setConfirmClassChange] = useState(false);
+
+  useEffect(() => {
+    onBusyStateChange?.(isPlanning || isFinalizing);
+  }, [isFinalizing, isPlanning, onBusyStateChange]);
 
   return (
     <section className="space-y-3 rounded-radius-sm border border-border-default bg-bg-surface p-3">

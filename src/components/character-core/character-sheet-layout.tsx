@@ -6,8 +6,11 @@ import {
   selectCharacterCoreBaseRevision,
   selectCharacterCoreConflictState,
   selectCharacterCoreSaveDisabled,
+  selectCharacterCoreStepBadgeStates,
+  type CharacterCoreSheetStep,
 } from "@/client/state/character-core-workflow.selectors";
 import { useDraftStore } from "@/client/state/draft-store";
+import { CharacterWorkbenchShell } from "@/components/character-core/character-workbench-shell";
 import { ConflictResolutionDialog } from "@/components/character-core/conflict-resolution-dialog";
 import { InventoryEditor } from "@/components/character-core/inventory-editor";
 import { LevelUpPanel } from "@/components/character-core/level-up-panel";
@@ -17,7 +20,6 @@ import { SpellsEditor } from "@/components/character-core/spells-editor";
 import { ValidationSummary } from "@/components/character-core/validation-summary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
   CHARACTER_WARNING_CONCEPT_SHORT,
@@ -46,6 +48,9 @@ interface CharacterSheetLayoutCopy {
   dirty: string;
   saved: string;
   nameLabel: string;
+  classLabel: string;
+  levelLabel: string;
+  revisionLabel: string;
   conceptLabel: string;
   notesLabel: string;
   validation: {
@@ -116,6 +121,8 @@ const DRAFT_SCOPE = "character-sheet" as const;
 
 type SheetTab = "core" | "progression" | "inventory" | "spells" | "notes";
 
+const SHEET_STEP_ORDER: CharacterCoreSheetStep[] = ["core", "progression", "inventory", "spells", "notes"];
+
 interface CharacterSheetProgressionState {
   classRef: CharacterCatalogRef;
   level: number;
@@ -155,6 +162,7 @@ export function createCharacterSheetSaveDraft({
 export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutProps) {
   const [activeTab, setActiveTab] = useState<SheetTab>("core");
   const [isSaving, setIsSaving] = useState(false);
+  const [isProgressionBusy, setIsProgressionBusy] = useState(false);
   const [name, setName] = useState(character.name);
   const [concept, setConcept] = useState(character.buildState.concept);
   const [notes, setNotes] = useState(character.buildState.notes ?? "");
@@ -251,8 +259,19 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
   const saveDisabled = selectCharacterCoreSaveDisabled(draftEnvelope, validation.hardIssues.length > 0, unacknowledgedWarnings.length > 0);
   const conflict = selectCharacterCoreConflictState(draftEnvelope);
   const baseRevision = selectCharacterCoreBaseRevision(draftEnvelope, revision);
+  const stepBadgeStates = selectCharacterCoreStepBadgeStates({
+    stepOrder: SHEET_STEP_ORDER,
+    activeStep: activeTab,
+    hardIssues: validation.hardIssues,
+    warnings: validation.warnings,
+    acknowledgedWarningCodes,
+  });
 
   const saveDraft = async (overrideBaseRevision?: number) => {
+    if (isProgressionBusy) {
+      return false;
+    }
+
     setIsSaving(true);
 
     try {
@@ -332,136 +351,207 @@ export function CharacterSheetLayout({ character, copy }: CharacterSheetLayoutPr
     { value: "spells", label: copy.tabs.spells },
     { value: "notes", label: copy.tabs.notes },
   ];
+  const activeTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
+  const previousTab = activeTabIndex > 0 ? tabs[activeTabIndex - 1] : null;
+  const nextTab = activeTabIndex < tabs.length - 1 ? tabs[activeTabIndex + 1] : null;
 
   return (
     <div className="space-y-4">
-      <section className="sticky top-2 z-10 flex flex-wrap items-center justify-between gap-2 rounded-radius-sm border border-border-default bg-bg-surface p-3 shadow-shadow-soft">
-        <div>
-          <h1 className="text-lg font-semibold text-fg-primary">{name}</h1>
-          <p className="text-xs text-fg-secondary">
-            {buildClassRef.name} · {buildLevel}
-          </p>
-        </div>
-        <p className="text-xs text-fg-secondary" aria-live="polite">
-          {draftEnvelope?.isDirty ? copy.dirty : copy.saved}
-        </p>
-      </section>
+      <CharacterWorkbenchShell
+        header={(
+          <>
+            <h1 className="text-lg font-semibold text-fg-primary">{name}</h1>
+            <p className="text-xs text-fg-secondary">
+              {buildClassRef.name} · {buildLevel}
+            </p>
+          </>
+        )}
+        saveState={<>{draftEnvelope?.isDirty ? copy.dirty : copy.saved}</>}
+        actions={(
+          <>
+            <Button
+              density="compact"
+              intent="neutral"
+              disabled={!previousTab || isProgressionBusy}
+              aria-label={previousTab?.label ?? copy.tabsAria}
+              onClick={() => {
+                if (!previousTab) {
+                  return;
+                }
 
-      <Tabs
-        items={tabs}
-        activeValue={activeTab}
-        ariaLabel={copy.tabsAria}
-        className="overflow-x-auto"
-      />
+                setActiveTab(previousTab.value as SheetTab);
+              }}
+            >
+              ←
+            </Button>
+            <Button
+              density="compact"
+              intent="neutral"
+              disabled={!nextTab || isProgressionBusy}
+              aria-label={nextTab?.label ?? copy.tabsAria}
+              onClick={() => {
+                if (!nextTab) {
+                  return;
+                }
 
-      <div className="flex flex-wrap gap-2">
-        {tabs.map((tab) => (
-          <Button
-            key={tab.value}
-            density="compact"
-            intent={activeTab === tab.value ? "primary" : "neutral"}
-            aria-label={tab.label}
-            onClick={() => setActiveTab(tab.value as SheetTab)}
-          >
-            {tab.label}
-          </Button>
-        ))}
-      </div>
-
-      {activeTab === "core" ? (
-        <section className="space-y-3 rounded-radius-sm border border-border-default bg-bg-surface p-3">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-fg-primary" htmlFor="character-sheet-name">
-              {copy.nameLabel}
-            </label>
-            <Input id="character-sheet-name" value={name} onChange={(event) => setName(event.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-fg-primary" htmlFor="character-sheet-concept">
-              {copy.conceptLabel}
-            </label>
-            <Textarea id="character-sheet-concept" value={concept} onChange={(event) => setConcept(event.target.value)} />
-          </div>
-        </section>
-      ) : null}
-
-      {activeTab === "progression" ? (
-        <LevelUpPanel
-          copy={copy.level}
-          characterId={character.id}
-          baseRevision={baseRevision}
-          currentClassRef={buildClassRef}
-          onFinalized={(payload: LevelUpFinalizedPayload) => {
-            setRevision(payload.revision);
-            setBuildLevel(payload.level);
-            setBuildClassRef(payload.classRef);
-            markSaved(DRAFT_SCOPE, character.id, "save");
-            setBaseRevision(DRAFT_SCOPE, character.id, payload.revision, "save");
-            clearConflict(DRAFT_SCOPE, character.id, "save");
-            patchDraft(DRAFT_SCOPE, character.id, { level: payload.level, classRef: payload.classRef }, "save");
-          }}
-        />
-      ) : null}
-
-      {activeTab === "inventory" ? (
-        <InventoryEditor copy={copy.inventory} entries={inventory} onChange={setInventory} />
-      ) : null}
-
-      {activeTab === "spells" ? (
-        <SpellsEditor copy={copy.spells} entries={spells} onChange={setSpells} />
-      ) : null}
-
-      {activeTab === "notes" ? (
-        <section className="space-y-2 rounded-radius-sm border border-border-default bg-bg-surface p-3">
-          <label className="text-sm font-medium text-fg-primary" htmlFor="character-sheet-notes">
-            {copy.notesLabel}
-          </label>
-          <Textarea id="character-sheet-notes" value={notes} onChange={(event) => setNotes(event.target.value)} />
-        </section>
-      ) : null}
-
-      <ValidationSummary
-        copy={copy.validation}
-        hardIssues={validation.hardIssues}
-        warnings={validation.warnings}
-        acknowledgedWarningCodes={acknowledgedWarningCodes}
-        onAcknowledgeWarning={(warningCode, acknowledged) => {
-          setAcknowledgedWarningCodes((previous) => {
-            if (acknowledged) {
-              return previous.includes(warningCode) ? previous : [...previous, warningCode];
+                setActiveTab(nextTab.value as SheetTab);
+              }}
+            >
+              →
+            </Button>
+            <Button
+              intent="primary"
+              density="compact"
+              disabled={isSaving || saveDisabled || isProgressionBusy}
+              onClick={() => {
+                void saveDraft();
+              }}
+            >
+              {isSaving ? copy.saving : copy.save}
+            </Button>
+          </>
+        )}
+        steps={tabs.map((tab) => ({
+          id: tab.value,
+          label: tab.label,
+          status: stepBadgeStates[tab.value as SheetTab].status,
+          isActive: activeTab === tab.value,
+          onSelect: () => {
+            if (isProgressionBusy) {
+              return;
             }
 
-            return previous.filter((code) => code !== warningCode);
-          });
-        }}
-      />
+            setActiveTab(tab.value as SheetTab);
+          },
+        }))}
+        pulse={(
+          <div className="space-y-2 text-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-fg-secondary">{copy.tabs.progression}</p>
+            <ul className="space-y-1 text-fg-primary">
+              <li>
+                {copy.classLabel}: {buildClassRef.name}
+              </li>
+              <li>
+                {copy.levelLabel}: {buildLevel}
+              </li>
+              <li>
+                {copy.revisionLabel}: {revision}
+              </li>
+            </ul>
+            <p className="text-xs text-fg-secondary" aria-live="polite">
+              {draftEnvelope?.isDirty ? copy.dirty : copy.saved}
+            </p>
+            {conflict ? (
+              <p className="rounded-radius-sm border border-state-danger/40 bg-state-danger/10 px-2 py-1 text-xs text-state-danger">
+                {copy.conflict.title}
+              </p>
+            ) : null}
+          </div>
+        )}
+        canvas={(
+          <>
+            {activeTab === "core" ? (
+              <section className="space-y-3 rounded-radius-sm border border-border-default bg-bg-surface p-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-fg-primary" htmlFor="character-sheet-name">
+                    {copy.nameLabel}
+                  </label>
+                  <Input id="character-sheet-name" value={name} onChange={(event) => setName(event.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-fg-primary" htmlFor="character-sheet-concept">
+                    {copy.conceptLabel}
+                  </label>
+                  <Textarea id="character-sheet-concept" value={concept} onChange={(event) => setConcept(event.target.value)} />
+                </div>
+              </section>
+            ) : null}
 
-      <div className="grid gap-3 lg:grid-cols-2">
-        <ShareToggleCard
-          copy={copy.share}
-          characterId={character.id}
-          enabled={shareEnabled}
-          shareToken={shareToken}
-          onChange={(payload) => {
-            setShareEnabled(payload.enabled);
-            setShareToken(payload.shareToken);
-          }}
-        />
-        <PdfExportActions
-          copy={copy.export}
-          characterId={character.id}
-          hasUnsavedChanges={Boolean(draftEnvelope?.isDirty)}
-          onRequestSaveBeforeExport={() => {
-            void saveDraft();
-          }}
-        />
-      </div>
+            {activeTab === "progression" ? (
+              <LevelUpPanel
+                copy={copy.level}
+                characterId={character.id}
+                baseRevision={baseRevision}
+                currentClassRef={buildClassRef}
+                onBusyStateChange={setIsProgressionBusy}
+                onFinalized={(payload: LevelUpFinalizedPayload) => {
+                  setRevision(payload.revision);
+                  setBuildLevel(payload.level);
+                  setBuildClassRef(payload.classRef);
+                  markSaved(DRAFT_SCOPE, character.id, "save");
+                  setBaseRevision(DRAFT_SCOPE, character.id, payload.revision, "save");
+                  clearConflict(DRAFT_SCOPE, character.id, "save");
+                  patchDraft(DRAFT_SCOPE, character.id, { level: payload.level, classRef: payload.classRef }, "save");
+                }}
+              />
+            ) : null}
+
+            {activeTab === "inventory" ? (
+              <InventoryEditor copy={copy.inventory} entries={inventory} onChange={setInventory} />
+            ) : null}
+
+            {activeTab === "spells" ? (
+              <SpellsEditor copy={copy.spells} entries={spells} onChange={setSpells} />
+            ) : null}
+
+            {activeTab === "notes" ? (
+              <section className="space-y-2 rounded-radius-sm border border-border-default bg-bg-surface p-3">
+                <label className="text-sm font-medium text-fg-primary" htmlFor="character-sheet-notes">
+                  {copy.notesLabel}
+                </label>
+                <Textarea id="character-sheet-notes" value={notes} onChange={(event) => setNotes(event.target.value)} />
+              </section>
+            ) : null}
+
+            <ValidationSummary
+              copy={copy.validation}
+              hardIssues={validation.hardIssues}
+              warnings={validation.warnings}
+              acknowledgedWarningCodes={acknowledgedWarningCodes}
+              onAcknowledgeWarning={(warningCode, acknowledged) => {
+                setAcknowledgedWarningCodes((previous) => {
+                  if (acknowledged) {
+                    return previous.includes(warningCode) ? previous : [...previous, warningCode];
+                  }
+
+                  return previous.filter((code) => code !== warningCode);
+                });
+              }}
+            />
+
+            <div className="grid gap-3 lg:grid-cols-2">
+              <ShareToggleCard
+                copy={copy.share}
+                characterId={character.id}
+                enabled={shareEnabled}
+                shareToken={shareToken}
+                onChange={(payload) => {
+                  setShareEnabled(payload.enabled);
+                  setShareToken(payload.shareToken);
+                }}
+              />
+              <PdfExportActions
+                copy={copy.export}
+                characterId={character.id}
+                hasUnsavedChanges={Boolean(draftEnvelope?.isDirty)}
+                onRequestSaveBeforeExport={() => {
+                  if (isProgressionBusy) {
+                    return;
+                  }
+
+                  void saveDraft();
+                }}
+              />
+            </div>
+          </>
+        )}
+      />
 
       <div className="sticky bottom-2 z-10 rounded-radius-sm border border-border-default bg-bg-surface/95 p-2 backdrop-blur-sm motion-reduce:backdrop-blur-none">
         <Button
           intent="primary"
           className="w-full"
-          disabled={isSaving || saveDisabled}
+          disabled={isSaving || saveDisabled || isProgressionBusy}
           onClick={() => {
             void saveDraft();
           }}

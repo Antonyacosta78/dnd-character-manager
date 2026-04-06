@@ -45,6 +45,9 @@ export default async function CharacterSheetPage({
           dirty: t("characterCore.sheet.dirty"),
           saved: t("characterCore.sheet.saved"),
           nameLabel: t("characterCore.sheet.nameLabel"),
+          classLabel: t("characterCore.sheet.classLabel"),
+          levelLabel: t("characterCore.sheet.levelLabel"),
+          revisionLabel: t("characterCore.sheet.revisionLabel"),
           conceptLabel: t("characterCore.sheet.conceptLabel"),
           notesLabel: t("characterCore.sheet.notesLabel"),
           validation: {
