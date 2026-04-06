@@ -32,7 +32,9 @@ export default async function SignUpPage() {
             usernameRequiredError: t("auth.signUp.errors.usernameRequired"),
             usernameDuplicateError: t("auth.signUp.errors.usernameDuplicate"),
             passwordRequiredError: t("auth.signUp.errors.passwordRequired"),
+            passwordInvalidError: t("auth.signUp.errors.passwordInvalid"),
             passwordMismatchError: t("auth.signUp.errors.passwordMismatch"),
+            emailRequiredError: t("auth.signUp.errors.emailRequired"),
             emailInvalidError: t("auth.signUp.errors.emailInvalid"),
           }}
         />

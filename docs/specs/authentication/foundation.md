@@ -4,11 +4,12 @@
 
 - Status: `proposed`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-04-06`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-06` - `Antony Acosta` - Updated registration contract to require email in MVP flows and removed nullable-email acceptance criteria so Better Auth registration remains deterministic.
 - `2026-04-05` - `Antony Acosta` - Extended registration contract with client-side password confirmation and automatic post-registration session establishment so successful sign-up continues directly into authenticated flows.
 - `2026-04-05` - `Antony Acosta` - Expanded Phase 1 auth foundation scope to treat MVP registration as a first-class authentication flow alongside sign-in, clarifying acceptance criteria and data flow so implementation and validation stay in one authoritative contract.
 - `2026-04-05` - `Antony Acosta` - Linked the implementation plan artifact for Phase 1 execution sequencing and verification tracking.
@@ -33,7 +34,7 @@
 - Registration UX includes a basic client-side password confirmation check before API submission.
 - User model behavior where:
   - `username` is required and unique.
-  - `email` is optional/nullable and does not block account creation/sign-in.
+  - `email` is required and must be valid for account creation.
 - Session resolution through the existing session context port/adapter boundary.
 - Application-layer authn/authz enforcement for character-owned operations before repository access.
 - Route protection contract for `/characters`.
@@ -57,7 +58,7 @@
 2. **Authentication contract**
    - Authentication entry flows accept `username + password` for both registration and sign-in.
    - Registration UI requires `password` and `confirmPassword` to match before server submission.
-   - Successful registration creates a new user record with required credentials and optional/nullable `email`.
+   - Successful registration creates a new user record with required credentials including valid `email`.
    - Successful registration also establishes an authenticated session for the created user (no separate sign-in step required).
    - Successful sign-in establishes a session resolvable through `SessionContextPort#getSessionContext()`.
    - Signed-out state resolves to `{ userId: null, isAdmin: false }` and must be handled explicitly.
@@ -104,8 +105,8 @@
 4. **Registration password confirmation mismatch (client-side)**
    - Given registration input where `password` and `confirmPassword` differ, the UI blocks submission and shows clear mismatch feedback without calling the registration API.
 
-5. **Nullable email behavior**
-   - Given account creation without `email`, user creation succeeds and the persisted `email` value is `null` (or equivalent nullable representation).
+5. **Required email behavior**
+   - Given account creation without `email`, creation fails with `REQUEST_VALIDATION_FAILED`.
 
 6. **Session resolution contract**
    - Given a valid authenticated request, `SessionContextPort#getSessionContext()` returns the current `userId`.
@@ -124,13 +125,13 @@
    - Given authenticated user A requesting user B's character resource through protected APIs/use-cases, the request fails with `AUTH_FORBIDDEN` and no resource payload.
 
 11. **No email verification gate in MVP**
-   - Given a newly created account with unverified or absent email, the user can still sign in via username/password and access `/characters` under normal ownership rules.
+    - Given a newly created account with unverified email, the user can still sign in via username/password and access `/characters` under normal ownership rules.
 
 ## Data and Flow
 
 Inputs:
 
-- Registration input (`username`, `password`, `confirmPassword`, optional `email`) from auth entry flow.
+- Registration input (`username`, `password`, `confirmPassword`, required `email`) from auth entry flow.
 - Sign-in credential input (`username`, `password`) from auth entry flow.
 - Session token/cookie headers on server requests.
 - Character operation input (route params/body/query).
@@ -139,7 +140,7 @@ Transformation path:
 
 1. Auth route handler (`/api/auth/[...all]`) handles credential registration/sign-in endpoints via Better Auth.
 2. Registration UI performs password confirmation (`password === confirmPassword`) before submission.
-3. Registration path validates payload, enforces username uniqueness, persists user identity fields (`username`, `password`, optional/nullable `email`), and establishes session state for the new user.
+3. Registration path validates payload, enforces username uniqueness, persists user identity fields (`username`, `password`, required `email`), and establishes session state for the new user.
 4. Sign-in path exchanges valid credentials for session state via Better Auth.
 5. Server operation resolves session through `SessionContextPort`.
 6. Application layer validates authn (`userId` presence) and authz (owner match).
@@ -198,7 +199,7 @@ Expected implementation surfaces for this spec:
 
 Recommended sequence:
 
-1. Confirm identity data constraints (`username` unique, `email` nullable).
+1. Confirm identity data constraints (`username` unique, registration `email` required).
 2. Wire/verify credential auth flow and session resolution behavior.
 3. Apply application-layer authn/authz guards to character use-cases.
 4. Protect `/characters` as first end-to-end validation route.

@@ -310,11 +310,11 @@
       "usernameLabel": "Username",
       "passwordLabel": "Password",
       "confirmPasswordLabel": "Confirm password",
-      "emailLabel": "Email (optional)",
+      "emailLabel": "Email",
       "usernamePlaceholder": "Choose a username",
       "passwordPlaceholder": "Create a password",
       "confirmPasswordPlaceholder": "Re-enter your password",
-      "emailPlaceholder": "Enter your email (optional)",
+      "emailPlaceholder": "Enter your email",
       "submit": "Create account",
       "pending": "Creating account...",
       "signInCta": "Already have an account? Sign in",
@@ -325,8 +325,10 @@
         "usernameRequired": "Username is required.",
         "usernameDuplicate": "That username is already taken.",
         "passwordRequired": "Password is required.",
+        "passwordInvalid": "Password must be at least 8 characters.",
         "passwordMismatch": "Passwords do not match.",
-        "emailInvalid": "Enter a valid email or leave it empty."
+        "emailRequired": "Email is required.",
+        "emailInvalid": "Enter a valid email address."
       }
     },
     "characters": {
