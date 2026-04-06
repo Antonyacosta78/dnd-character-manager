@@ -310,11 +310,11 @@
       "usernameLabel": "Nombre de usuario",
       "passwordLabel": "Contraseña",
       "confirmPasswordLabel": "Confirmar contraseña",
-      "emailLabel": "Correo electrónico (opcional)",
+      "emailLabel": "Correo electrónico",
       "usernamePlaceholder": "Elige un nombre de usuario",
       "passwordPlaceholder": "Crea una contraseña",
       "confirmPasswordPlaceholder": "Vuelve a ingresar tu contraseña",
-      "emailPlaceholder": "Ingresa tu correo (opcional)",
+      "emailPlaceholder": "Ingresa tu correo",
       "submit": "Crear cuenta",
       "pending": "Creando cuenta...",
       "signInCta": "¿Ya tienes una cuenta? Inicia sesión",
@@ -325,8 +325,10 @@
         "usernameRequired": "El nombre de usuario es obligatorio.",
         "usernameDuplicate": "Ese nombre de usuario ya está en uso.",
         "passwordRequired": "La contraseña es obligatoria.",
+        "passwordInvalid": "La contraseña debe tener al menos 8 caracteres.",
         "passwordMismatch": "Las contraseñas no coinciden.",
-        "emailInvalid": "Ingresa un correo válido o déjalo vacío."
+        "emailRequired": "El correo electrónico es obligatorio.",
+        "emailInvalid": "Ingresa una dirección de correo válida."
       }
     },
     "characters": {

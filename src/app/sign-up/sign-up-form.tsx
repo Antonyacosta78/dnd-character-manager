@@ -32,7 +32,9 @@ export interface SignUpFormCopy {
   usernameRequiredError: string;
   usernameDuplicateError: string;
   passwordRequiredError: string;
+  passwordInvalidError: string;
   passwordMismatchError: string;
+  emailRequiredError: string;
   emailInvalidError: string;
 }
 
@@ -139,7 +141,7 @@ export function SignUpForm({ copy }: { copy: SignUpFormCopy }) {
         <label htmlFor="sign-up-email" className="text-sm font-medium text-fg-primary">
           {copy.emailLabel}
         </label>
-        <Input id="sign-up-email" name="email" type="email" placeholder={copy.emailPlaceholder} autoComplete="email" />
+        <Input id="sign-up-email" name="email" type="email" placeholder={copy.emailPlaceholder} autoComplete="email" required />
       </div>
 
       {feedback ? <Alert intent={feedback.intent} description={feedback.message} /> : null}
@@ -178,11 +180,19 @@ function resolveErrorMessage(payload: RegisterApiError, copy: SignUpFormCopy): s
     return copy.usernameRequiredError;
   }
 
-  if (fieldIssues?.password?.some((issue) => issue === "required" || issue === "invalidType" || issue === "invalidFormat")) {
+  if (fieldIssues?.password?.some((issue) => issue === "required" || issue === "invalidType")) {
     return copy.passwordRequiredError;
   }
 
-  if (fieldIssues?.email?.some((issue) => issue === "invalidType" || issue === "invalidFormat")) {
+  if (fieldIssues?.password?.includes("invalidFormat")) {
+    return copy.passwordInvalidError;
+  }
+
+  if (fieldIssues?.email?.some((issue) => issue === "required" || issue === "invalidType")) {
+    return copy.emailRequiredError;
+  }
+
+  if (fieldIssues?.email?.includes("invalidFormat")) {
     return copy.emailInvalidError;
   }
 

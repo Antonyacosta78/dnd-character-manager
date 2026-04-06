@@ -4,11 +4,12 @@
 
 - Status: `in-progress`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-04-06`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-06` - `Antony Acosta` - Updated MVP registration contract to require email at sign-up so Better Auth account creation remains deterministic and avoids undefined-email provider failures.
 - `2026-04-05` - `Antony Acosta` - Added Phase 1 UX and flow requirements for client-side password confirmation on registration and immediate post-registration session establishment (auto sign-in) so onboarding reaches protected routes without a second auth step.
 - `2026-04-05` - `Antony Acosta` - Expanded Phase 1 scope to include MVP self-service registration (`username`, `password`, optional `email`) so sign-in is paired with account creation in the same auth foundation slice.
 - `2026-04-05` - `Antony Acosta` - Added the Phase 1 authentication implementation plan reference so execution can proceed with concrete sequencing.
@@ -25,11 +26,11 @@ This feature serves players first by protecting personal character libraries in 
 ## Must Have
 
 - Add a minimal sign-in entry path using username plus password that can establish a valid session in local and production environments.
-- Add a minimal self-service registration entry path using username plus password (with optional email) that can create an account in local and production environments.
+- Add a minimal self-service registration entry path using username plus password plus required email that can create an account in local and production environments.
 - Add simple client-side password confirmation on registration (password + confirm password match) before submitting to the server.
 - Automatically establish a signed-in session after successful registration so users can continue directly to protected character surfaces.
 - Require a unique username for each account at creation time.
-- Keep email optional (`nullable`) in the user profile for this MVP slice.
+- Require email input for MVP account creation while keeping email-verification flows deferred.
 - Resolve a current user identity for server-side app operations through a stable session context boundary.
 - Enforce user ownership scope for character-linked read and write operations.
 - Define unauthenticated behavior clearly for protected pages and API routes.
@@ -53,14 +54,14 @@ This feature serves players first by protecting personal character libraries in 
 
 ## Acceptance Criteria
 
-- A new user can register with `username + password` (and optional `email`) and receive stable validation errors for duplicate username or invalid payloads.
+- A new user can register with `username + password + email` and receive stable validation errors for duplicate username, missing email, or invalid payloads.
 - Registration UI performs a basic password confirmation check before submission and blocks mismatched passwords with clear user feedback.
 - A successful registration flow establishes a valid session and transitions the user directly into authenticated app behavior.
 - A signed-in user can reach protected surfaces and receives only their own scoped records.
 - An unauthenticated request to a protected page or route returns defined signed-out behavior.
 - Application use-cases that require identity read it from session context and enforce authz before repository access.
 - Account creation enforces a unique username invariant; duplicate usernames are rejected with stable validation behavior.
-- Email is optional for MVP account creation and storage; null email values do not block sign-in with username plus password.
+- Email is required for MVP account creation and must be valid before account creation proceeds.
 - MVP does not require email verification before character creation.
 - Character-linked persistence shape supports user ownership from first write (no global unowned records).
 - Existing foundation auth route integration remains wired and usable for the selected entry flow.

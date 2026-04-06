@@ -10,7 +10,7 @@ type RegisterValidationIssue = "required" | "invalidType" | "invalidFormat" | "d
 interface RegisterBody {
   username: string;
   password: string;
-  email: string | null;
+  email: string;
 }
 
 interface ResponseMeta {
@@ -108,6 +108,16 @@ export function createRegisterPostRoute({
           timestamp,
           fields: {
             username: ["duplicate"],
+          },
+        });
+      }
+
+      if (isPasswordConstraintError(error)) {
+        return createValidationErrorResponse({
+          requestId,
+          timestamp,
+          fields: {
+            password: ["invalidFormat"],
           },
         });
       }
@@ -214,7 +224,9 @@ function validateRegisterBody(body: unknown):
     fields.password = ["invalidType"];
   }
 
-  if (rawEmail !== undefined && rawEmail !== null && typeof rawEmail !== "string") {
+  if (rawEmail === undefined || rawEmail === null) {
+    fields.email = ["required"];
+  } else if (typeof rawEmail !== "string") {
     fields.email = ["invalidType"];
   }
 
@@ -227,7 +239,7 @@ function validateRegisterBody(body: unknown):
 
   const username = (rawUsername as string).trim();
   const password = rawPassword as string;
-  const email = typeof rawEmail === "string" ? rawEmail.trim() : null;
+  const email = typeof rawEmail === "string" ? rawEmail.trim() : "";
 
   if (username.length === 0) {
     fields.username = ["required"];
@@ -235,9 +247,13 @@ function validateRegisterBody(body: unknown):
 
   if (password.trim().length === 0) {
     fields.password = ["required"];
+  } else if (password.length < 8) {
+    fields.password = ["invalidFormat"];
   }
 
-  if (email && !isValidEmail(email)) {
+  if (email.length === 0) {
+    fields.email = ["required"];
+  } else if (!isValidEmail(email)) {
     fields.email = ["invalidFormat"];
   }
 
@@ -253,7 +269,7 @@ function validateRegisterBody(body: unknown):
     value: {
       username,
       password,
-      email: email || null,
+      email,
     },
   };
 }
@@ -269,7 +285,7 @@ async function createAccountWithAuthProvider(input: RegisterBody, requestHeaders
       body: {
         username: input.username,
         password: input.password,
-        email: input.email ?? undefined,
+        email: input.email,
         name: input.username,
       },
       headers: requestHeaders,
@@ -284,7 +300,7 @@ async function createAccountWithAuthProvider(input: RegisterBody, requestHeaders
     const result = await signUpEmail({
       asResponse: true,
       body: {
-        email: input.email ?? undefined,
+        email: input.email,
         password: input.password,
         username: input.username,
         name: input.username,
@@ -321,7 +337,7 @@ async function createSessionAfterRegistration(
     return resolveSessionCreationResult(result);
   }
 
-  if (typeof signInEmail === "function" && input.email) {
+  if (typeof signInEmail === "function") {
     const result = await signInEmail({
       asResponse: true,
       body: {
@@ -441,6 +457,20 @@ function isDuplicateUsernameError(error: unknown): boolean {
     normalizedErrorText.includes("duplicate") ||
     normalizedErrorText.includes("unique") ||
     normalizedErrorText.includes("taken")
+  );
+}
+
+function isPasswordConstraintError(error: unknown): boolean {
+  const normalizedErrorText = extractErrorText(error).toLowerCase();
+
+  if (!normalizedErrorText.includes("password")) {
+    return false;
+  }
+
+  return (
+    normalizedErrorText.includes("too short") ||
+    normalizedErrorText.includes("at least") ||
+    normalizedErrorText.includes("min")
   );
 }
 

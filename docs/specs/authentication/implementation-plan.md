@@ -4,11 +4,12 @@
 
 - Status: `ready`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-04-06`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-06` - `Antony Acosta` - Updated Phase 1 registration scope to require email input and validation so Better Auth registration remains deterministic in local and production environments.
 - `2026-04-05` - `Antony Acosta` - Created the Phase 1 implementation plan with sequenced vertical slices for username/password auth, ownership enforcement, `/characters` protection, and API-error-contract-aligned deny behavior.
 - `2026-04-05` - `Antony Acosta` - Updated Phase 1 scope to explicitly include MVP self-service registration (username + password, optional email), plus registration-focused flow, edge-case, and verification coverage.
 - `2026-04-05` - `Antony Acosta` - Updated registration execution details to include client-side password confirmation and automatic post-registration session establishment with direct transition to authenticated routes.
@@ -16,17 +17,17 @@
 ## Goal
 
 - Implement the first production-safe authentication and identity slice so the app can distinguish signed-out users from signed-in owners and enforce that boundary before character data access.
-- Include MVP self-service registration in the same foundation slice so new users can create accounts with `username` + `password` and optional `email`.
+- Include MVP self-service registration in the same foundation slice so new users can create accounts with `username` + `password` + required `email`.
 - Deliver the first protected route (`/characters`) end-to-end with deterministic signed-out behavior and owner-scoped results.
-- Lock identity persistence rules for MVP (`username` unique, `email` nullable, no email-verification gate) so future character features can safely build on stable ownership semantics.
+- Lock identity persistence rules for MVP (`username` unique, registration `email` required, no email-verification gate) so future character features can safely build on stable ownership semantics.
 
 In scope (this plan implements now):
 
 - Better Auth credential flow configured for username + password.
-- Self-service registration surface wired end-to-end (UI/client submission + server handling) for `username` + `password` with optional `email`.
+- Self-service registration surface wired end-to-end (UI/client submission + server handling) for `username` + `password` + required `email`.
 - Registration UX performs basic password confirmation before API submission.
 - Successful registration immediately establishes session state and transitions user into authenticated route behavior.
-- Identity schema updates for unique usernames and nullable emails.
+- Identity schema updates for unique usernames and required-email registration contract.
 - Session resolution and owner checks enforced in application use-cases before repository calls.
 - First character ownership repository/use-case path for `/characters`.
 - API/route deny-path behavior mapped to `docs/architecture/api-error-contract.md` codes.
@@ -43,7 +44,7 @@ Out of scope (intentionally deferred):
 Completion criteria:
 
 - User persistence enforces unique `username` and allows `email = null` without blocking account creation.
-- Registration creates an account for valid `username` + `password` (+ optional `email`) and rejects malformed payloads/duplicate usernames with contract-aligned validation errors.
+- Registration creates an account for valid `username` + `password` + `email` and rejects malformed payloads/duplicate usernames with contract-aligned validation errors.
 - Registration UI blocks password mismatch (`password` vs `confirmPassword`) before API submission.
 - Successful registration yields an authenticated session (cookie/session artifacts present) without requiring manual sign-in.
 - Username/password sign-in establishes a session that resolves through `SessionContextPort#getSessionContext()`.
@@ -104,26 +105,26 @@ Completion criteria:
 - `prisma/schema.prisma`
   - Reuse: current Better Auth model baseline and migration workflow.
   - Keep consistent: Prisma-first persistence changes with migration artifacts checked in.
-  - Do not copy forward: email-required identity assumptions that conflict with Phase 1 contract.
+- Do not copy forward: email-optional assumptions that conflict with Phase 1 contract.
 
 ## Files to Change
 
 - `prisma/schema.prisma` (risk: high)
   - Update `User` model for MVP identity contract:
     - add required unique `username`
-    - make `email` nullable while preserving uniqueness semantics for non-null values
+    - keep compatibility with existing `email` nullability while enforcing required email in registration input contracts
     - ensure Better Auth-compatible account/session relations stay intact.
   - Why risk: auth schema changes affect migrations, existing records, and provider expectations.
   - Depends on: Better Auth credential configuration in `src/auth.ts`.
 
 - `src/auth.ts` (risk: medium)
-  - Configure username/password auth behavior explicitly (including sign-up/sign-in expectations that align with nullable email).
+   - Configure username/password auth behavior explicitly (including sign-up/sign-in expectations that align with required email registration).
   - Keep email verification disabled for MVP flows.
   - Why risk: incorrect provider config can silently break session creation.
   - Depends on: updated Prisma user fields.
 
 - `src/app/sign-up/page.tsx` (risk: medium, if already present)
-  - Add a minimal registration UI that collects `username`, `password`, `confirmPassword`, and optional `email`, then calls the registration server path.
+  - Add a minimal registration UI that collects `username`, `password`, `confirmPassword`, and required `email`, then calls the registration server path.
   - Ensure client-side password confirmation mismatch blocks submission with localized feedback.
   - Must show contract-safe validation feedback for malformed payload and duplicate username.
   - Why risk: incorrect client/server integration can create confusing account-creation failure states.
@@ -192,7 +193,7 @@ Transport/UI:
   - Minimal username/password entry path that uses the configured Better Auth credential surface.
 
 - `src/app/sign-up/page.tsx`
-  - Minimal self-service registration entry path for username/password confirmation with optional email.
+  - Minimal self-service registration entry path for username/password confirmation with required email.
 
 Tests:
 
@@ -238,7 +239,7 @@ Trust boundaries and validation:
 
 - Untrusted: request params, cookies, headers, body payloads.
 - Validated boundary 1 (authentication): `SessionContextPort` resolves `userId` or signed-out null state.
-- Validated boundary 1a (registration input): registration route validates `username` + `password` required and `email` optional/nullable before provider call.
+- Validated boundary 1a (registration input): registration route validates `username` + `password` + `email` as required before provider call.
 - Validated boundary 1b (registration UX): client checks `password === confirmPassword` before request submission.
 - Validated boundary 2 (authorization): application use-case validates owner scope before any repository call.
 - Trusted internal: repository queries constrained by validated `ownerUserId`.
@@ -278,7 +279,7 @@ sequenceDiagram
   alt mismatch
     C-->>C: show mismatch error, do not call API
   else matches
-    C->>R: POST /api/auth/register { username, password, email? }
+    C->>R: POST /api/auth/register { username, password, email }
     alt malformed payload
       R-->>C: 400 REQUEST_VALIDATION_FAILED envelope
     else valid payload
@@ -399,7 +400,7 @@ Type ownership:
 ## Functions and Components
 
 - `createListOwnerCharactersUseCase(deps)`
-  - Input: optional filter params + implicit session context.
+   - Input: filter params + implicit session context.
   - Output: owner-scoped character summaries.
   - Side effects: none besides repository read.
   - Rule: must call `sessionContext.getSessionContext()` before repository access.
@@ -438,13 +439,13 @@ Rollout gating:
 ## Implementation Order
 
 1. Finalize identity schema contract
-   - Output: updated `prisma/schema.prisma` + migration with `username` unique and `email` nullable.
+   - Output: updated `prisma/schema.prisma` + migration with `username` unique and registration flow contract that requires `email`.
    - Verify: `bun run db:generate` and migration apply in dev DB.
    - Merge safety: yes (schema-only, no route behavior changed yet).
 
 2. Configure credential auth behavior
    - Output: updated `src/auth.ts` (+ any provider-required user field mapping).
-   - Verify: targeted auth adapter/session tests for signed-in and signed-out states; registration accepts optional email.
+    - Verify: targeted auth adapter/session tests for signed-in and signed-out states; registration requires email.
    - Merge safety: yes if existing routes remain backward compatible.
 
 3. Add registration route and minimal sign-up UI
@@ -495,7 +496,7 @@ Automated checks:
 
 Manual scenarios:
 
-- Create account with username/password and no email -> success.
+- Create account with username/password and no email -> `REQUEST_VALIDATION_FAILED`.
 - Attempt second account with same username -> `400 REQUEST_VALIDATION_FAILED`.
 - Submit malformed registration payload (missing/invalid username or password) -> `400 REQUEST_VALIDATION_FAILED`.
 - Submit mismatched password and confirm password -> inline mismatch error and no registration API request.
@@ -551,8 +552,8 @@ Backout:
 
 ## Definition of Done
 
-- [ ] Prisma schema + migration enforce username uniqueness and nullable email contract.
-- [ ] Self-service registration is implemented in Phase 1 (`username` + `password`, optional `email`) with contract-aligned validation errors.
+- [ ] Prisma schema + migration enforce username uniqueness and required-email registration contract.
+- [ ] Self-service registration is implemented in Phase 1 (`username` + `password` + required `email`) with contract-aligned validation errors.
 - [ ] Username/password auth flow is configured and session resolution contract holds for signed-in/signed-out requests.
 - [ ] Authn/authz checks run before character repository access in app-layer use-cases.
 - [ ] `/characters` is protected end-to-end and owner-scoped.

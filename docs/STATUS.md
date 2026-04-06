@@ -70,7 +70,7 @@ Checklist markers:
 - Confidence: `high`
 - Checklist
   - [x] Authentication entry and session lifecycle flow (sign-in implemented; registration now auto-signs users into an authenticated session)
-  - [x] Self-service registration entry flow (`username`, `password`, optional `email`) with client-side password confirmation
+- [x] Self-service registration entry flow (`username`, `password`, required `email`) with client-side password confirmation
   - [x] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
   - [x] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
   - [x] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
