@@ -338,5 +338,122 @@
       "lastUpdated": "Última actualización: {updatedAt}",
       "backHome": "Volver al inicio"
     }
+  },
+  "characterCore": {
+    "backToCharacters": "Volver a personajes",
+    "list": {
+      "createCta": "Crear personaje"
+    },
+    "builder": {
+      "stepOne": {
+        "title": "Paso 1: Concepto y mecánicas iniciales",
+        "description": "Captura el concepto del personaje y sus mecánicas de nivel 1 para crear el registro canónico.",
+        "nameLabel": "Nombre del personaje",
+        "namePlaceholder": "Por ejemplo: Aelar Windrider",
+        "conceptLabel": "Concepto",
+        "conceptPlaceholder": "Describe la fantasía de clase, tono y rol en la mesa.",
+        "classLabel": "Clase",
+        "classPlaceholder": "Selecciona una clase",
+        "classSourceLabel": "Fuente",
+        "levelLabel": "Nivel inicial",
+        "levelValue": "Nivel 1",
+        "acknowledgeWarning": "Entiendo y quiero continuar con esta advertencia.",
+        "save": "Crear y guardar personaje",
+        "saving": "Guardando personaje...",
+        "unsavedDraft": "Hay cambios en borrador sin guardar.",
+        "warnings": {
+          "conceptShort": "El concepto es muy corto. Agrega más contexto o reconoce la advertencia para continuar."
+        },
+        "errors": {
+          "generic": "No se pudo crear tu personaje. Inténtalo de nuevo.",
+          "validation": "Revisa los campos obligatorios antes de guardar.",
+          "loadClasses": "No se pudieron cargar opciones de clase desde el catálogo de reglas."
+        }
+      }
+    },
+    "sheet": {
+      "skeletonDescription": "La base de la hoja del personaje ya está activa. Más secciones de edición llegarán en los próximos cortes.",
+      "classLabel": "Clase",
+      "levelLabel": "Nivel",
+      "conceptLabel": "Concepto",
+      "revisionLabel": "Revisión",
+      "tabsAria": "Secciones de la hoja del personaje",
+      "tabs": {
+        "core": "Base",
+        "progression": "Progresión",
+        "inventory": "Inventario",
+        "spells": "Conjuros",
+        "notes": "Notas"
+      },
+      "save": "Guardar cambios",
+      "saving": "Guardando cambios...",
+      "dirty": "Cambios sin guardar",
+      "saved": "Todos los cambios guardados",
+      "nameLabel": "Nombre del personaje",
+      "notesLabel": "Notas",
+      "validation": {
+        "title": "Validación",
+        "hardTitle": "Problemas bloqueantes",
+        "warningTitle": "Advertencias",
+        "acknowledgeLabel": "Reconocer advertencia"
+      },
+      "inventory": {
+        "title": "Inventario",
+        "addRow": "Agregar objeto",
+        "labelPlaceholder": "Nombre del objeto",
+        "quantityLabel": "Cantidad",
+        "remove": "Quitar"
+      },
+      "spells": {
+        "title": "Conjuros",
+        "addRow": "Agregar conjuro",
+        "labelPlaceholder": "Nombre del conjuro",
+        "statusLabel": "Estado del conjuro",
+        "remove": "Quitar",
+        "statuses": {
+          "known": "Conocido",
+          "prepared": "Preparado",
+          "always": "Siempre"
+        }
+      },
+      "level": {
+        "title": "Subir de nivel",
+        "plan": "Planificar subida",
+        "finalize": "Finalizar nivel",
+        "planning": "Planificando...",
+        "finalizing": "Finalizando...",
+        "multiclassConfirm": "Confirmo subir de nivel en una clase diferente.",
+        "targetLevelLabel": "Nivel objetivo"
+      },
+      "share": {
+        "title": "Compartir",
+        "description": "Habilita compartir en modo solo lectura para este personaje.",
+        "enable": "Habilitar enlace",
+        "disable": "Deshabilitar enlace",
+        "enabled": "El enlace está habilitado.",
+        "disabled": "El enlace está deshabilitado."
+      },
+      "export": {
+        "title": "Exportar PDF",
+        "summary": "Exportar resumen",
+        "official": "Exportar formato oficial",
+        "saveThenExport": "Guardar y exportar",
+        "exportLastSaved": "Exportar último guardado"
+      },
+      "utilities": {
+        "trigger": "Compartir y exportar",
+        "title": "Compartir y exportar",
+        "description": "Gestiona el acceso de solo lectura y la exportación en PDF desde un solo lugar.",
+        "dismiss": "Cerrar"
+      },
+      "conflict": {
+        "title": "Se detectó un conflicto",
+        "description": "Existe una revisión más reciente en el servidor. Elige cómo resolver el guardado.",
+        "keepLocal": "Conservar local",
+        "keepServer": "Conservar servidor",
+        "reviewDifferences": "Revisar diferencias",
+        "changedSectionsLabel": "Secciones cambiadas"
+      }
+    }
   }
 }

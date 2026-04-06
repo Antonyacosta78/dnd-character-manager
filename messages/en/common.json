@@ -338,5 +338,122 @@
       "lastUpdated": "Last updated: {updatedAt}",
       "backHome": "Back to home"
     }
+  },
+  "characterCore": {
+    "backToCharacters": "Back to characters",
+    "list": {
+      "createCta": "Create character"
+    },
+    "builder": {
+      "stepOne": {
+        "title": "Step 1: Concept and initial mechanics",
+        "description": "Capture the character concept and first-level mechanics to create the canonical record.",
+        "nameLabel": "Character name",
+        "namePlaceholder": "For example: Aelar Windrider",
+        "conceptLabel": "Concept",
+        "conceptPlaceholder": "Describe the class fantasy, tone, and role at the table.",
+        "classLabel": "Class",
+        "classPlaceholder": "Select a class",
+        "classSourceLabel": "Source",
+        "levelLabel": "Starting level",
+        "levelValue": "Level 1",
+        "acknowledgeWarning": "I understand and want to continue with this warning.",
+        "save": "Create and save character",
+        "saving": "Saving character...",
+        "unsavedDraft": "Unsaved draft changes.",
+        "warnings": {
+          "conceptShort": "Concept is very short. Add more context or acknowledge the warning to continue."
+        },
+        "errors": {
+          "generic": "Could not create your character. Try again.",
+          "validation": "Please review required fields before saving.",
+          "loadClasses": "Could not load class options from the rules catalog."
+        }
+      }
+    },
+    "sheet": {
+      "skeletonDescription": "Character sheet foundation is active. More editing sections are coming in upcoming slices.",
+      "classLabel": "Class",
+      "levelLabel": "Level",
+      "conceptLabel": "Concept",
+      "revisionLabel": "Revision",
+      "tabsAria": "Character sheet sections",
+      "tabs": {
+        "core": "Core",
+        "progression": "Progression",
+        "inventory": "Inventory",
+        "spells": "Spells",
+        "notes": "Notes"
+      },
+      "save": "Save changes",
+      "saving": "Saving changes...",
+      "dirty": "Unsaved changes",
+      "saved": "All changes saved",
+      "nameLabel": "Character name",
+      "notesLabel": "Notes",
+      "validation": {
+        "title": "Validation",
+        "hardTitle": "Blocking issues",
+        "warningTitle": "Warnings",
+        "acknowledgeLabel": "Acknowledge warning"
+      },
+      "inventory": {
+        "title": "Inventory",
+        "addRow": "Add item",
+        "labelPlaceholder": "Item label",
+        "quantityLabel": "Quantity",
+        "remove": "Remove"
+      },
+      "spells": {
+        "title": "Spells",
+        "addRow": "Add spell",
+        "labelPlaceholder": "Spell label",
+        "statusLabel": "Spell status",
+        "remove": "Remove",
+        "statuses": {
+          "known": "Known",
+          "prepared": "Prepared",
+          "always": "Always"
+        }
+      },
+      "level": {
+        "title": "Level up",
+        "plan": "Plan level up",
+        "finalize": "Finalize level",
+        "planning": "Planning...",
+        "finalizing": "Finalizing...",
+        "multiclassConfirm": "I confirm leveling in a different class.",
+        "targetLevelLabel": "Target level"
+      },
+      "share": {
+        "title": "Share",
+        "description": "Enable read-only sharing for this character.",
+        "enable": "Enable share",
+        "disable": "Disable share",
+        "enabled": "Share is enabled.",
+        "disabled": "Share is disabled."
+      },
+      "export": {
+        "title": "Export PDF",
+        "summary": "Export summary",
+        "official": "Export official-like",
+        "saveThenExport": "Save then export",
+        "exportLastSaved": "Export last saved"
+      },
+      "utilities": {
+        "trigger": "Share and export",
+        "title": "Sharing and export",
+        "description": "Manage read-only share access and PDF exports from one place.",
+        "dismiss": "Close"
+      },
+      "conflict": {
+        "title": "Save conflict detected",
+        "description": "A newer server revision exists. Choose how to resolve this save.",
+        "keepLocal": "Keep local",
+        "keepServer": "Keep server",
+        "reviewDifferences": "Review differences",
+        "changedSectionsLabel": "Changed sections"
+      }
+    }
   }
 }

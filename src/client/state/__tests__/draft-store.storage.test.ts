@@ -141,4 +141,31 @@ describe("draft-store.storage", () => {
     assert.equal(drafts.some((draft) => draft.entityId === "char-1"), false);
     assert.equal(drafts.some((draft) => draft.entityId === "char-21"), true);
   });
+
+  it("reads envelopes with baseRevision and conflict metadata", () => {
+    const key = createDraftStorageKey("character-create", "with-revision");
+
+    globalThis.localStorage.setItem(
+      key,
+      JSON.stringify({
+        scope: "character-create",
+        entityId: "with-revision",
+        schemaVersion: 1,
+        updatedAt: "2026-04-04T00:00:00.000Z",
+        data: { name: "Aelar" },
+        isDirty: true,
+        baseRevision: 2,
+        conflict: {
+          baseRevision: 2,
+          serverRevision: 3,
+          changedSections: ["core"],
+        },
+      }),
+    );
+
+    const result = readPersistedDraft("character-create", "with-revision");
+
+    assert.equal(result?.baseRevision, 2);
+    assert.equal(result?.conflict?.serverRevision, 3);
+  });
 });

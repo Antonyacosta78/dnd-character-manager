@@ -4,11 +4,12 @@
 
 - Status: `proposed`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-04-06`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-06` - `Antony Acosta` - Reframed Character Core UX toward a dynamic workbench model inspired by DMV builder interaction patterns (step rail, live mechanics pulse, build/story mode split, and sticky action rail) while preserving Arcane Codex accessibility and conflict-safety contracts.
 - `2026-04-05` - `Antony Acosta` - Created the Character Core UX guide to define implementation-ready interaction, hierarchy, state, accessibility, and responsive behavior contracts for guided builder and free-edit sheet MVP delivery. (Made with OpenCode)
 
 ## Related Feature
@@ -39,6 +40,24 @@
 - Mobile users complete create -> edit -> level -> save without desktop fallback.
 - Override usage is intentional (acknowledged per warning), not accidental (blind proceed behavior).
 
+## Inspiration Baseline (DMV Analysis)
+
+Reference inspection artifact: `temp/character-core-dmv-inspiration.md`
+
+Patterns to adapt:
+
+1. **Stepper momentum:** visible sequence and completion signals reduce paralysis.
+2. **Always-on mechanics pulse:** immediate stat feedback builds trust and speeds decision-making.
+3. **Workbench action rail:** save/random/new/clone/export actions feel tool-like, not form-like.
+4. **Build vs Story separation:** users can switch between mechanical optimization and narrative authoring without losing context.
+5. **Progressive disclosure:** "show info" and "show selections" reduce noise while preserving depth.
+
+Patterns to avoid copying directly:
+
+- Over-dense icon-first controls that reduce accessibility clarity.
+- Ad/chrome interference and stacked repeated toolbars.
+- Hover-dependent or ambiguous interaction affordances.
+
 ## Information Architecture: Guided Builder + Free-Edit Sheet
 
 ### IA Principles
@@ -66,33 +85,169 @@ flowchart TD
   J --> K[Enter Free-Edit Sheet]
 ```
 
-### Free-Edit Sheet IA (Post-Create)
+### Workbench IA (Guided + Free-Edit Shared Shell)
 
-1. **Sticky summary strip (top):** name, class/level, HP/AC, save status, dirty indicator.
-2. **Primary edit zones (tabbed/section-nav):**
-   - Core
-   - Progression (Level Up)
-   - Inventory
+Use a single "Character Workbench" shell across create and edit to reduce context switching.
+See **ASCII Wireframes** below for implementation-oriented region maps and interaction hotspots.
+
+1. **Top action rail (sticky):** Save, Back, Next, Quick Start, Randomize Step, Export, Share state.
+2. **Left step rail:** ordered domains with completion/warning badges:
+   - Race
+   - Class/Level
+   - Ability Scores/Feats
+   - Background
+   - Proficiencies
    - Spells
-   - Notes/Custom
-3. **Secondary actions cluster:** Share toggle, Export PDF, Restore Draft/Conflict status.
-4. **Validation panel:** persistent entry point + contextual inline markers.
+   - Equipment
+   - Notes/Story
+3. **Center active canvas:** card-based option selection and rule-aware detail drawers.
+4. **Right pulse panel (sticky):** class/level, HP/AC, proficiency, saves/skills, key feature deltas.
+5. **Mode switch:** `Build` (mechanics) <-> `Story` (traits, ideals, bonds, flaws, backstory).
+6. **Selections drawer:** collapsible timeline of current picks and pending choices.
+
+### IA Layout Contract (Desktop)
+
+```text
+[Action Rail: Save | Back | Next | Quick Start | Randomize | Export]
+
+[Step Rail] [Active Canvas]                         [Pulse Panel]
+Race        option cards + info + filters           AC / HP / Speed
+Class       subclass and level choices              Saves / Skills
+Abilities   point buy/roll/standard                  Features / Slots
+...         pending choices + warnings               Dirty/Conflict state
+
+[Build | Story]  [Selections Drawer]
+```
+
+## ASCII Wireframes (Implementation Orientation)
+
+These are **communication wireframes**, not visual style comps. They define layout regions, sticky behavior, and high-frequency interaction hotspots while staying within Arcane Codex workbench constraints (dense, legible, low ornament, keyboard-safe).
+
+Legend:
+
+- `[*]` = high-frequency interaction hotspot
+- `[!]` = state-critical trust signal (save/validation/conflict)
+- `(sticky)` = remains visible while canvas scrolls
+
+### 1) Desktop Workbench Shell
+
+```text
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Action Rail (sticky): [Back*] [Next*] [Save*!] [Quick Start*] [Randomize Step*] [Export] [Share!]          │
+└───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────┬───────────────────────────────────────────────────────────────────────┬───────────────┐
+│ Step Rail (sticky)    │ Active Canvas (scroll region)                                         │ Pulse Panel   │
+│-----------------------│-----------------------------------------------------------------------│ (sticky)       │
+│ [Race]        ✓ / !   │ Step Header: Race [Show Info*] [Show Selections*]                    │---------------│
+│ [Class/Level] ○ / !   │ --------------------------------------------------------------------- │ Character     │
+│ [Abilities]   ○ / !   │ Option Cards (grid/list):                                             │ Pulse [!]     │
+│ [Background]  ○ / !   │  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐             │ AC / HP /     │
+│ [Proficiencies]○ / !  │  │ Elf            │  │ Dwarf         │  │ Human         │             │ Speed         │
+│ [Spells]      ○ / !   │  │ +2 DEX [Δ]     │  │ +2 CON [Δ]    │  │ +1 All [Δ]    │             │ Saves /       │
+│ [Equipment]   ○ / !   │  │ Select*        │  │ Select*       │  │ Select*       │             │ Skills        │
+│ [Notes/Story] ○       │  └───────────────┘  └───────────────┘  └───────────────┘             │ Features/     │
+│                       │                                                                       │ Slots         │
+│ Validation Summary [!]│ Pending Choices [!] -> links to first unresolved field*               │ Dirty/Saved/  │
+│ (jump links*)         │ Inline Error/Warning rows with acknowledge controls [!]               │ Conflict [!]  │
+└───────────────────────┴───────────────────────────────────────────────────────────────────────┴───────────────┘
+┌──────────────────────────────────────────────┬───────────────────────────────────────────────────────────────┐
+│ Mode Switch (sticky bottom): [Build*] [Story*]│ Selections Drawer (collapsible): Recent picks + pending [*]│
+└──────────────────────────────────────────────┴───────────────────────────────────────────────────────────────┘
+```
+
+### 2) Mobile Workbench Shell
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ Character Workbench                                          │
+│ Save State [Unsaved/Saved/Conflict!]                         │
+├──────────────────────────────────────────────────────────────┤
+│ Step Rail (segmented, horizontally scrollable):              │
+│ [Race*][Class*][Abilities*][Background*][Spells*][Equip*]    │
+├──────────────────────────────────────────────────────────────┤
+│ Active Canvas (single-column cards/forms)                    │
+│ - Step header + info toggle*                                 │
+│ - Option cards with delta chips [Δ] + Select*                │
+│ - Inline validation + acknowledge warning controls [!]       │
+│ - Pending choices jump list*                                 │
+│                                                              │
+│ Pulse Panel (collapsible bottom sheet):                      │
+│ [Handle] Character Pulse [expand/collapse*]                  │
+│   when expanded -> AC/HP/Speed, Saves/Skills, feature deltas │
+└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│ Sticky Bottom Actions: [Back*] [Next*] [Save*!] [••• More*] │
+│ More menu -> Quick Start, Randomize Step, Export, Share      │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### 3) Conflict Resolution Modal Flow State
+
+```text
+State trigger: user presses Save -> server revision mismatch detected [!]
+
+┌──────────────────────────────────────────────────────────────┐
+│ CONFLICT DETECTED                                            │
+│ Someone else (or another session) changed this character.    │
+│ Choose how to continue.                                      │
+│                                                              │
+│ Changed Sections: [Core] [Inventory] [Spells]               │
+│                                                              │
+│ Primary actions:                                              │
+│  [Review Differences*]  <- default focus (non-destructive)   │
+│  [Keep Local] [Keep Server]                                  │
+│                                                              │
+│ Secondary: [Cancel]                                           │
+└──────────────────────────────────────────────────────────────┘
+
+Review Differences* ->
+┌──────────────────────────────────────────────────────────────┐
+│ Section diff list (Core / Progression / Inventory / Spells / Notes) │
+│ Field-level diff panel                                       │
+│ Sticky footer: [Keep Local] [Keep Server] [Back]             │
+└──────────────────────────────────────────────────────────────┘
+
+Keep Local / Keep Server -> confirmation prompt for destructive choice ->
+result banner + preserved draft safety notice
+```
+
+### 4) Build vs Story Mode Comparison Snapshot
+
+```text
+┌─────────────────────────────────────┬─────────────────────────────────────┐
+│ BUILD MODE (mechanics-first)       │ STORY MODE (narrative-first)        │
+├─────────────────────────────────────┼─────────────────────────────────────┤
+│ Goal: produce valid mechanical save│ Goal: capture roleplay context       │
+│                                     │                                     │
+│ Visible by default:                 │ Visible by default:                  │
+│ - option cards + rule deltas [Δ]    │ - traits / ideals / bonds / flaws    │
+│ - pending choices + blockers [!]    │ - backstory, notes, pronouns, hooks  │
+│ - validation summary [!]             │ - writing guidance + examples         │
+│                                     │                                     │
+│ Pulse panel emphasis:                │ Pulse panel emphasis:                 │
+│ - AC/HP/saves/skills/features        │ - core mechanical anchors compact     │
+│                                     │                                     │
+│ Primary CTA: [Next]/[Save]           │ Primary CTA: [Save Notes]/[Save]     │
+│                                     │                                     │
+│ Must not hide: save/conflict state ! │ Must not hide: save/conflict state !  │
+└─────────────────────────────────────┴─────────────────────────────────────┘
+```
 
 ## Key User Journeys
 
 ### 1) First-Time Create (Campaign Player)
 
-- User starts guided builder, enters concept + core mechanics.
-- UI progressively discloses choices; unresolved required choices are explicit.
+- User starts in workbench with active first step and visible completion map.
+- Option cards provide immediate stat/rule deltas in pulse panel.
 - First save requires hard-valid state; soft warnings can be acknowledged and saved.
-- On success, user lands on free-edit with a visible success confirmation and clean draft state.
+- On success, user remains in same shell (no jarring mode jump), now in free-edit context with clean draft state.
 
 ### 2) Quick-Start One-Shot
 
-- User chooses preset from Step 1.
-- UI previews preset effects (what was auto-filled) before save.
-- User can undo preset or continue; no irreversible lock-in before first save.
-- Save CTA copy emphasizes speed + later editability.
+- User can choose Quick Start preset or Randomize Step from action rail.
+- Canvas shows what changed and pulse panel highlights mechanical deltas.
+- User can undo preset/random output before save; no irreversible lock-in before first save.
+- Save CTA copy emphasizes speed plus later editability.
 
 ### 3) Level-Up (Including Multiclass)
 
@@ -104,7 +259,7 @@ flowchart TD
 
 ### 4) Inventory and Spells Edits
 
-- Fast add/edit/remove interactions should be inline-first.
+- Fast add/edit/remove interactions should be inline-first and card-aware.
 - Custom entries are visibly marked as custom (not catalog-backed).
 - Save behavior matches core sheet contract (draft first, explicit save canonical).
 - Errors preserve unsaved edits and anchor user to first failing row/field.
@@ -133,6 +288,7 @@ flowchart TD
 3. Save CTA remains disabled until all visible soft warnings are either resolved or acknowledged.
 4. Acknowledged warnings persist with the character and are shown as "Acknowledged" on revisit.
 5. If warning context materially changes, acknowledgment resets for that warning code.
+6. Warning badges appear both on impacted controls and the owning step in the step rail.
 
 ### UX Copy Contract (Practical)
 
@@ -142,6 +298,8 @@ flowchart TD
 
 ## Mobile-First / Responsive Behavior Expectations
 
+The mobile wireframe above is the baseline behavior contract for section stacking, pulse collapse, and sticky action reachability.
+
 1. **Single-column baseline** under mobile breakpoints for builder and sheet editing.
 2. Sticky summary strip remains visible but collapses non-critical metadata first.
 3. Minimum tap target size: 44x44 CSS px for actionable controls.
@@ -149,6 +307,9 @@ flowchart TD
 5. Long tables (inventory/spells) must support row expansion rather than horizontal chaos.
 6. Critical CTAs (Save, Level Up Finalize) remain reachable without precision scrolling.
 7. No desktop-only interaction dependency (hover-only affordances are forbidden for required tasks).
+8. On mobile, step rail collapses to horizontal segmented navigation.
+9. Pulse panel collapses into an expandable bottom-sheet summary card.
+10. Action rail condenses to sticky bottom primary controls (`Back`, `Next`, `Save`, overflow menu).
 
 ## Offline/Local Draft + Conflict Resolution UX
 
@@ -208,6 +369,7 @@ Decision defaults and safeguards:
 2. Reuse `ui/*` primitives for control semantics and states.
 3. Use domain components for domain-critical semantics (stats/combat/validation/conflict signals).
 4. Keep `workbench` behavior dense and clear; reserve richer ornament for `codex` read surfaces.
+5. Use motion only to clarify causality (selection -> stat delta), not decorative flourish.
 
 ### Do / Do Not
 
@@ -217,6 +379,7 @@ Decision defaults and safeguards:
 | Keep key mechanical state visible in sticky summary | Hide class/level/save state behind deep tabs |
 | Pair icons/runes with text labels for critical meaning | Use icon-only state semantics as sole signal |
 | Use existing dialog/drawer patterns for conflict + confirm | Create custom modal behavior per feature |
+| Show card-level mechanical deltas before commit | Force users to infer downstream stat impact from raw text |
 
 ## UX States Checklist (Implementation + QA)
 
@@ -244,18 +407,18 @@ Decision defaults and safeguards:
 8. Keyboard and screen reader users can complete create/save/conflict resolution paths.
 9. Export flow clearly distinguishes unsaved vs saved source state before PDF generation.
 10. UI implementation uses Arcane Codex token/component contracts without one-off state styling.
+11. Workbench shell behavior stays consistent between create and edit contexts.
 
 ## Open Questions
 
-1. Should Character Core formalize a feature-level exception to global-state architecture conflict policy (current architecture note still states LWW/no warnings in v1)?
-2. Should quick-start presets ship with a visible confidence label (for example "table-ready" vs "needs review") to reduce false confidence for first-time users?
-3. Should mobile stat summary remain always sticky (`8A`) or shift to hybrid collapsible (`8E`) if vertical pressure is too high in real device QA?
+1. Should quick-start presets ship with visible confidence labels (for example "table-ready" vs "needs review") in MVP or post-MVP?
+2. Should randomize controls operate at full-character scope in MVP, or remain step-scoped only?
+3. Should pulse panel include optional compact dice shortcuts in MVP, or stay read-only for scope safety?
 
 ## Recommended Follow-Up Docs
 
 - `docs/specs/character-core/implementation-plan.md` (wire this UX contract into component/state/tasks).
 - `docs/specs/character-core/test-plan.md` (define UX and accessibility scenario coverage).
-- Update `docs/architecture/global-state-management.md` if conflict-policy baseline changes from LWW/no-warning to explicit choice prompt.
 
 ## Related Docs
 
@@ -268,4 +431,4 @@ Decision defaults and safeguards:
 
 ## Related Implementation Plan
 
-- `docs/specs/character-core/implementation-plan.md` (to be created)
+- `docs/specs/character-core/implementation-plan.md`

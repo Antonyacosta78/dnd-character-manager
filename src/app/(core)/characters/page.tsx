@@ -16,6 +16,13 @@ export default async function CharactersPage() {
 
   return (
     <div className="space-y-4 rounded-radius-sm border border-border-default bg-bg-surface p-4 shadow-shadow-soft">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-lg font-semibold text-fg-primary">{t("auth.characters.title")}</h1>
+        <Link href="/characters/new" className="text-sm text-accent-rubric underline-offset-2 hover:underline">
+          {t("characterCore.list.createCta")}
+        </Link>
+      </div>
+
       {characters.length === 0 ? (
         <p className="text-sm text-fg-secondary">{t("auth.characters.emptyState")}</p>
       ) : (
@@ -25,7 +32,9 @@ export default async function CharactersPage() {
               key={character.id}
               className="rounded-radius-sm border border-border-default bg-bg-elevated px-4 py-3 shadow-shadow-soft"
             >
-              <p className="font-semibold text-fg-primary">{character.name}</p>
+              <Link href={`/characters/${character.id}`} className="font-semibold text-fg-primary underline-offset-2 hover:underline">
+                {character.name}
+              </Link>
               <p className="mt-1 text-xs text-fg-muted">
                 {t("auth.characters.lastUpdated", {
                   updatedAt: character.updatedAt.toISOString(),
