@@ -20,6 +20,7 @@ import {
 function createEmptyByScopeState(): Record<DraftScope, Record<string, DraftEnvelope>> {
   return {
     "character-create": {},
+    "character-sheet": {},
     "progression-plan": {},
     "branch-edit": {},
     "snapshot-prepare": {},
@@ -235,6 +236,76 @@ export function createDraftStoreWithOptions(options: CreateDraftStoreOptions = {
         ...current,
         updatedAt: now().toISOString(),
         isDirty: false,
+        conflict: undefined,
+      };
+
+      set((state) => ({
+        ...state,
+        byScope: writeScopeDraft(state.byScope, nextEnvelope),
+      }));
+
+      if (trigger) {
+        persistDraft(nextEnvelope);
+      }
+    },
+
+    setBaseRevision(scope, entityId, baseRevision, trigger = "submit") {
+      const current = get().byScope[scope][entityId] ?? null;
+
+      if (!current) {
+        return;
+      }
+
+      const nextEnvelope: DraftEnvelope = {
+        ...current,
+        updatedAt: now().toISOString(),
+        baseRevision,
+      };
+
+      set((state) => ({
+        ...state,
+        byScope: writeScopeDraft(state.byScope, nextEnvelope),
+      }));
+
+      if (trigger) {
+        persistDraft(nextEnvelope);
+      }
+    },
+
+    markConflict(scope, entityId, conflict, trigger = "save") {
+      const current = get().byScope[scope][entityId] ?? null;
+
+      if (!current) {
+        return;
+      }
+
+      const nextEnvelope: DraftEnvelope = {
+        ...current,
+        updatedAt: now().toISOString(),
+        conflict,
+      };
+
+      set((state) => ({
+        ...state,
+        byScope: writeScopeDraft(state.byScope, nextEnvelope),
+      }));
+
+      if (trigger) {
+        persistDraft(nextEnvelope);
+      }
+    },
+
+    clearConflict(scope, entityId, trigger = "save") {
+      const current = get().byScope[scope][entityId] ?? null;
+
+      if (!current) {
+        return;
+      }
+
+      const nextEnvelope: DraftEnvelope = {
+        ...current,
+        updatedAt: now().toISOString(),
+        conflict: undefined,
       };
 
       set((state) => ({

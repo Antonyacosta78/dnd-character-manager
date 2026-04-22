@@ -1,5 +1,6 @@
 export const DRAFT_SCOPES = [
   "character-create",
+  "character-sheet",
   "progression-plan",
   "branch-edit",
   "snapshot-prepare",
@@ -21,6 +22,12 @@ export interface DraftEnvelope<TData extends DraftPayload = DraftPayload> {
   updatedAt: string;
   data: TData;
   isDirty: boolean;
+  baseRevision?: number;
+  conflict?: {
+    baseRevision: number;
+    serverRevision: number;
+    changedSections: string[];
+  };
 }
 
 export interface DraftStoreState {
@@ -42,6 +49,27 @@ export interface DraftStoreActions {
   ): void;
   clearDraft(scope: DraftScope, entityId: string): void;
   markSaved(
+    scope: DraftScope,
+    entityId: string,
+    trigger?: Extract<DraftPersistenceTrigger, "save" | "submit">,
+  ): void;
+  setBaseRevision(
+    scope: DraftScope,
+    entityId: string,
+    baseRevision: number,
+    trigger?: Extract<DraftPersistenceTrigger, "save" | "submit">,
+  ): void;
+  markConflict(
+    scope: DraftScope,
+    entityId: string,
+    conflict: {
+      baseRevision: number;
+      serverRevision: number;
+      changedSections: string[];
+    },
+    trigger?: Extract<DraftPersistenceTrigger, "save" | "submit">,
+  ): void;
+  clearConflict(
     scope: DraftScope,
     entityId: string,
     trigger?: Extract<DraftPersistenceTrigger, "save" | "submit">,

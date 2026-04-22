@@ -82,6 +82,8 @@ function isDraftEnvelope(value: unknown): value is DraftEnvelope {
   const schemaVersion = value.schemaVersion;
   const updatedAt = value.updatedAt;
   const isDirty = value.isDirty;
+  const baseRevision = value.baseRevision;
+  const conflict = value.conflict;
 
   if (typeof scope !== "string" || !isDraftScope(scope)) {
     return false;
@@ -101,6 +103,44 @@ function isDraftEnvelope(value: unknown): value is DraftEnvelope {
 
   if (typeof isDirty !== "boolean") {
     return false;
+  }
+
+  if (
+    baseRevision !== undefined &&
+    (typeof baseRevision !== "number" || !Number.isInteger(baseRevision) || baseRevision < 1)
+  ) {
+    return false;
+  }
+
+  if (conflict !== undefined) {
+    if (!isRecord(conflict)) {
+      return false;
+    }
+
+    const candidate = conflict as Record<string, unknown>;
+
+    if (
+      typeof candidate.baseRevision !== "number" ||
+      !Number.isInteger(candidate.baseRevision) ||
+      candidate.baseRevision < 1
+    ) {
+      return false;
+    }
+
+    if (
+      typeof candidate.serverRevision !== "number" ||
+      !Number.isInteger(candidate.serverRevision) ||
+      candidate.serverRevision < 1
+    ) {
+      return false;
+    }
+
+    if (
+      !Array.isArray(candidate.changedSections) ||
+      !candidate.changedSections.every((section) => typeof section === "string")
+    ) {
+      return false;
+    }
   }
 
   return isRecord(value.data);

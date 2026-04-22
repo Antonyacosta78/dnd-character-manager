@@ -75,11 +75,16 @@ describe("draft-store actions and selectors", () => {
     );
 
     store.getState().markSaved("character-create", "hero-1", "submit");
+    store.getState().setBaseRevision("character-create", "hero-1", 3, "submit");
 
     const stateAfterSave = store.getState();
     assert.equal(
       selectDraftIsDirty(stateAfterSave, "character-create", "hero-1"),
       false,
+    );
+    assert.equal(
+      selectDraftEnvelope(stateAfterSave, "character-create", "hero-1")?.baseRevision,
+      3,
     );
 
     store.getState().clearDraft("character-create", "hero-1");
@@ -155,5 +160,40 @@ describe("draft-store actions and selectors", () => {
     const state = store.getState();
 
     assert.equal(selectDraftIsDirty(state, "character-create", "hero-tie"), false);
+  });
+
+  it("stores and clears conflict metadata", () => {
+    const store = createDraftStore();
+
+    store
+      .getState()
+      .patchDraft("character-create", "hero-conflict", { name: "Aelar" });
+
+    store.getState().markConflict(
+      "character-create",
+      "hero-conflict",
+      {
+        baseRevision: 1,
+        serverRevision: 2,
+        changedSections: ["core"],
+      },
+      "save",
+    );
+
+    assert.deepEqual(
+      selectDraftEnvelope(store.getState(), "character-create", "hero-conflict")?.conflict,
+      {
+        baseRevision: 1,
+        serverRevision: 2,
+        changedSections: ["core"],
+      },
+    );
+
+    store.getState().clearConflict("character-create", "hero-conflict", "save");
+
+    assert.equal(
+      selectDraftEnvelope(store.getState(), "character-create", "hero-conflict")?.conflict,
+      undefined,
+    );
   });
 });

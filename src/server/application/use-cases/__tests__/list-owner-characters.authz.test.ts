@@ -21,6 +21,15 @@ describe("createListOwnerCharactersUseCase", () => {
           repositoryCalls += 1;
           return [];
         },
+        async createCharacter() {
+          throw new Error("not used");
+        },
+        async getByIdForOwner() {
+          throw new Error("not used");
+        },
+        async saveCanonical() {
+          throw new Error("not used");
+        },
       },
     });
 
@@ -46,6 +55,15 @@ describe("createListOwnerCharactersUseCase", () => {
             },
           ];
         },
+        async createCharacter() {
+          throw new Error("not used");
+        },
+        async getByIdForOwner() {
+          throw new Error("not used");
+        },
+        async saveCanonical() {
+          throw new Error("not used");
+        },
       },
     });
 
@@ -67,6 +85,15 @@ describe("createListOwnerCharactersUseCase", () => {
         async listByOwner() {
           repositoryCalls += 1;
           return [];
+        },
+        async createCharacter() {
+          throw new Error("not used");
+        },
+        async getByIdForOwner() {
+          throw new Error("not used");
+        },
+        async saveCanonical() {
+          throw new Error("not used");
         },
       },
     });

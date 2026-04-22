@@ -4,13 +4,19 @@
 
 - Status: `ready`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-04-06`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-04-06` - `Antony Acosta` - Added reference to `implementation-plan-v2.md` as the active update path reflecting shipped baseline and DMV-inspired workbench uplift sequencing.
+- `2026-04-06` - `Antony Acosta` - Added DMV-inspired workbench UX iteration slices (step rail, live pulse panel, build/story mode split, and dynamic option-card canvases) so Character Core can evolve beyond form-heavy interaction while staying aligned with Arcane Codex and existing conflict-safety contracts.
 - `2026-04-05` - `Antony Acosta` - Aligned plan dependencies and verification criteria after global-state conflict policy baseline moved to explicit conflict-choice handling for user-authored canonical records.
 - `2026-04-05` - `Antony Acosta` - Created the Character Core implementation plan with phased, repo-aware slices for create/edit/level/save, catalog-driven validation, sharing/export, and mobile/offline conflict handling so engineering can execute MVP in merge-safe increments.
+
+## Active Update Path
+
+- For ongoing implementation sequencing from current branch reality, use: `docs/specs/character-core/implementation-plan-v2.md`.
 
 ## Goal
 
@@ -22,6 +28,7 @@ In scope (this plan implements now):
 
 - Canonical server-side Character Core persistence model and repositories.
 - Guided builder start (concept + initial mechanics) plus transition to free-edit sheet.
+- Dynamic workbench shell for create/edit routes: step rail, active canvas, live pulse panel, sticky action rail.
 - Save/update flow with hard vs soft validation and persisted warning overrides.
 - Level-up plan/finalize flow with deterministic auto-apply + unresolved-choice gate.
 - Multiclass class-change confirmation and level-history write contract.
@@ -451,7 +458,7 @@ Acceptance criteria mapping used below:
    - Merge safety: yes (additive routes).
 
 3. Phase 2: free-edit sheet structure + validation surfaces
-   - Output: `[id]` sheet route, sticky summary, tabbed edit zones, validation summary/inline markers, warning acknowledgment persistence.
+   - Output: `[id]` sheet route with workbench shell (step rail + active canvas + live pulse panel), sticky action rail, validation summary/inline markers, warning acknowledgment persistence.
    - Acceptance: `AC2`, `AC7`, baseline of `AC10`.
    - Verify: component tests + keyboard/focus manual checks + `bun run lint`.
    - Merge safety: yes (can ship before leveling).
@@ -475,7 +482,7 @@ Acceptance criteria mapping used below:
    - Merge safety: yes (feature flags optional).
 
 7. Phase 6: mobile hardening + accessibility pass
-   - Output: responsive adjustments for summary strip, section nav, inventory/spell row expansion, CTA reachability, keyboard/screen-reader fixes.
+   - Output: responsive adjustments for workbench shell (segmented step rail, collapsible pulse panel, sticky bottom action controls), inventory/spell row expansion, CTA reachability, keyboard/screen-reader fixes.
    - Acceptance: `AC10`.
    - Verify: mobile viewport E2E smoke + a11y manual checks.
    - Merge safety: yes (UI-only hardening).
@@ -491,6 +498,64 @@ Acceptance criteria mapping used below:
    - Acceptance: all ACs closed with evidence.
    - Verify: `bun run lint` + targeted `bun test` suites + final manual smoke matrix.
    - Merge safety: yes.
+
+## Workbench UX Iteration Slices (DMV-Inspired)
+
+These slices refine interaction quality without changing canonical Character Core contracts.
+
+1. Slice W1: shared workbench shell
+   - Scope: unify `/characters/new` and `/characters/[id]` into same shell pattern.
+   - Deliverables:
+     - Step rail with completion and warning badges.
+     - Sticky action rail (`Save`, `Back`, `Next`, `Quick Start`, `Randomize Step`, `Export`).
+     - Right-side live pulse panel (class/level, AC/HP, proficiency, saves/skills snapshot).
+   - Primary files:
+     - `src/components/character-core/character-sheet-layout.tsx`
+     - `src/components/character-core/character-builder-step-one.tsx`
+     - `messages/en/common.json`, `messages/es/common.json`
+   - Validation:
+     - keyboard navigation across rails/panel
+     - save/conflict states visible in action rail
+
+2. Slice W2: dynamic option-card canvas
+   - Scope: replace form-like selects with card-based choices where possible.
+   - Deliverables:
+     - Race/Class/Background option cards with concise delta chips (`+2 DEX`, `speed +5`, `new proficiency`).
+     - Rule info disclosure panel (collapsed by default).
+     - "Show selections" drawer summarizing current picks and unresolved nodes.
+   - Primary files:
+     - `src/components/character-core/character-builder-step-one.tsx`
+     - `src/components/character-core/validation-summary.tsx`
+   - Validation:
+     - selection updates pulse panel causally
+     - unresolved required choices stay explicit
+
+3. Slice W3: build/story mode split
+   - Scope: separate mechanical and narrative editing modes without route split.
+   - Deliverables:
+     - `Build` mode (mechanics-heavy surfaces).
+     - `Story` mode (traits, ideals, bonds, flaws, notes/backstory).
+     - mode switch preserves unsaved state and conflict context.
+   - Primary files:
+     - `src/components/character-core/character-sheet-layout.tsx`
+     - `src/components/character-core/inventory-editor.tsx`
+     - `src/components/character-core/spells-editor.tsx`
+   - Validation:
+     - no state loss across mode switches
+     - warning and dirty indicators remain accurate in both modes
+
+4. Slice W4: mobile parity hardening
+   - Scope: ensure workbench quality on small screens.
+   - Deliverables:
+     - segmented horizontal step rail
+     - collapsible pulse panel bottom sheet
+     - sticky bottom action controls
+   - Primary files:
+     - `src/components/character-core/character-sheet-layout.tsx`
+     - `src/app/(core)/characters/[id]/page.tsx`
+   - Validation:
+     - mobile smoke scenarios for create -> level -> save
+     - VoiceOver/NVDA checks for mode switch and rail controls
 
 ## Verification
 
@@ -512,6 +577,8 @@ Manual scenarios:
 - Share path: enabled token reads succeed; disable immediately revokes access.
 - Export path: save-then-export vs export-last-saved behavior is explicit.
 - Offline path: edit offline, refresh, restore draft, reconnect with conflict prompt.
+- Workbench path: step rail badges, pulse panel deltas, and selections drawer stay in sync after each choice.
+- Mode path: Build <-> Story switching preserves dirty state, warnings, and base revision.
 
 Observability checks:
 
