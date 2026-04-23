@@ -6,6 +6,7 @@
       "name": "dnd-character-manager",
       "dependencies": {
         "@better-auth/prisma-adapter": "^1.4.2",
+        "@nextwrappers/core": "^1.1.2",
         "@prisma/client": "^5.22.0",
         "better-auth": "^1.4.2",
         "next": "16.1.7",
@@ -217,6 +218,8 @@
     "@next/swc-win32-arm64-msvc": ["@next/swc-win32-arm64-msvc@16.1.7", "", { "os": "win32", "cpu": "arm64" }, "sha512-S0n3KrDJokKTeFyM/vGGGR8+pCmXYrjNTk2ZozOL1C/JFdfUIL9O1ATaJOl5r2POe56iRChbsszrjMAdWSv7kQ=="],
 
     "@next/swc-win32-x64-msvc": ["@next/swc-win32-x64-msvc@16.1.7", "", { "os": "win32", "cpu": "x64" }, "sha512-mwgtg8CNZGYm06LeEd+bNnOUfwOyNem/rOiP14Lsz+AnUY92Zq/LXwtebtUiaeVkhbroRCQ0c8GlR4UT1U+0yg=="],
+
+    "@nextwrappers/core": ["@nextwrappers/core@1.1.2", "", {}, "sha512-MUcKrAJzJCVoBqFHREjaxixe/BRE/XgwqOTq68ku4DZNZ3Mi+1CwtjG2gAV3kmU3po7CBcqVxuyH57mR1QBCHw=="],
 
     "@noble/ciphers": ["@noble/ciphers@2.1.1", "", {}, "sha512-bysYuiVfhxNJuldNXlFEitTVdNnYUc+XNJZd7Qm2a5j1vZHgY+fazadNFWFaMK/2vye0JVlxV3gHmC0WDfAOQw=="],
 
