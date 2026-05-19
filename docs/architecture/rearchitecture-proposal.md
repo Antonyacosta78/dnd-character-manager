@@ -4,7 +4,7 @@
 
 - Status: `draft`
 - Created At: `2026-04-20`
-- Last Updated: `2026-04-25`
+- Last Updated: `2026-05-13`
 - Owner: `Antony Acosta`
 
 # Summary
@@ -1074,9 +1074,9 @@ Unexpected internal failures must:
 
 This redesign will include new coding standards to the backend code, those should be recorded in the `.rulesync/` folder as new rules or edits to the existing rules. The description of these rules will describe if there is wiggle room in applying them
 
-### Functions over classes
+### Prefer functions over classes
 
-Functions are the new first-class citizen, this is because they are easier to maintain and keep a single responsibility. Use functions or function collections (objects with functions as properties) before classes.
+Functions are the new first-class citizen, this is because they are easier to maintain and keep a single responsibility. Use functions or function collections (objects with functions as properties) before classes. This is not to say that you cannot use classes, this rule makes it so functions are preferred over classes when there is no clear advantage over using classes
 
 #### Examples
 
@@ -1504,3 +1504,79 @@ describe("POST /api/characters", () => {
 ```
 
 Endpoint-level tests are useful, but they do not replace unit tests for the backend code under `src/server`.
+
+# Open Questions
+
+## Critical Decision Gates
+
+1. Does this proposal formally supersede `docs/architecture/back-end-architecture.md` and backend sections of `docs/architecture/app-architecture.md`, or remain an additive draft until migration milestones are met?
+A: Yes, this formally replaces `docs/architecture/back-end-architecture.md` and `docs/architecture/app-architecture.md`, the idea is that those documents will be rewritten in order to match the new architecture and this will be left as an artifact to prove that the rearchitecture happened (changing its status to `implemented`)
+2. Is the migration strategy a full rewrite or an incremental coexistence model?
+A: Full Rewrite
+3. If coexistence is allowed, what is the canonical source of truth when accepted architecture docs conflict with this proposal?
+A: Coexistence is not allowed.
+4. Are `src/server/import/**` and catalog lineage/publish/read-model boundaries in scope for this redesign now, or explicitly deferred?
+A: import and catalog are to deferred since they are pending rearchitecturing/reimplementation themselves, as part of this plan, they are to be send to a `_deprecated` folder (taken out of the project).
+5. Must API/CLI external contract compatibility remain strict during migration (`docs/architecture/api-error-contract.md`)?
+A: API/CLI external contract should be adapted to this architecture's proposal. this includes editing `docs/architecture/api-error-contract.md` too. 
+
+## Architecture Shape and Dependency Model
+
+6. Are Ports/Adapters/Composition removed entirely, or re-expressed under Services while preserving dependency inversion?
+A: Removed entirely, this is not a relabeling but a new paradigm on how to think about the backend.
+7. If Ports are removed, what formal contract pattern replaces them for testability and implementation swapability (especially DB, Session, and RulesCatalog capabilities)?
+A: Mocks for testability, we are not considering implementation swapability because it is not a concern, we can allow to have dependencies on specific technologies
+8. Where does composition/wiring live in the new model, and is there still an explicit composition root?
+A: it is a concern of services, the only exception to this (as of now) is app bootstrapping (loading the env and other operations needed at start).
+9. Is this redesign primarily a structural rename/reorganization, or does it intentionally change runtime semantics and governance?
+A: It intentionally changes runtime semantics and governance, it is a different way of thinking.
+
+## Auth, Middleware, and Policy Boundaries
+
+10. Which authorization checks belong only in entrypoint middleware, and which must still be enforced in orchestrators as defense-in-depth?
+A: Authorization checks that depend on business logic and records that are NOT ones done for authentication/permission handling are to be enforced in orchestrator.
+11. What is the authoritative authorization policy model for v1 (owner-based, role-based, admin override, policy matrix), and where is that policy defined?
+A: Owner based, it is not defined, the policy is simple and remains as is right onw
+12. How should session resolution failures be classified vs unauthenticated caller failures to avoid ambiguous handling?
+A: Both have the same result: cannot get identification of caller, so both should be handled the same
+
+## Transport and Entrypoint Decisions
+
+13. Are Server Actions/Server Functions both long-term entrypoints, or is one now preferred/deprecated?
+A: Both are long-term entrypoints, even if one is more favored than the other, both  are available for implementation
+14. How should provider-owned auth routing (`src/app/api/auth/[...all]/route.ts`) fit the framework-wiring-only rule for route files?
+A: they should be replaced with in-house endpoints and better auth should be used as a **service**. 
+15. Should all `src/app/api/**/route.ts` modules become pure wiring re-exports immediately, or is phased conversion allowed?
+A: Immediately, this is a one-sweep conversion.
+16. What naming/traceability convention prevents collisions for dynamic or similarly named routes in `src/server/entrypoint/api/**`?
+A: Decided on a case by case basis, the files under `src/server/entrypoint/api/**` will be used as libraries (many endpoints with many concerns per file, scoped to the concern of that file).
+17. Should existing CLI entrypoints be moved from `src/server/cli/**` to `src/server/entrypoint/cli/**` in this migration phase?
+A: Yes, Moved and Adapted to the new architecture, with the exception pointed before for the catalog. 
+
+## Services and Data Boundaries
+
+18. Should `RulesCatalog` remain a first-class service boundary with its own typed contract and provider parity obligations?
+A: RulesCatalog will be deprecated
+19. How should `DATA_INTEGRITY_MODE` behavior (`strict`/`warn`/`off`) and fingerprint/lineage checks map into the new layers/services model?
+A: everything related to catalog will be deprecated
+20. Which transaction boundary policy is authoritative: orchestration-owned unit-of-work, service-internal atomic capability methods, or both by rule?
+A: As per this proposal: "Transaction clients and transaction-scoped repository wiring must remain inside the DB Service boundary."
+21. DB Service examples use repository classes, while code standards prefer functions. Which style is normative for service implementation?
+A: This is a formal exception for the use of classes, using a repository class keeps better parity and a more normal architecture.
+## Error Contract and Compatibility
+
+22. May internal error taxonomy change while preserving the external API/CLI envelope and stable error code contract unchanged?
+A: Yes
+23. If internal taxonomy changes are allowed, what explicit mapping policy guarantees backwards-compatible HTTP status, CLI exit codes, and envelope shape during migration?
+A: No explicit policy guarantees that it stays stable, this should be checked at implementation time
+24. Should the proposed `entity` error field remain internal diagnostics only, or be exposed in transport payloads?
+A: Internal diagnostics, should be shown for debugging only.
+
+## Rollout Governance and Completion
+
+25. What is the minimum acceptance bar for declaring migration complete (endpoint coverage, contract tests, compatibility checks, and import/runtime parity where applicable)?
+A: The rollout plan is completed when all the backend is working on this new architecture.
+26. Is a rollback/fallback mechanism required during partial migration (feature flags, dual-path routing, or endpoint-level fallback)?
+A: Partial migration is not supported
+27. If "architecture cannot be deviated from" remains a hard rule, what formal exception process exists for verified edge cases (for example ADR/change request)?
+A: a proposal/request or explicit architecture document, this should only be done if **the task cannot possibly be done under this architecture**
