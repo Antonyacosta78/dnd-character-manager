@@ -11,6 +11,7 @@
 - Created At: `YYYY-MM-DD`
 - Last Updated: `YYYY-MM-DD`
 - Owner: `<name or team>` (human owner, not tool)
+- Template Version: `v2`
 
 ## Changelog (Required)
 

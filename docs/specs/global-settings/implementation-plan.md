@@ -4,11 +4,13 @@
 
 - Status: `completed`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Renamed per-game scope references to per-adventure terminology to match planned instance naming across roadmap artifacts. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Synced plan to shipped implementation outcomes, including per-control eased save-feedback overlays (`900ms`), selector/action hook stability updates to prevent snapshot loops, and completed DoD checklist state. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Expanded MVP scope to include an experimental theme border-radius setting with typed presets (`none` to `pronounced`) and updated plan details for contracts, actions/selectors, persistence/fallback validation, and verification coverage. (Made with OpenCode)

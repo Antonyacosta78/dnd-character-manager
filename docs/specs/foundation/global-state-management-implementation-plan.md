@@ -4,11 +4,13 @@
 
 - Status: `draft`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-04` - `OpenCode` - Created initial implementation plan from accepted architecture decisions for draft/workflow global state.
 - `2026-04-04` - `OpenCode` - Clarified that this plan directly implements the architecture decision and intentionally does not require a separate feature spec.
 

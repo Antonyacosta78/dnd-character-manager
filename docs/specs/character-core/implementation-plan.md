@@ -4,11 +4,13 @@
 
 - Status: `ready`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Aligned plan dependencies and verification criteria after global-state conflict policy baseline moved to explicit conflict-choice handling for user-authored canonical records.
 - `2026-04-05` - `Antony Acosta` - Created the Character Core implementation plan with phased, repo-aware slices for create/edit/level/save, catalog-driven validation, sharing/export, and mobile/offline conflict handling so engineering can execute MVP in merge-safe increments.
 

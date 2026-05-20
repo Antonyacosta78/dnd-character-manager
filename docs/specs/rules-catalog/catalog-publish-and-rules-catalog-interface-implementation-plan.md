@@ -4,11 +4,13 @@
 
 - Status: `completed`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked implementation plan completed after merge, closed Definition of Done items, and recorded implementation evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created implementation plan for foundation publish/read-model delivery.
 - `2026-04-04` - `Antony Acosta` - Incorporated resolved decisions for publish strategy, activation protocol, payload size policy, and runtime cache posture. Made with OpenCode.
