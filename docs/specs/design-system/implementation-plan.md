@@ -4,11 +4,13 @@
 
 - Status: `completed`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Synced Arcane Codex contract defaults to `2D` + `bookish`, aligned `.rulesync` guidance, and marked implementation Definition of Done checklist complete with verification evidence. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Recorded implementation decisions for split `workbench`/`codex` routes, runtime schema validation in this slice, and v1 rune/icon semantics so execution evidence aligns with plan scope. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; plan remains draft because design-system implementation has not started in code. (Made with OpenCode)

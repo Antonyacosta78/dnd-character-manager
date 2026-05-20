@@ -4,11 +4,13 @@
 
 - Status: `completed`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; i18n foundation implementation plan is completed for this slice. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Initial i18n implementation plan created from approved architecture/spec decisions. (Made with OpenCode)
 

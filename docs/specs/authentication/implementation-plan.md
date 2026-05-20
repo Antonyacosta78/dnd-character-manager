@@ -4,11 +4,13 @@
 
 - Status: `ready`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-06`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-06` - `Antony Acosta` - Updated Phase 1 registration scope to require email input and validation so Better Auth registration remains deterministic in local and production environments.
 - `2026-04-05` - `Antony Acosta` - Created the Phase 1 implementation plan with sequenced vertical slices for username/password auth, ownership enforcement, `/characters` protection, and API-error-contract-aligned deny behavior.
 - `2026-04-05` - `Antony Acosta` - Updated Phase 1 scope to explicitly include MVP self-service registration (username + password, optional email), plus registration-focused flow, edge-case, and verification coverage.

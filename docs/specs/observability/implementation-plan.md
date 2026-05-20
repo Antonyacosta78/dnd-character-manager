@@ -4,11 +4,13 @@
 
 - Status: `ready`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-05-19`
 - Owner: `Antony Acosta`
+- Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Locked bug-report notes validation to a `750`-character maximum and aligned implementation slice gates to that explicit cap. (Made with OpenCode)
 - `2026-04-05` - `Antony Acosta` - Created a lean, slice-based implementation plan for Phase 10 observability MVP with Sentry Cloud, request correlation, failure-state request ID exposure, and bug-report triage flow. (Made with OpenCode)
 
