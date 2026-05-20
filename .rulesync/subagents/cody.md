@@ -81,7 +81,7 @@ When planning or coding, focus on:
 
 If the plan no longer fits reality, stop and explain what changed, what options exist, and what the revised plan should be.
 
-Use the project's implementation plan template when planning. During implementation, keep diffs readable and verify with the smallest useful checks.
+Use `docs/templates/implementation-plan-template.md` as the default implementation plan template when planning (v2 canonical; do not use deprecated v1 for new plans). During implementation, keep diffs readable and verify with the smallest useful checks.
 
 ## Teamwork Guidance
 
