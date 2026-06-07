@@ -54,6 +54,8 @@ Functions are the first choice for backend operations because they are easier to
 - Do not introduce classes for ordinary operations when a function is enough.
 - Classes are still acceptable where the architecture explicitly calls for them, such as DB Service repository classes.
 
+#### Do:
+
 ```ts
 export interface CreateCharacterInput {
   name: string;
@@ -84,6 +86,11 @@ export async function createCharacterOrchestrator(
 
   return DBService.characters.create(result);
 }
+```
+
+#### Don't:
+
+```ts
 
 export class CreateCharacterUseCase {
   async execute(input: CreateCharacterInput): Promise<Character> {
@@ -111,6 +118,8 @@ Avoid mutating variables and objects in place because immutability makes data fl
 - Create new values when transforming data.
 - Do not mutate existing values in place when a new value can be returned clearly.
 
+#### Do:
+
 ```ts
 export function applyLevelUp(
   character: Character,
@@ -123,6 +132,11 @@ export function applyLevelUp(
     features: [...character.features, ...levelUp.newFeatures],
   };
 }
+```
+
+#### Don't:
+
+```ts
 
 export function applyLevelUpMutable(
   character: Character,
@@ -140,10 +154,17 @@ export function applyLevelUpMutable(
 
 Backend code should usually be clear enough to read without comments. Use comments to explain architectural or non-obvious reasoning. Do not use comments to restate what the code already says.
 
+#### Do:
+
 ```ts
 // Session context is stored through Session Service because middleware
 // must not own request-scoped caller state directly.
 await SessionService.bindCurrentSession(session);
+```
+
+#### Don't:
+
+```ts
 
 // Gets the current session.
 const activeSession = await SessionService.getCurrentSession();
@@ -164,6 +185,8 @@ Shared state is harder to track than explicit inputs and outputs.
 - When shared state is necessary, add a comment that explains why that boundary is required.
 - Even approved state-propagation services should follow the immutability rule as much as practical.
 
+#### Do:
+
 ```ts
 export function canEditCharacter(input: {
   characterOwnerId: string;
@@ -171,6 +194,11 @@ export function canEditCharacter(input: {
 }): boolean {
   return input.characterOwnerId === input.callerUserId;
 }
+```
+
+#### Don't:
+
+```ts
 
 let currentUserId: string | undefined;
 
@@ -193,11 +221,18 @@ The defined architecture is the main structure for backend work.
 - If work cannot be accomplished within the architecture, stop, explain the conflict, and do not proceed until there is explicit approval or a redirection plan.
 - Framework route files must stay as framework wiring to Entrypoint implementations. They must not become the place where orchestration, persistence, and error mapping are mixed together.
 
+#### Do:
+
 ```ts
 // Do not proceed with this implementation as-is.
 // This feature requires the Entrypoint Layer to call DB Service directly for
 // business data loading, which violates the current boundary rules.
 // The implementation needs an approved orchestration operation first.
+```
+
+#### Don't:
+
+```ts
 
 // src/app/api/characters/route.ts
 export async function POST(request: Request): Promise<Response> {
@@ -228,12 +263,16 @@ One externally invocable operation should have one validator, one orchestrator, 
 - If an endpoint needs more than one orchestrator, it is likely doing too much.
 - If an endpoint needs several unrelated Core functions, split or redesign it.
 
+#### Do:
+
 ```text
 src/server/entrypoint/api/characters/create.ts
 src/server/middleware/api/schema-validation/create-character.ts
 src/server/orchestration/character/create.ts
 src/server/core/character/create.ts
 ```
+
+#### Don't:
 
 ```ts
 export async function POST(request: Request): Promise<Response> {
@@ -257,12 +296,19 @@ Introducing new patterns creates noise and code smell.
 - The backend architecture already defines Entrypoints, Orchestration, Core, Middleware, and Services.
 - Do not recreate those boundaries through extra ports, adapters, wrappers, or composition layers under different names unless they solve a real problem the current structure cannot.
 
+#### Do:
+
 ```ts
 export async function listCharactersOrchestrator(): Promise<
   OperationResult<CharacterSummary[]>
 > {
   return DBService.characters.listSummaries();
 }
+```
+
+#### Don't:
+
+```ts
 
 interface CharacterQueryPort {
   listSummaries(): Promise<CharacterSummary[]>;
@@ -292,6 +338,8 @@ All backend code should have explicit typing.
 - Only use `unknown` when a value is genuinely unknown at a boundary and is narrowed immediately into a specific type.
 - Define explicit input and output contracts instead of vague object shapes.
 
+#### Do:
+
 ```ts
 export interface CreateCharacterCoreInput {
   name: string;
@@ -316,6 +364,11 @@ export function createCharacterCore(
     startingHp: input.characterClass.baseHp + input.ancestry.hpBonus,
   };
 }
+```
+
+#### Don't:
+
+```ts
 
 export function createCharacterCoreUnsafe(input: any): any {
   return {
@@ -334,6 +387,8 @@ As a rule of thumb, everything under `src/server` should have useful unit testin
 - Test Core functions as pure business logic.
 - Test Orchestration by mocking services and verifying operation-level behavior.
 - Endpoint-level tests are useful, but they do not replace unit tests for backend code under `src/server`.
+
+#### Do:
 
 ```ts
 describe("createCharacterCore", () => {
@@ -372,6 +427,11 @@ describe("createCharacterOrchestrator", () => {
     ).rejects.toBeInstanceOf(CharacterAncestryNotFoundError);
   });
 });
+```
+
+#### Don't:
+
+```ts
 
 describe("POST /api/characters", () => {
   it("creates a character", async () => {
