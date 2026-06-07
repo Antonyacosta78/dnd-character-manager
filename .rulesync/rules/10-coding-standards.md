@@ -11,7 +11,10 @@ opencode:
 
 ## Core Principles
 
-- Follow KISS (Keep It Simple, Stupid): prefer simple, readable solutions over clever abstractions.
+- Follow KISS (Keep It Simple, Stupid): prefer simple, readable solutions over clever abstractions or extra patterns.
+- Prefer functions over classes. Only use classes when the architecture explicitly calls for them, such as DB Service repository classes.
+- Prefer immutability: return new values instead of mutating existing ones unless mutation has a clear performance or clarity benefit.
+- Comments should explain why a decision exists, not restate what the code already says.
 - If a function, file, or logic branch feels complex, split it into smaller named steps until each part is easy to reason about.
 - Prefer composition over personalization: avoid wide APIs with many knobs when composed units communicate intent better.
 - Follow DRY with judgment: reuse existing code when it improves clarity, but allow small repetition when abstraction would make code harder to maintain.
@@ -35,14 +38,26 @@ opencode:
 
 ## Refactoring Expectations
 
-- Refactors are cheap and should be suggested early when architecture no longer fits the use case.
+- Suggest targeted refactors early when code structure no longer fits the use case, but do not change architecture boundaries without explicit approval.
 - AI agents should not execute broad or opportunistic refactors without explicit user approval or request.
 - By default, agents should ship the scoped feature/fix first, then propose targeted refactor follow-ups.
 
+## Backend Architecture Boundaries
+
+- For backend work, the defined architecture is not to be tampered with. If the task conflicts with the architecture, stop and escalate for an explicit decision before proceeding.
+- Avoid shared state. Pass operation data through parameters unless an approved service or singleton boundary is responsible for execution-scoped state.
+- Keep one-operation execution paths aligned across layers: one externally invocable operation should map to one entrypoint, one validator, one orchestrator, and the needed Core module(s). If an operation needs multiple validators, multiple orchestrators, or unrelated Core flows, split or redesign it.
+- Reuse the existing architectural patterns before inventing new ones. Do not add ports, adapters, wrappers, or composition layers unless they solve a real problem the current structure cannot.
+
+## Typing and Tests
+
+- Type code explicitly. Do not use `any`; use `unknown` only at real boundaries and narrow it immediately.
+- Backend code under `src/server` should have useful unit coverage, especially for Core and Orchestration logic.
+
 ## Quality Baseline
 
-- For code edits, run `bun run lint` at minimum.
-- If lint cannot run, report why and list the exact verification gap.
+- For code edits, run `bun run lint` and `bun run build`; both should pass.
+- If lint or build cannot run, report why and list the exact verification gap.
 
 ## React Rendering Guidance
 
