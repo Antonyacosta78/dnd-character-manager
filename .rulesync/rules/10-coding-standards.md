@@ -42,7 +42,8 @@ opencode:
 ## Backend Code Standards
 
 - These standards apply to all backend code in the repository.
-- `docs/architecture/rearchitecture-proposal.md` is the canonical source for these backend standards.
+- This document is the canonical source for these backend standards.
+- `docs/architecture/rearchitecture-proposal.md` is supporting architecture history and rationale, not the live source of truth.
 - The wiggle room for each rule is described in the rule itself. If work still conflicts with the defined architecture after applying that wiggle room, stop and escalate before proceeding.
 
 ### Prefer functions over classes
