@@ -12,9 +12,9 @@ opencode:
 ## Core Principles
 
 - Follow KISS (Keep It Simple, Stupid): prefer simple, readable solutions over clever abstractions or extra patterns.
-- Prefer functions over classes. Only use classes when the architecture explicitly calls for them, such as DB Service repository classes.
+- Prefer functions or function collections over classes. Only use classes when the architecture explicitly calls for them, such as DB Service repository classes.
 - Prefer immutability: return new values instead of mutating existing ones unless mutation has a clear performance or clarity benefit.
-- Comments should explain why a decision exists, not restate what the code already says.
+- Comments should explain why a decision exists, especially for architectural or non-obvious reasoning, and should not restate what the code already says.
 - If a function, file, or logic branch feels complex, split it into smaller named steps until each part is easy to reason about.
 - Prefer composition over personalization: avoid wide APIs with many knobs when composed units communicate intent better.
 - Follow DRY with judgment: reuse existing code when it improves clarity, but allow small repetition when abstraction would make code harder to maintain.
@@ -45,14 +45,15 @@ opencode:
 ## Backend Architecture Boundaries
 
 - For backend work, the defined architecture is not to be tampered with. If the task conflicts with the architecture, stop and escalate for an explicit decision before proceeding.
-- Avoid shared state. Pass operation data through parameters unless an approved service or singleton boundary is responsible for execution-scoped state.
-- Keep one-operation execution paths aligned across layers: one externally invocable operation should map to one entrypoint, one validator, one orchestrator, and the needed Core module(s). If an operation needs multiple validators, multiple orchestrators, or unrelated Core flows, split or redesign it.
-- Reuse the existing architectural patterns before inventing new ones. Do not add ports, adapters, wrappers, or composition layers unless they solve a real problem the current structure cannot.
+- Avoid shared state. Pass operation data through parameters unless an approved service or singleton boundary is responsible for execution-scoped state; when shared state is necessary, document why, and keep that state as immutable as practical.
+- Framework route files should stay as framework wiring to Entrypoint implementations; they should not mix orchestration, persistence, and error mapping directly.
+- Keep one-operation execution paths aligned across layers: one externally invocable operation should map to one entrypoint, one validator, one orchestrator, and the needed Core module(s). If an operation needs multiple validators, multiple orchestrators, or unrelated Core flows, unify, split, or redesign it.
+- Reuse the existing architectural patterns before inventing new ones. The backend architecture already defines Entrypoints, Orchestration, Core, Middleware, and Services; do not add ports, adapters, wrappers, or composition layers that recreate those boundaries under different names unless they solve a real problem the current structure cannot.
 
 ## Typing and Tests
 
-- Type code explicitly. Do not use `any`; use `unknown` only at real boundaries and narrow it immediately.
-- Backend code under `src/server` should have useful unit coverage, especially for Core and Orchestration logic.
+- Type code explicitly. Do not use `any`, avoid `unknown`, and only use `unknown` at genuine boundaries where it is narrowed immediately into a specific type.
+- Backend code under `src/server` should have useful unit coverage. Endpoint-level tests are helpful, but they do not replace unit tests for Core, Orchestration, and other backend logic.
 
 ## Quality Baseline
 
