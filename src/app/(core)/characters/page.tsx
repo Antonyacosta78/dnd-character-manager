@@ -1,18 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { AuthSessionContext } from "@/server/adapters/auth/auth-session-context";
-import { createPrismaCharacterRepository } from "@/server/adapters/prisma/character-repository";
-import { createListOwnerCharactersUseCase } from "@/server/application/use-cases/list-owner-characters";
-
 export default async function CharactersPage() {
   const t = await getTranslations("common");
-  const listOwnerCharacters = createListOwnerCharactersUseCase({
-    sessionContext: new AuthSessionContext(),
-    characterRepository: createPrismaCharacterRepository(),
-  });
-  let characters: Awaited<ReturnType<typeof listOwnerCharacters>> = [];
-  characters = await listOwnerCharacters();
+  const characters: Array<{
+    id: string;
+    name: string;
+    updatedAt: Date;
+  }> = [];
 
   return (
     <div className="space-y-4 rounded-radius-sm border border-border-default bg-bg-surface p-4 shadow-shadow-soft">

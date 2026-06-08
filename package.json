@@ -9,13 +9,6 @@
     "lint": "eslint",
     "test": "bun test",
     "i18n:check-catalog": "bun run scripts/check-i18n-catalog.ts",
-    "db:generate": "prisma generate",
-    "db:migrate:dev": "prisma migrate dev",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "data:fingerprint": "bun run src/server/cli/data-fingerprint.ts",
-    "data:import": "bun run src/server/cli/data-import.ts",
-    "ops:catalog:health": "bun run src/server/cli/ops-catalog-health.ts",
     "ai:generate": "rulesync generate --targets opencode --features rules,subagents,skills",
     "ai:generate:all": "rulesync generate --targets opencode,codexcli,claudecode,cursor --features rules,ignore,subagents,skills",
     "ai:check": "rulesync generate --check --targets opencode --features rules,subagents,skills"

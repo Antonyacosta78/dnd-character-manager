@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `proposed`
+- Status: `rolled back`
 - Created At: `2026-04-05`
-- Last Updated: `2026-04-06`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-08` - `Antony Acosta` - Marked the authentication foundation spec as rolled back after the active authentication implementation was removed in Step 7. Made with OpenCode.
 - `2026-04-06` - `Antony Acosta` - Updated registration contract to require email in MVP flows and removed nullable-email acceptance criteria so Better Auth registration remains deterministic.
 - `2026-04-05` - `Antony Acosta` - Extended registration contract with client-side password confirmation and automatic post-registration session establishment so successful sign-up continues directly into authenticated flows.
 - `2026-04-05` - `Antony Acosta` - Expanded Phase 1 auth foundation scope to treat MVP registration as a first-class authentication flow alongside sign-in, clarifying acceptance criteria and data flow so implementation and validation stay in one authoritative contract.

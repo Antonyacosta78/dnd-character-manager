@@ -2,10 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
-import {
-  AuthForbiddenError,
-  AuthUnauthenticatedError,
-} from "@/server/application/errors/auth-errors";
 import { isServerError } from "@/server/errors";
 
 export interface ResponseMeta {
@@ -98,22 +94,6 @@ export function createRestErrorResponse<TDetails = Record<string, unknown> | und
 }
 
 export function mapRestError(error: unknown): ApiErrorBody {
-  if (error instanceof AuthUnauthenticatedError) {
-    return {
-      code: "AUTH_UNAUTHENTICATED",
-      message: "Authentication is required to access this resource.",
-      status: 401,
-    };
-  }
-
-  if (error instanceof AuthForbiddenError) {
-    return {
-      code: "AUTH_FORBIDDEN",
-      message: "You are not allowed to access this resource.",
-      status: 403,
-    };
-  }
-
   if (isServerError(error)) {
     const details = "details" in error ? (error.details as Record<string, unknown> | undefined) : undefined;
 

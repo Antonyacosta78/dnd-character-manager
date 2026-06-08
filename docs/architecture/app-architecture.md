@@ -4,36 +4,35 @@
 
 - Status: `completed`
 - Created At: `2026-03-18`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-04-05` - `Antony Acosta` - Renamed planned domain terminology from game/games to adventure/adventures for instance-level play context consistency. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-06-08` - `Antony Acosta` - Rewrote backend-facing sections to align app structure with the active post-cutover backend baseline while keeping Step 7 rollback/reset work outside this document's completion claims. Made with OpenCode.
+- `2026-04-05` - `Antony Acosta` - Renamed planned domain terminology from game/games to adventure/adventures for instance-level play context consistency. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
 - `2026-03-18` - `Antony Acosta` - Initial document created.
 
 ## Purpose
 
-This document is the baseline runtime architecture for the application. It defines the boundaries that protect delivery speed now while keeping migration cost bounded as the product moves from character core to branching timelines, snapshots, and output generation.
+This document defines the current application structure at a high level.
 
-The primary audience is senior engineers and AI coding agents. The goal is not to explain web architecture fundamentals; the goal is to prevent accidental coupling and keep major decisions explicit.
+It describes how the app shell, frontend routes, and active backend baseline fit together after the Step 6 cutover cleanup. It does not claim final project completion and does not absorb Step 7 rollback/reset work in advance.
 
 ## Architecture Stance
 
-The project uses a modular monolith on Next.js App Router.
+The project remains a Next.js App Router modular monolith.
 
-Why this is intentional:
+The active structure is intentionally split between:
 
-- The near-term risk is feature delivery drag, not service scaling limits.
-- The product has domain complexity (branching, progression validity, immutable snapshots) that benefits from in-process consistency.
-- We can preserve migration optionality with strict ports and provider boundaries without introducing distributed systems overhead in v1.
+- app shell and presentation code
+- backend runtime boundaries for server-side operations
+- client-side state and UI behavior where required
 
-This is an event-ready architecture, not a full event-sourced architecture. We keep seams for future event-based evolution but do not accept the operational and cognitive tax of full event sourcing yet.
+## Primary Runtime Boundaries
 
-## Layered Runtime Model
-
-### 1) UI Layer
+### UI and App Shell
 
 Paths:
 
@@ -42,239 +41,90 @@ Paths:
 
 Responsibilities:
 
-- Render views and gather user intent.
-- Perform UI-local state handling and interaction flow.
-- Delegate all business operations to application services/actions.
-
-Explicitly out of scope:
-
-- Domain rule evaluation.
-- Direct Prisma access.
-- Direct reads from `external/` data.
-
-### 2) Application Layer
-
-Path:
-
-- `src/server/application/**/*`
-
-Responsibilities:
-
-- Implement use-cases (`createCharacter`, `planLevel`, `branchTimeline`, `freezeSnapshot`, etc.).
-- Orchestrate repositories, rules catalog queries, and transaction boundaries.
-- Enforce authn/authz checks at operation boundaries.
+- render the shell and presentation layers
+- gather user intent
+- call backend entrypoints only through approved backend boundaries
+- avoid direct dependency on legacy backend internals
 
 Rules:
 
-- Application services may coordinate multiple domain modules.
-- Application services must not encode raw external format logic.
-- Application services return deterministic, typed results for UI/API consumers.
+- client code must not import Prisma, Better Auth provider internals, or backend service internals directly
+- server-rendered app shell code may exist without active backend feature behavior when a route is intentionally stubbed/reset
 
-### 3) Domain Layer
+### Backend Runtime
 
-Path:
+Canonical backend reference:
 
-- `src/server/domain/**/*`
+- `docs/architecture/back-end-architecture.md`
 
-Responsibilities:
+Active backend layers:
 
-- Own core invariants and business behavior.
-- Define entities/value objects and domain services.
-- Provide pure logic where practical to maximize test density.
+- framework route wiring in `src/app/api/**`
+- entrypoints in `src/server/entrypoint/**`
+- orchestration in `src/server/orchestration/**`
+- core logic in `src/server/core/**`
+- middleware in `src/server/middleware/**`
+- services in `src/server/services/**`
 
-Rules:
+The previous `application` / `ports` / `adapters` / `composition` layering is not part of the active baseline for migrated runtime paths.
 
-- No framework dependencies.
-- No ORM model dependencies.
-- No network/filesystem concerns.
+### Client State
 
-### 4) Ports Layer
+Paths:
 
-Path:
-
-- `src/server/ports/**/*`
+- `src/client/**/*`
 
 Responsibilities:
 
-- Define stable contracts for adapters:
-  - repositories
-  - rules catalog (namespaced reader contract)
-  - auth/session context
+- own browser-only interaction state and local workflow state
+- remain separate from backend transport or persistence ownership
 
-Rules:
+## Dependency Direction
 
-- Ports describe capability and semantics, not implementation details.
-- Ports are the only dependency application/domain layers use for infrastructure concerns.
+Allowed high-level direction:
 
-Rules catalog contract note:
+- UI -> backend entrypoint transport or shell-safe stubs
+- entrypoint -> middleware -> orchestration -> core
+- orchestration -> services
 
-- Prefer namespaced readers (`rulesCatalog.classes.get`, `rulesCatalog.feats.list`) over flat method growth.
-- Extend contract additively when new gameplay domains are introduced.
+Disallowed high-level direction:
 
-### 5) Adapters Layer
+- UI -> Prisma or Better Auth internals
+- Core -> services, transport, framework, or provider logic
+- route wiring files -> direct business logic or persistence access
 
-Path:
+## Current Transport Posture
 
-- `src/server/adapters/**/*`
+Active HTTP routes:
 
-Responsibilities:
+- `GET /api/characters`
+- `POST /api/auth/register`
+- `GET /api/auth/[...all]` returning intentional `501`
+- `POST /api/auth/[...all]` returning intentional `501`
 
-- Concrete implementations for ports:
-  - Prisma repositories
-  - Better Auth session adapters
-  - `DerivedRulesCatalog` and future `RawRulesCatalog`
+Current server-function posture:
 
-Rules:
+- scaffolding exists
+- no active server-function operation in repo state
 
-- Adapter internals are free to optimize, but external behavior must satisfy port contracts.
-- Adapters must not leak implementation-specific types past the port boundary.
+Current CLI posture:
 
-### 6) Composition Layer
+- no active CLI command is part of the current baseline
+- deferred catalog/import CLI scope is not considered active application runtime
 
-Path:
+## Shell and Reset Notes
 
-- `src/server/composition/**/*`
+The app shell may intentionally preserve non-functional or stubbed routes/components where later reimplementation is planned.
 
-Responsibilities:
+That is currently acceptable for:
 
-- Runtime wiring of concrete adapters to ports.
-- Configuration-based implementation selection.
-- Construction of application services with resolved dependencies.
+- auth transport removed from active use and surfaced as intentional `501`
+- backend-dependent app shell behaviors replaced with shell-safe stubs where required
 
-Rules:
-
-- Lightweight DI only (factories/composition functions).
-- No global service locator patterns hidden in unrelated modules.
-
-## Domain Module Boundaries
-
-The following modules are first-class boundaries and should remain explicit:
-
-- `characters`
-  - persistent identity
-  - lifecycle status
-  - ownership model
-- `progression`
-  - level-by-level plan semantics
-  - missing-level and invalid-state detection
-- `branches`
-  - timeline branching behavior
-  - world lock semantics post-branch
-- `worlds`
-  - continuity grouping
-  - world-level context and constraints
-- `adventures`
-  - playable context metadata
-  - association between adventure and chosen snapshot/version
-- `snapshots`
-  - immutable freeze records
-  - provenance from branch and level at freeze time
-
-Cross-module workflows belong in application services, not ad-hoc imports from one domain module into another.
-
-## Non-Negotiable Product Invariants
-
-These invariants are architecture-level requirements, not optional validations:
-
-1. Character identity is independent from any adventure instance.
-2. A branch, once created, is world-locked.
-3. Generating a playable output at level N requires required inputs for levels `1..N`.
-4. Snapshots are immutable after creation.
-5. Adventure history references frozen snapshots, never mutable planning data.
-
-If a feature conflicts with these invariants, the feature design must change.
-
-## Persistence Strategy
-
-The persistence approach is Prisma + repository adapters.
-
-Design intent:
-
-- Use SQLite for local/v1 convenience.
-- Preserve an uncomplicated migration path to Postgres.
-- Keep domain/application logic storage-agnostic.
-
-Constraints:
-
-- Domain/application must not import Prisma client/model types directly.
-- SQL/storage-specific optimizations remain in adapter code.
-- Migrations must preserve immutable snapshot semantics and timeline consistency.
-
-## Authentication and Authorization
-
-Authentication and authorization are first-class from v1, not retrofit concerns.
-
-- Auth provider: Better Auth with Prisma adapter.
-- Ownership model: user-owned records with `ownerUserId` semantics.
-- Enforcement location: application layer use-cases.
-- Policy model for v1:
-  - owner-based access by default
-  - optional admin capability for diagnostics/operations
-
-Do not rely on client-side checks for access safety.
-
-## API/Transport Decision
-
-Default runtime transport model:
-
-- Server Actions for app-internal operations where appropriate.
-- Route Handlers for explicit HTTP boundaries and future compatibility.
-
-Decision record:
-
-- GraphQL is intentionally excluded from v1 due to schema/resolver overhead with no current multi-client payoff.
-- tRPC remains optional if typed RPC ergonomics become materially better than current action/handler ergonomics.
-
-## Dependency Direction Rules
-
-Allowed high-level dependency direction:
-
-- UI -> Application
-- Application -> Domain + Ports
-- Adapters -> Ports
-- Composition -> Application + Adapters + Ports
-
-Disallowed examples:
-
-- UI -> Prisma adapter
-- Domain -> Prisma/Better Auth/Next.js
-- Application -> raw `external/` file access
-
-## Operational Concerns
-
-### Observability
-
-At minimum, instrument:
-
-- use-case latency and failure rates
-- integrity mismatch events
-- catalog provider identity and dataset fingerprint at startup
-
-### Reliability
-
-- Prefer deterministic behavior over permissive silent fallbacks.
-- Fail closed on integrity violations in strict environments.
-- Keep transactional boundaries explicit in application services.
-
-### Test Strategy
-
-- Domain tests validate invariants in isolation.
-- Application tests validate orchestration and policy enforcement.
-- Adapter tests validate persistence/provider contract compliance.
-- End-to-end tests cover critical user flows (branching, freeze snapshot, generation prerequisites).
-
-## Evolution Path
-
-The expected evolution path is:
-
-1. Strengthen modular monolith boundaries.
-2. Add provider parity tests (`DerivedRulesCatalog` vs `RawRulesCatalog`).
-3. Introduce shadow-read comparisons for raw provider.
-4. Consider changing default provider only after parity and stability criteria are met.
+This document therefore describes the current active baseline, not the final long-term product state.
 
 ## Related Docs
 
-- `docs/architecture/data-sources.md`
-- `docs/architecture/parsing-pipeline.md`
-- `docs/architecture/rules-catalog-provider.md`
-- `docs/architecture/catalog-lineage-and-import-runs.md`
+- `docs/architecture/back-end-architecture.md`
+- `docs/architecture/api-error-contract.md`
+- `docs/architecture/rearchitecture-proposal.md`

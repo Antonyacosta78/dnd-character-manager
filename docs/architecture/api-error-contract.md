@@ -4,45 +4,47 @@
 
 - Status: `accepted`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-08` - `Antony Acosta` - Rewrote the API/error contract to match the active post-cutover backend baseline. Removed outdated catalog-health and rules-read contract language from the canonical active contract. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked API/error contract as accepted for Phase 0 surfaces (`ops:catalog:health` plus optional example rules-read route) while keeping full rules-entity endpoint definitions intentionally deferred. Made with OpenCode.
-- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; contract surfaces are partially implemented and still in progress. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
-- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
+- `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; contract surfaces are partially implemented and still in progress. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. Made with OpenCode.
+- `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
 - `2026-04-03` - `Antony Acosta` - Initial document created.
 
 ## Purpose
 
-Define the canonical transport and error contract for foundation-era operational and rules-read surfaces so implementations remain consistent across route handlers, CLI commands, application services, and adapters.
+Define the canonical caller-facing transport and error contract for the current active backend baseline.
 
-This note exists to prevent:
+This document covers active REST routes and the shared typed error mapping behavior used by the current backend entrypoint layer. It does not mark the overall rearchitecture as complete, and it does not reintroduce deprecated catalog/import CLI surfaces into the active contract.
 
-- envelope drift across surfaces (different `meta` or error shapes)
-- inconsistent HTTP status and CLI exit-code mappings
-- accidental leakage of internal errors (SQL traces, stack internals, provider internals)
-- policy mismatches between integrity mode behavior and surface-level responses
+## Current Active Scope
 
-## Current Plan
+Current active HTTP contract surfaces:
 
-### Contract Scope (Phase 0)
+- `GET /api/characters`
+- `POST /api/auth/register`
+- `GET /api/auth/[...all]`
+- `POST /api/auth/[...all]`
 
-This contract currently covers:
+Current active server-function contract surfaces:
 
-- required operational command surface: `bun run ops:catalog:health`
-- optional example HTTP surface: `GET /api/rules/classes`
+- none
 
-Full rules-entity endpoint definitions are deferred to a dedicated rules API contract doc.
+Current active CLI contract surfaces:
 
-### Shared Envelope Contracts
+- none
+
+## Shared Envelope Contracts
 
 ```ts
 interface ResponseMeta {
   requestId: string;
-  timestamp: string; // ISO-8601 UTC
+  timestamp: string;
 }
 
 interface ApiSuccess<T> {
@@ -52,306 +54,145 @@ interface ApiSuccess<T> {
 
 interface ApiErrorResponse {
   error: {
-    code: ErrorCode;
+    code: string;
     message: string;
     status: number;
     details?: Record<string, unknown>;
   };
   meta: ResponseMeta;
 }
-
-interface CliSuccess<T> {
-  data: T;
-  meta: ResponseMeta;
-}
-
-interface CliErrorResponse {
-  error: {
-    code: ErrorCode;
-    message: string;
-    exitCode: number;
-    details?: Record<string, unknown>;
-  };
-  meta: ResponseMeta;
-}
 ```
 
-Envelope rules:
+Rules:
 
-- `meta` is required on every success/error envelope (HTTP and CLI).
-- `message` must be safe for user display/logging and must not include internals.
-- `details` is optional and safe-only; no stack traces, SQL fragments, or raw provider internals.
-- In HTTP errors, `status` must match actual HTTP status.
+- every response includes `meta`
+- every error response includes `status` that matches the HTTP status code
+- `details` is optional and must remain caller-safe
+- internal stacks, SQL fragments, raw provider payloads, and implementation internals must not be exposed
+- every HTTP response includes `x-request-id`
 
-### Shared Surface Conventions
+## Internal Typed Error Contract
 
-HTTP conventions:
+All internal typed errors extend the shared `ServerError` base and carry:
 
-- Transport: JSON over HTTP.
-- Content type: `application/json; charset=utf-8`.
-- Every response includes header `x-request-id`.
-- If inbound `x-request-id` exists and is valid, reuse it; otherwise generate one.
-- No HTML error bodies for contract routes.
+- `code`
+- `entity`
+- `status`
+- `exitCode`
+- `message`
 
-CLI conventions:
+Current error family entities:
 
-- Success payloads are written to `stdout` as JSON.
-- Error payloads are written to `stderr` as JSON.
-- Exit code must map to stable error taxonomy.
-- Command output should remain machine-parseable by default.
+- `entrypoint`
+- `middleware`
+- `orchestration`
+- `core`
+- `db-service`
+- `session-service`
 
-### Surface Contract: `bun run ops:catalog:health`
+## REST Mapping Rules
 
-Purpose:
+Default REST mapping in the current baseline:
 
-- Operational visibility into active catalog provider, fingerprint, and integrity state.
+- schema validation middleware errors -> `400`
+- authentication middleware errors -> `401`
+- authorization middleware errors -> `403`
+- orchestration validation errors -> `400`
+- orchestration forbidden errors -> `403`
+- not-implemented entrypoint errors -> `501`
+- dependency/internal failures -> `500` unless a specific typed status is defined otherwise
+- unknown unexpected failures -> `500`
 
-Execution policy:
+Current canonical error codes in active use:
 
-- Command is intended for local operators/developers in v1.
-- No HTTP auth challenge exists in command path.
-- If later wrapped by operational tooling, caller authorization is enforced by host system.
+- `REQUEST_VALIDATION_FAILED`
+- `AUTH_UNAUTHENTICATED`
+- `AUTH_FORBIDDEN`
+- `AUTH_ROUTE_NOT_IMPLEMENTED`
+- `INTERNAL_ERROR`
 
-Invocation:
+## Route-Specific Contracts
 
-- No args in v1.
+### `GET /api/characters`
 
-Success output (`stdout`, exit code `0`):
-
-```ts
-interface CatalogHealthData {
-  provider: "derived"; // raw unsupported in v1
-  fingerprint: string;
-  integrityStatus: "ok" | "warn" | "mismatch";
-  activeCatalogVersionId: string | null;
-  lastIntegrityCheckAt: string | null;
-  dataIntegrityMode: "strict" | "warn" | "off";
-}
-```
-
-Operational behavior:
-
-- `integrityStatus = mismatch` in `strict` mode exits non-zero with `RULES_CATALOG_DATASET_MISMATCH`.
-- `integrityStatus = warn` in `warn` mode returns exit code `0` and includes warn status in output.
-- If no active catalog exists, command exits non-zero in strict mode and outputs mismatch diagnostics.
-
-### Surface Contract (Optional Example): `GET /api/rules/classes`
-
-Purpose:
-
-- Return deterministic class option references for character creation/progression selection.
-- Demonstrate HTTP envelope/error behavior without forcing full rules endpoint rollout in Phase 0.
-
-Auth policy:
-
-- `401` if unauthenticated.
-- No admin requirement.
-
-Query params:
-
-- `q` (optional): case-insensitive search term.
-  - trimmed length 1-80 when provided
-  - invalid length returns `400`
-- No pagination in Phase 0.
-
-Success `200` response:
+Success `200`:
 
 ```ts
-interface ClassOption {
+interface CharacterListItem {
+  id: string;
   name: string;
-  source: string;
+  ownerUserId: string;
+  updatedAt: string | Date;
 }
 
-interface ListClassesData {
-  items: ClassOption[];
-  count: number;
-  dataset: {
-    provider: "derived";
-    fingerprint: string;
-  };
+interface ListOwnerCharactersData {
+  items: CharacterListItem[];
 }
 ```
 
-Determinism requirements:
+Failure mappings:
 
-- Results must be sorted by `name` ascending, then `source` ascending.
-- Identical input + identical dataset fingerprint must produce identical output order and content.
+- `401` -> `AUTH_UNAUTHENTICATED`
+- `403` -> `AUTH_FORBIDDEN`
+- `500` -> `INTERNAL_ERROR`
 
-### Error Code Catalog and Mapping
+### `POST /api/auth/register`
+
+Success `200`:
 
 ```ts
-type ErrorCode =
-  | "AUTH_UNAUTHENTICATED"
-  | "AUTH_FORBIDDEN"
-  | "REQUEST_VALIDATION_FAILED"
-  | "RULES_CATALOG_UNAVAILABLE"
-  | "RULES_CATALOG_DATASET_MISMATCH"
-  | "RULES_PROVIDER_UNSUPPORTED"
-  | "INTERNAL_ERROR";
-```
-
-HTTP status mapping:
-
-- `AUTH_UNAUTHENTICATED` -> `401`
-- `AUTH_FORBIDDEN` -> `403`
-- `REQUEST_VALIDATION_FAILED` -> `400`
-- `RULES_CATALOG_UNAVAILABLE` -> `503`
-- `RULES_CATALOG_DATASET_MISMATCH` -> `503` in strict mode; `200` health payload with warn/mismatch semantics when policy allows
-- `RULES_PROVIDER_UNSUPPORTED` -> `503`
-- `INTERNAL_ERROR` -> `500`
-
-CLI exit-code mapping:
-
-- `REQUEST_VALIDATION_FAILED` -> `1`
-- `RULES_CATALOG_UNAVAILABLE` -> `2`
-- `RULES_CATALOG_DATASET_MISMATCH` -> `2`
-- `RULES_PROVIDER_UNSUPPORTED` -> `2`
-- `INTERNAL_ERROR` -> `3`
-
-Surface-level error mapping:
-
-- `bun run ops:catalog:health`
-  - `1`: `REQUEST_VALIDATION_FAILED`
-  - `2`: `RULES_CATALOG_DATASET_MISMATCH`, `RULES_CATALOG_UNAVAILABLE`, `RULES_PROVIDER_UNSUPPORTED`
-  - `3`: `INTERNAL_ERROR`
-
-- Optional example route: `GET /api/rules/classes`
-  - `400`: `REQUEST_VALIDATION_FAILED`
-  - `401`: `AUTH_UNAUTHENTICATED`
-  - `503`: `RULES_CATALOG_UNAVAILABLE`, `RULES_CATALOG_DATASET_MISMATCH`, `RULES_PROVIDER_UNSUPPORTED`
-  - `500`: `INTERNAL_ERROR`
-
-### Response Examples
-
-Catalog health CLI success (`stdout`):
-
-```json
-{
-  "data": {
-    "provider": "derived",
-    "fingerprint": "sha256:3f...",
-    "integrityStatus": "ok",
-    "activeCatalogVersionId": "cat_01HXYZ",
-    "lastIntegrityCheckAt": "2026-04-03T19:14:11.221Z",
-    "dataIntegrityMode": "strict"
-  },
-  "meta": {
-    "requestId": "req_01HXYZ",
-    "timestamp": "2026-04-03T19:14:11.224Z"
-  }
+interface RegisterData {
+  created: true;
 }
 ```
 
-Example classes success (optional route):
+Response behavior:
 
-```json
-{
-  "data": {
-    "items": [
-      { "name": "Barbarian", "source": "PHB" },
-      { "name": "Bard", "source": "PHB" }
-    ],
-    "count": 2,
-    "dataset": {
-      "provider": "derived",
-      "fingerprint": "sha256:3f..."
-    }
-  },
-  "meta": {
-    "requestId": "req_01HXYZ",
-    "timestamp": "2026-04-03T19:15:02.004Z"
-  }
-}
-```
+- may append `set-cookie` headers when session creation succeeds
 
-HTTP error response:
+Failure mappings:
 
-```json
-{
-  "error": {
-    "code": "REQUEST_VALIDATION_FAILED",
-    "message": "Query parameter 'q' must be between 1 and 80 characters.",
-    "status": 400,
-    "details": {
-      "field": "q"
-    }
-  },
-  "meta": {
-    "requestId": "req_01HXYZ",
-    "timestamp": "2026-04-03T19:15:44.332Z"
-  }
-}
-```
+- `400` -> `REQUEST_VALIDATION_FAILED`
+- `500` -> `INTERNAL_ERROR`
 
-Catalog health CLI error (`stderr`):
+Validation details may include field-level issues for:
 
-```json
-{
-  "error": {
-    "code": "RULES_CATALOG_DATASET_MISMATCH",
-    "message": "Active catalog fingerprint does not match expected fingerprint in strict mode.",
-    "exitCode": 2
-  },
-  "meta": {
-    "requestId": "req_01HXYZ",
-    "timestamp": "2026-04-03T19:16:44.332Z"
-  }
-}
-```
+- `username`
+- `password`
+- `email`
+- `body`
 
-### Data and Flow
+### `GET /api/auth/[...all]`
 
-- CLI runner resolves request id and calls pre-wired health use-case.
-- Optional route handler validates transport input and calls pre-wired classes use-case.
-- Application layer enforces auth/authz and orchestrates port calls.
-- `RulesCatalog` adapter returns deterministic typed data or operational errors.
-- CLI/route surfaces map use-case result/error into canonical envelope.
+Current active behavior:
 
-## Boundaries
+- returns `501`
+- error code: `AUTH_ROUTE_NOT_IMPLEMENTED`
 
-This architecture note governs:
+### `POST /api/auth/[...all]`
 
-- transport-level success/error envelope shape across foundation surfaces
-- error-code taxonomy and status/exit mappings
-- contract behavior for Phase 0 operational health command
-- optional example behavior for a single rules-read route
+Current active behavior:
 
-This architecture note does not govern:
+- returns `501`
+- error code: `AUTH_ROUTE_NOT_IMPLEMENTED`
 
-- full rules entity API design (pagination/filtering/versioning across all entities)
-- import pipeline internals
-- domain modeling for character progression/branches/snapshots
-- UI presentation decisions beyond transport payload shape
+This intentional unavailability is part of the current cutover/reset baseline and is not treated as an accidental transport failure.
 
-## Notes
+## Server-Function and CLI Notes
 
-Constraints and edge cases:
+Server-function mapping:
 
-- `RULES_PROVIDER=raw` is unsupported in v1; command/route should fail with `RULES_PROVIDER_UNSUPPORTED` if runtime config bypasses startup validation.
-- In strict integrity mode, mismatch is fail-closed (`503` for HTTP routes, non-zero exit for CLI commands).
-- Query validation must happen before adapter calls.
-- No direct `external/` file access in route handlers.
-- Full rules-entity endpoint definitions are intentionally deferred to a dedicated rules API contract doc.
+- shared sanitization helpers exist
+- no active server-function operation currently exposes a caller-facing contract
 
-Implementation guidance:
+CLI mapping:
 
-- Keep request-id generation/reuse in a shared utility so CLI and route surfaces cannot drift.
-- Keep error-code constants centralized to avoid string mismatch across layers.
-- Keep envelope serialization in surface-layer helpers (HTTP responder + CLI printer), not inside domain logic.
+- typed CLI error mapping helpers exist in scaffolding
+- no active CLI command is part of the current canonical backend contract
+- deferred catalog/import CLI work is intentionally excluded from this active contract and remains outside Step 6 completion claims
 
-## Related Specs
+## Related Docs
 
+- `docs/architecture/back-end-architecture.md`
 - `docs/architecture/app-architecture.md`
-- `docs/architecture/rules-catalog-provider.md`
-- `docs/architecture/data-sources.md`
-- `docs/specs/foundation/implementation-plan.md`
-- Placeholder: `docs/specs/rules-api/endpoint-suite.md` (future)
-
-## Related Features
-
-- Placeholder: `docs/features/foundation.md` (not created yet)
-- Placeholder: rules API feature rundown (not created yet)
-
-## Open Questions
-
-- None for Phase 0 scope.
+- `docs/architecture/rearchitecture-proposal.md`

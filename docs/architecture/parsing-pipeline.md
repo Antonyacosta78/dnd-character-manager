@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `accepted`
+- Status: `rolled back`
 - Created At: `2026-03-18`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-08` - `Antony Acosta` - Marked the parsing pipeline architecture as rolled back for active implementation status after Step 7 removed import/parsing runtime code from the repo baseline. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked parsing-pipeline architecture as accepted for foundation v1 after merge evidence confirmed deterministic staged import, publish, and activation behavior. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
