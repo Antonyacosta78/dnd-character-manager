@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import { createRegisterPostRoute } from "@/app/api/auth/register/route";
+import { createRegisterPostRoute } from "@/server/entrypoint/api/auth/register";
 
 describe("POST /api/auth/register", () => {
   it("returns success envelope for valid registration payload", async () => {

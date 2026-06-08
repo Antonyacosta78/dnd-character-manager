@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 
 import { AuthForbiddenError, AuthUnauthenticatedError } from "@/server/application/errors/auth-errors";
 
-import { createCharactersGetRoute } from "@/app/api/characters/route";
+import { createCharactersGetRoute } from "@/server/entrypoint/api/characters";
 
 describe("GET /api/characters", () => {
   it("returns success envelope for owner-scoped list", async () => {
