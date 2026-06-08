@@ -4,6 +4,7 @@ import { describe, it } from "bun:test";
 import { AuthForbiddenError, AuthUnauthenticatedError } from "@/server/application/errors/auth-errors";
 
 import { createCharactersGetRoute } from "@/server/entrypoint/api/characters";
+import { SessionServiceClass } from "@/server/services/session";
 
 describe("GET /api/characters", () => {
   it("returns success envelope for owner-scoped list", async () => {
@@ -16,6 +17,10 @@ describe("GET /api/characters", () => {
           updatedAt: new Date("2026-04-05T12:00:00.000Z"),
         },
       ],
+      sessionService: new SessionServiceClass({
+        getSession: async () => ({ user: { id: "user-1" } }),
+        getUserIsAdmin: async () => false,
+      }),
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_test_success",
     });
@@ -35,6 +40,9 @@ describe("GET /api/characters", () => {
       listOwnerCharacters: async () => {
         throw new AuthUnauthenticatedError();
       },
+      sessionService: new SessionServiceClass({
+        getSession: async () => null,
+      }),
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_test_unauthenticated",
     });
@@ -53,6 +61,10 @@ describe("GET /api/characters", () => {
       listOwnerCharacters: async () => {
         throw new AuthForbiddenError();
       },
+      sessionService: new SessionServiceClass({
+        getSession: async () => ({ user: { id: "user-1" } }),
+        getUserIsAdmin: async () => false,
+      }),
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_test_forbidden",
     });
@@ -70,6 +82,10 @@ describe("GET /api/characters", () => {
       listOwnerCharacters: async () => {
         throw new Error("db unavailable");
       },
+      sessionService: new SessionServiceClass({
+        getSession: async () => ({ user: { id: "user-1" } }),
+        getUserIsAdmin: async () => false,
+      }),
       now: () => new Date("2026-04-05T12:00:00.000Z"),
       createRequestId: () => "req_test_internal",
     });

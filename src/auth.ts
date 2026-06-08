@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { username } from "better-auth/plugins";
 
-import { prisma } from "@/server/adapters/prisma/prisma-client";
+import { prisma } from "@/server/services/db/client";
 
 const betterAuthUrl = process.env.BETTER_AUTH_URL;
 

@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { stack } from "@nextwrappers/core";
 
 import {
   createResponseMeta,
@@ -7,6 +7,13 @@ import {
   type ApiErrorBody,
   mapRestError,
 } from "@/server/entrypoint/api/rest-contract";
+import { schemaValidation } from "@/server/middleware/api/schema-validation";
+import type { MiddlewareValidationResult } from "@/server/middleware/shared/types";
+import {
+  SessionService,
+  type RegisterAccountInput,
+  type RegisterAccountResult,
+} from "@/server/services/session";
 
 type RegisterField = "username" | "password" | "email" | "body";
 type RegisterValidationIssue =
@@ -16,20 +23,10 @@ type RegisterValidationIssue =
   | "duplicate"
   | "invalidPayload";
 
-interface RegisterBody {
-  username: string;
-  password: string;
-  email: string;
-}
-
-interface AccountCreationResult {
-  setCookieHeaders: string[];
-}
-
 type CreateAccount = (
-  input: RegisterBody,
+  input: RegisterAccountInput,
   requestHeaders: Headers,
-) => Promise<AccountCreationResult>;
+) => Promise<RegisterAccountResult>;
 
 export interface RegisterApiEntrypointDeps {
   createAccount: CreateAccount;
@@ -44,27 +41,10 @@ export function createRegisterPostRoute({
 }: RegisterApiEntrypointDeps) {
   return async function POST(request: Request) {
     const meta = createResponseMeta(request, { now, createRequestId });
-
-    const parsedBody = await parseRequestBody(request);
-
-    if (!parsedBody.ok) {
-      return createValidationErrorResponse({
-        meta,
-        fields: parsedBody.fields,
-      });
-    }
-
-    const payloadValidation = validateRegisterBody(parsedBody.body);
-
-    if (!payloadValidation.ok) {
-      return createValidationErrorResponse({
-        meta,
-        fields: payloadValidation.fields,
-      });
-    }
-
-    try {
-      const creationResult = await createAccount(payloadValidation.value, request.headers);
+    const handler = stack(schemaValidation(validateRegisterBody))(async (_request, ext) => {
+      const validatedInput = (ext as { validatedInput?: unknown } | undefined)
+        ?.validatedInput as RegisterAccountInput;
+      const creationResult = await createAccount(validatedInput, request.headers);
       const response = createRestSuccessResponse({
         data: {
           created: true,
@@ -77,6 +57,10 @@ export function createRegisterPostRoute({
       }
 
       return response;
+    });
+
+    try {
+      return await handler(request);
     } catch (error) {
       if (isDuplicateUsernameError(error)) {
         return createValidationErrorResponse({
@@ -105,7 +89,7 @@ export function createRegisterPostRoute({
 }
 
 const defaultPostRoute = createRegisterPostRoute({
-  createAccount: createAccountWithAuthProvider,
+  createAccount: (input, requestHeaders) => SessionService.registerAccount(input, requestHeaders),
 });
 
 /** @implements POST /api/auth/register */
@@ -113,47 +97,19 @@ export async function POST(request: Request) {
   return defaultPostRoute(request);
 }
 
-async function parseRequestBody(request: Request): Promise<
-  | {
-      ok: true;
-      body: unknown;
-    }
-  | {
-      ok: false;
-      fields: Partial<Record<RegisterField, RegisterValidationIssue[]>>;
-    }
+function validateRegisterBody(
+  body: unknown,
+): MiddlewareValidationResult<
+  RegisterAccountInput,
+  { fields: Partial<Record<RegisterField, RegisterValidationIssue[]>> }
 > {
-  try {
-    const body = await request.json();
-
-    return {
-      ok: true,
-      body,
-    };
-  } catch {
-    return {
-      ok: false,
-      fields: {
-        body: ["invalidPayload"],
-      },
-    };
-  }
-}
-
-function validateRegisterBody(body: unknown):
-  | {
-      ok: true;
-      value: RegisterBody;
-    }
-  | {
-      ok: false;
-      fields: Partial<Record<RegisterField, RegisterValidationIssue[]>>;
-    } {
   if (!isPlainObject(body)) {
     return {
       ok: false,
-      fields: {
-        body: ["invalidPayload"],
+      details: {
+        fields: {
+          body: ["invalidPayload"],
+        },
       },
     };
   }
@@ -181,7 +137,9 @@ function validateRegisterBody(body: unknown):
   if (Object.keys(fields).length > 0) {
     return {
       ok: false,
-      fields,
+      details: {
+        fields,
+      },
     };
   }
 
@@ -208,7 +166,9 @@ function validateRegisterBody(body: unknown):
   if (Object.keys(fields).length > 0) {
     return {
       ok: false,
-      fields,
+      details: {
+        fields,
+      },
     };
   }
 
@@ -220,138 +180,6 @@ function validateRegisterBody(body: unknown):
       email,
     },
   };
-}
-
-async function createAccountWithAuthProvider(
-  input: RegisterBody,
-  requestHeaders: Headers,
-): Promise<AccountCreationResult> {
-  const authApi = auth.api as Record<string, unknown>;
-  const signUpUsername = authApi.signUpUsername;
-  const signUpEmail = authApi.signUpEmail;
-
-  if (typeof signUpUsername === "function") {
-    const result = await signUpUsername({
-      asResponse: true,
-      body: {
-        username: input.username,
-        password: input.password,
-        email: input.email,
-        name: input.username,
-      },
-      headers: requestHeaders,
-    });
-
-    assertAuthResultSucceeded(result);
-
-    return createSessionAfterRegistration(authApi, input, requestHeaders);
-  }
-
-  if (typeof signUpEmail === "function") {
-    const result = await signUpEmail({
-      asResponse: true,
-      body: {
-        email: input.email,
-        password: input.password,
-        username: input.username,
-        name: input.username,
-      },
-      headers: requestHeaders,
-    });
-
-    assertAuthResultSucceeded(result);
-
-    return createSessionAfterRegistration(authApi, input, requestHeaders);
-  }
-
-  throw new Error("Auth provider registration API is unavailable.");
-}
-
-async function createSessionAfterRegistration(
-  authApi: Record<string, unknown>,
-  input: RegisterBody,
-  requestHeaders: Headers,
-): Promise<AccountCreationResult> {
-  const signInUsername = authApi.signInUsername;
-  const signInEmail = authApi.signInEmail;
-
-  if (typeof signInUsername === "function") {
-    const result = await signInUsername({
-      asResponse: true,
-      body: {
-        username: input.username,
-        password: input.password,
-      },
-      headers: requestHeaders,
-    });
-
-    return resolveSessionCreationResult(result);
-  }
-
-  if (typeof signInEmail === "function") {
-    const result = await signInEmail({
-      asResponse: true,
-      body: {
-        email: input.email,
-        password: input.password,
-      },
-      headers: requestHeaders,
-    });
-
-    return resolveSessionCreationResult(result);
-  }
-
-  throw new Error("Auth provider sign-in API is unavailable.");
-}
-
-function resolveSessionCreationResult(result: unknown): AccountCreationResult {
-  assertAuthResultSucceeded(result);
-
-  if (result instanceof Response) {
-    return {
-      setCookieHeaders: getSetCookieHeaders(result),
-    };
-  }
-
-  return {
-    setCookieHeaders: [],
-  };
-}
-
-function getSetCookieHeaders(response: Response): string[] {
-  const responseHeaders = response.headers as Headers & { getSetCookie?: () => string[] };
-
-  if (typeof responseHeaders.getSetCookie === "function") {
-    return responseHeaders.getSetCookie().filter((value) => value.length > 0);
-  }
-
-  const singleSetCookieHeader = response.headers.get("set-cookie");
-
-  if (!singleSetCookieHeader) {
-    return [];
-  }
-
-  return [singleSetCookieHeader];
-}
-
-function assertAuthResultSucceeded(result: unknown): void {
-  if (!result || typeof result !== "object") {
-    return;
-  }
-
-  if (result instanceof Response) {
-    if (!result.ok) {
-      throw new Error(`Registration failed with status ${result.status}`);
-    }
-
-    return;
-  }
-
-  const maybeResult = result as { error?: unknown };
-
-  if (maybeResult.error) {
-    throw maybeResult.error;
-  }
 }
 
 function createValidationErrorResponse(input: {
