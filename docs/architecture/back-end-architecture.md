@@ -4,19 +4,20 @@
 
 - Status: `accepted`
 - Created At: `2026-04-21`
-- Last Updated: `2026-06-08`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Rewrote the canonical backend architecture doc to match the active post-cutover backend baseline created through rearchitecture steps 1-6. Kept Step 7 rollback/reset work out of this document's completion claims. Made with OpenCode.
+- `2026-06-09` - `Antony Acosta` - Removed migration-step references so this canonical backend document describes only the current active backend baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Rewrote the canonical backend architecture doc to match the active backend baseline and keep migration-history/process details out of the architecture body. Made with OpenCode.
 - `2026-04-21` - `Antony Acosta` - Created a standalone backend architecture note by extracting backend-relevant boundaries and decisions from app architecture and aligning references to existing backend foundation docs. Made with OpenCode.
 
 ## Purpose
 
 This document defines the current active backend architecture in the repository.
 
-It is the canonical backend boundary reference for implementation work after the Step 6 cutover cleanup. It intentionally describes the active backend baseline only. Future rollback/reset work planned for Step 7 is not treated as completed here.
+It is the canonical backend boundary reference for implementation work. It intentionally describes the current active backend baseline only.
 
 ## Active Backend Baseline
 
@@ -170,10 +171,10 @@ This is a deliberate cutover/reset decision, not an accidental partial migration
 
 ## Deferred Scope
 
-Catalog/import runtime code and broader feature rollback/reset remain outside this document's active backend baseline.
+Catalog/import runtime code and removed backend-dependent feature implementations are outside this document's active backend baseline.
 
 - catalog/import runtime code is not part of the active backend baseline described here
-- broader feature removal/reset remains planned for Step 7
+- removed backend-dependent feature implementations are not part of the active backend baseline described here
 - this document does not mark the overall rearchitecture as complete
 
 ## Related Docs
@@ -181,4 +182,3 @@ Catalog/import runtime code and broader feature rollback/reset remain outside th
 - `docs/architecture/app-architecture.md`
 - `docs/architecture/api-error-contract.md`
 - `docs/architecture/rearchitecture-proposal.md`
-- `docs/architecture/rearchitecture-proposal-plan/step-06-cutover-cleanup-and-completion-evidence.md`

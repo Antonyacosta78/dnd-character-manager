@@ -4,12 +4,14 @@
 
 - Status: `accepted`
 - Created At: `2026-04-03`
-- Last Updated: `2026-06-08`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Rewrote the API/error contract to match the active post-cutover backend baseline. Removed outdated catalog-health and rules-read contract language from the canonical active contract. Made with OpenCode.
+- `2026-06-09` - `Antony Acosta` - Rewrote this document as a generalized architecture-level error/taxonomy contract aligned to the backend rearchitecture proposal instead of route-specific surface contracts. Made with OpenCode.
+- `2026-06-09` - `Antony Acosta` - Removed migration-step references so this canonical API/error contract describes only the current active transport baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Rewrote the API/error contract to match the active backend baseline. Removed outdated catalog-health and rules-read contract language from the canonical active contract. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked API/error contract as accepted for Phase 0 surfaces (`ops:catalog:health` plus optional example rules-read route) while keeping full rules-entity endpoint definitions intentionally deferred. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Corrected status to match current implementation reality; contract surfaces are partially implemented and still in progress. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. Made with OpenCode.
@@ -18,28 +20,29 @@
 
 ## Purpose
 
-Define the canonical caller-facing transport and error contract for the current active backend baseline.
+Define the canonical caller-facing transport and error contract for the backend architecture.
 
-This document covers active REST routes and the shared typed error mapping behavior used by the current backend entrypoint layer. It does not mark the overall rearchitecture as complete, and it does not reintroduce deprecated catalog/import CLI surfaces into the active contract.
+This document is architecture-level. It defines shared error taxonomy, ownership rules, envelope rules, sanitization, and default transport mappings. It does not define feature-specific success payloads or route-by-route API contracts.
 
-## Current Active Scope
+## Scope
 
-Current active HTTP contract surfaces:
+This contract applies to backend entrypoints implemented through:
 
-- `GET /api/characters`
-- `POST /api/auth/register`
-- `GET /api/auth/[...all]`
-- `POST /api/auth/[...all]`
+- REST API route handlers
+- server functions
+- CLI entrypoints
 
-Current active server-function contract surfaces:
+This contract does not define:
 
-- none
+- feature-specific request/response payloads
+- feature-specific endpoint success schemas
+- frontend presentation behavior
 
-Current active CLI contract surfaces:
+Feature-specific transport details should live in feature specs or implementation docs, while remaining consistent with this contract.
 
-- none
+## Shared Envelope Rules
 
-## Shared Envelope Contracts
+### REST API Envelope
 
 ```ts
 interface ResponseMeta {
@@ -52,12 +55,12 @@ interface ApiSuccess<T> {
   meta: ResponseMeta;
 }
 
-interface ApiErrorResponse {
+interface ApiErrorResponse<TDetails = Record<string, unknown> | undefined> {
   error: {
     code: string;
     message: string;
     status: number;
-    details?: Record<string, unknown>;
+    details?: TDetails;
   };
   meta: ResponseMeta;
 }
@@ -68,128 +71,257 @@ Rules:
 - every response includes `meta`
 - every error response includes `status` that matches the HTTP status code
 - `details` is optional and must remain caller-safe
-- internal stacks, SQL fragments, raw provider payloads, and implementation internals must not be exposed
 - every HTTP response includes `x-request-id`
+- raw stacks, SQL fragments, provider internals, secrets, tokens, and unsafe request payloads must not be exposed
 
-## Internal Typed Error Contract
-
-All internal typed errors extend the shared `ServerError` base and carry:
-
-- `code`
-- `entity`
-- `status`
-- `exitCode`
-- `message`
-
-Current error family entities:
-
-- `entrypoint`
-- `middleware`
-- `orchestration`
-- `core`
-- `db-service`
-- `session-service`
-
-## REST Mapping Rules
-
-Default REST mapping in the current baseline:
-
-- schema validation middleware errors -> `400`
-- authentication middleware errors -> `401`
-- authorization middleware errors -> `403`
-- orchestration validation errors -> `400`
-- orchestration forbidden errors -> `403`
-- not-implemented entrypoint errors -> `501`
-- dependency/internal failures -> `500` unless a specific typed status is defined otherwise
-- unknown unexpected failures -> `500`
-
-Current canonical error codes in active use:
-
-- `REQUEST_VALIDATION_FAILED`
-- `AUTH_UNAUTHENTICATED`
-- `AUTH_FORBIDDEN`
-- `AUTH_ROUTE_NOT_IMPLEMENTED`
-- `INTERNAL_ERROR`
-
-## Route-Specific Contracts
-
-### `GET /api/characters`
-
-Success `200`:
+### CLI Envelope
 
 ```ts
-interface CharacterListItem {
-  id: string;
-  name: string;
-  ownerUserId: string;
-  updatedAt: string | Date;
+interface CliSuccess<T> {
+  data: T;
+  meta: ResponseMeta;
 }
 
-interface ListOwnerCharactersData {
-  items: CharacterListItem[];
+interface CliErrorResponse<TDetails = Record<string, unknown> | undefined> {
+  error: {
+    code: string;
+    message: string;
+    exitCode: number;
+    details?: TDetails;
+  };
+  meta: ResponseMeta;
 }
 ```
 
-Failure mappings:
+Rules:
 
-- `401` -> `AUTH_UNAUTHENTICATED`
-- `403` -> `AUTH_FORBIDDEN`
-- `500` -> `INTERNAL_ERROR`
+- success payloads are written to `stdout`
+- error payloads are written to `stderr`
+- output should remain machine-parseable by default
+- internal stacks, provider internals, and unsafe payloads must not be exposed
 
-### `POST /api/auth/register`
+### Server-Function Failure Shape
 
-Success `200`:
+Server functions do not need the same HTTP or CLI envelope, but they must still:
+
+- sanitize internal failures before they cross the entrypoint boundary
+- preserve typed failure meaning where useful to the caller
+- avoid exposing raw implementation internals
+
+## Base Typed Error Contract
+
+All internal typed errors extend a shared `ServerError` base.
 
 ```ts
-interface RegisterData {
-  created: true;
+export interface ServerErrorInput {
+  code: string;
+  entity:
+    | "entrypoint"
+    | "middleware"
+    | "orchestration"
+    | "core"
+    | "db-service"
+    | "session-service";
+  status: number;
+  exitCode: number;
+  message: string;
+  cause?: unknown;
+}
+
+export class ServerError extends Error {
+  readonly code: string;
+  readonly entity: ServerErrorInput["entity"];
+  readonly status: number;
+  readonly exitCode: number;
+
+  constructor(input: ServerErrorInput) {
+    super(input.message, { cause: input.cause });
+    this.name = this.constructor.name;
+    this.code = input.code;
+    this.entity = input.entity;
+    this.status = input.status;
+    this.exitCode = input.exitCode;
+  }
 }
 ```
 
-Response behavior:
+Required properties on all typed errors:
 
-- may append `set-cookie` headers when session creation succeeds
+- `code`: stable machine-readable error code
+- `entity`: owning boundary/error family
+- `status`: default HTTP status
+- `exitCode`: default CLI exit code
+- `message`: caller-safe or sanitizable error message
 
-Failure mappings:
+Optional runtime behavior inherited from `Error`:
 
-- `400` -> `REQUEST_VALIDATION_FAILED`
-- `500` -> `INTERNAL_ERROR`
+- stack trace
+- `cause`
 
-Validation details may include field-level issues for:
+## Error Taxonomy
 
-- `username`
-- `password`
-- `email`
-- `body`
+Errors are classified by both:
 
-### `GET /api/auth/[...all]`
+- where they originate
+- what kind of failure they represent
 
-Current active behavior:
+### Error Families
 
-- returns `501`
-- error code: `AUTH_ROUTE_NOT_IMPLEMENTED`
+#### Entrypoint Errors
 
-### `POST /api/auth/[...all]`
+Meaning:
 
-Current active behavior:
+- transport-boundary failures
+- unsupported or intentionally unavailable transport behavior
+- transport-specific response/mapping failures
 
-- returns `501`
-- error code: `AUTH_ROUTE_NOT_IMPLEMENTED`
+Examples:
 
-This intentional unavailability is part of the current cutover/reset baseline and is not treated as an accidental transport failure.
+- malformed transport state
+- intentionally unavailable route/command
+- transport-specific output construction failure
 
-## Server-Function and CLI Notes
+#### Middleware Errors
 
-Server-function mapping:
+Meaning:
 
-- shared sanitization helpers exist
-- no active server-function operation currently exposes a caller-facing contract
+- shared transport-level failures before orchestration begins
 
-CLI mapping:
+Subfamilies:
 
-- typed CLI error mapping helpers exist in scaffolding
-- no active CLI command is part of the current canonical backend contract
-- deferred catalog/import CLI work is intentionally excluded from this active contract and remains outside Step 6 completion claims
+- authentication middleware errors
+- authorization middleware errors
+- schema validation middleware errors
+
+Examples:
+
+- unauthenticated caller
+- forbidden access at the entry boundary
+- malformed request body/query/params
+
+#### Orchestration Errors
+
+Meaning:
+
+- operation-level failures while coordinating services and core logic
+
+Examples:
+
+- not found
+- conflict
+- dependency failure with operation meaning
+- unsupported workflow state
+
+#### Core Errors
+
+Meaning:
+
+- business-rule violations
+- invalid domain operations
+
+Rules:
+
+- core errors must stay domain/business focused
+- core errors must not represent transport or infrastructure failures
+
+#### Service Errors
+
+Meaning:
+
+- infrastructure/integration failures inside a service boundary
+
+Subfamilies:
+
+- DB service errors
+- session service errors
+
+Rules:
+
+- service errors may preserve debugging detail for internal use
+- orchestration may translate service errors into clearer operation-level meaning when appropriate
+
+## Boundary Ownership Rules
+
+- entrypoint owns transport translation and sanitization
+- middleware owns entry-boundary checks before orchestration runs
+- orchestration owns operation-level failure meaning
+- core owns domain/business failure meaning
+- services own provider/infrastructure failure meaning
+
+Errors may cross boundaries, but they are sanitized only at the entrypoint boundary.
+
+## Default Transport Mapping
+
+These mappings are defaults. Feature-specific entrypoints may refine caller-facing response structure, but they must not redefine the taxonomy itself.
+
+### REST API
+
+- schema validation middleware errors -> `400 Bad Request`
+- authentication middleware errors -> `401 Unauthorized`
+- authorization middleware errors -> `403 Forbidden`
+- orchestration not-found errors -> `404 Not Found`
+- core business-rule errors -> `422 Unprocessable Entity`
+- orchestration conflict errors -> `409 Conflict`
+- service dependency failures -> `500 Internal Server Error` or `503 Service Unavailable`, depending on failure meaning
+- intentionally unavailable entrypoint errors -> `501 Not Implemented`
+- unexpected internal failures -> `500 Internal Server Error`
+
+### Server Functions
+
+- middleware, orchestration, core, and service errors should be translated into sanitized caller-safe failures
+- raw implementation internals must not be exposed
+- unexpected failures must be converted into a generic internal failure for the server-function boundary
+
+### CLI
+
+- expected operational errors preserve typed `exitCode`
+- unexpected failures map to a generic non-zero internal failure exit code
+- output must remain sanitized for external callers
+
+## Logging And Sanitization Rules
+
+Entrypoint owns logging.
+
+That means:
+
+- expected operational errors should be logged when surfaced through an entrypoint
+- unexpected internal failures must always be logged
+- lower layers may preserve detail and causes, but entrypoint decides what is logged and what is exposed
+
+Development logging policy:
+
+- log to `stdout` while developing
+
+Production logging policy:
+
+- redact or omit secrets, credentials, tokens, raw session payloads, unsafe request bodies, and other sensitive internals
+
+Caller-facing sanitization rules:
+
+- never expose raw stack traces
+- never expose raw SQL/provider internals
+- never expose unsafe request/session payloads
+- keep `message` and `details` safe for callers
+
+## Session Vs Authentication Rule
+
+Use authentication middleware errors when:
+
+- caller is not authenticated
+- session is invalid
+- session is expired
+
+Use session service errors when:
+
+- session provider cannot be reached
+- session cannot be resolved due to provider/integration failure
+- caller/session lookup fails inside the session-service boundary
+
+## Implementation Notes
+
+- route-specific success payloads should be documented in feature/spec docs, not here
+- route-specific error codes may exist when feature semantics require them, but they must still fit this taxonomy
+- a shell/reset baseline may intentionally expose `501 Not Implemented` entrypoints; that is still governed by this contract as an entrypoint-level failure
 
 ## Related Docs
 

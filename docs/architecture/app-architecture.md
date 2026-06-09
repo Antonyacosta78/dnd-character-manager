@@ -4,12 +4,13 @@
 
 - Status: `completed`
 - Created At: `2026-03-18`
-- Last Updated: `2026-06-08`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Rewrote backend-facing sections to align app structure with the active post-cutover backend baseline while keeping Step 7 rollback/reset work outside this document's completion claims. Made with OpenCode.
+- `2026-06-09` - `Antony Acosta` - Removed migration-step references so this canonical app-structure document describes only the current active baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Rewrote backend-facing sections to align app structure with the active backend baseline and keep migration-history/process details out of the architecture body. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Renamed planned domain terminology from game/games to adventure/adventures for instance-level play context consistency. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. Made with OpenCode.
 - `2026-03-18` - `Antony Acosta` - Initial document created.
@@ -18,7 +19,7 @@
 
 This document defines the current application structure at a high level.
 
-It describes how the app shell, frontend routes, and active backend baseline fit together after the Step 6 cutover cleanup. It does not claim final project completion and does not absorb Step 7 rollback/reset work in advance.
+It describes how the app shell, frontend routes, and active backend baseline fit together in the current repo state. It does not claim final project completion.
 
 ## Architecture Stance
 
