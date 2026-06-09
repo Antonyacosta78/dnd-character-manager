@@ -9,7 +9,7 @@
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Marked the parsing foundation spec as rolled back for active implementation status after Step 7 removed the import/parsing runtime from the repo baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Marked the parsing foundation spec as rolled back for active implementation status after the import/parsing runtime was removed from the repo baseline as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked parser option-completeness spec as approved after merged implementation and strict/warn import verification. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)

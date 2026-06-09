@@ -9,7 +9,7 @@
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Marked the authentication and identity feature as rolled back after backend auth transport, provider wiring, and protected backend flows were removed from the active repo in Step 7. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Marked the authentication and identity feature as rolled back after backend auth transport, provider wiring, and protected backend flows were removed from the active repo as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-06` - `Antony Acosta` - Updated MVP registration contract to require email at sign-up so Better Auth account creation remains deterministic and avoids undefined-email provider failures.
 - `2026-04-05` - `Antony Acosta` - Added Phase 1 UX and flow requirements for client-side password confirmation on registration and immediate post-registration session establishment (auto sign-in) so onboarding reaches protected routes without a second auth step.
 - `2026-04-05` - `Antony Acosta` - Expanded Phase 1 scope to include MVP self-service registration (`username`, `password`, optional `email`) so sign-in is paired with account creation in the same auth foundation slice.

@@ -20,7 +20,7 @@ This decision prevents:
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Marked the catalog storage/read-model architecture as rolled back for active implementation status after Step 7 removed catalog runtime code from the repo baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Marked the catalog storage/read-model architecture as rolled back for active implementation status after catalog runtime code was removed from the repo baseline as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked storage/read-model architecture as accepted after merged publish/runtime-reader implementation and verification. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created architecture note for catalog storage/read-model boundaries.
 - `2026-04-04` - `Antony Acosta` - Resolved publish strategy, transaction boundary, payload size policy, and v1 runtime read posture decisions. Made with OpenCode.

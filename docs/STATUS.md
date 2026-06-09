@@ -20,7 +20,7 @@ Checklist markers:
 ## Snapshot
 
 - Last verified: 2026-06-08
-- Evidence method: docs + code audit + rollback verification pass after Step 7 feature reset
+- Evidence method: docs + code audit + rollback verification pass as per the rearchitecture proposal
 
 ## Phase Checklist
 
@@ -31,11 +31,11 @@ Checklist markers:
 - Checklist
   - [x] Product and architecture direction documented
   - [x] Feature/spec workflow and templates in place
-  - [ ] Rules import and catalog publish foundation wired (rolled back from active repo in Step 7)
+  - [ ] Rules import and catalog publish foundation wired (rolled back from active repo as per the rearchitecture proposal)
   - [x] i18n foundation wired for `en` and `es`
   - [x] Arcane Codex design-system foundation reference slice implemented (tokens, primitives, domain/pattern components, split workbench/codex routes)
   - [x] Global state management foundation (architecture/spec + store, persistence, provider wiring, and tests)
-  - [ ] Operations health command wired (`ops-catalog-health`) (rolled back from active repo in Step 7)
+  - [ ] Operations health command wired (`ops-catalog-health`) (rolled back from active repo as per the rearchitecture proposal)
 - Evidence
   - `docs/architecture/feature-workflow.md`
   - `docs/specs/foundation/implementation-plan.md`
@@ -60,7 +60,7 @@ Checklist markers:
   - `src/app/draft-store-demo.tsx`
   - `src/i18n/index.ts`
   - `package.json`
-  - `docs/architecture/rearchitecture-proposal-plan/step-07-feature-reset-and-rollback.md`
+  - `docs/architecture/rearchitecture-proposal.md`
 
 ### Phase 1 - Authentication And Identity
 
@@ -82,7 +82,7 @@ Checklist markers:
   - `src/app/sign-up/page.tsx`
   - `src/app/sign-up/sign-up-form.tsx`
   - `src/app/(core)/characters/page.tsx`
-  - `docs/architecture/rearchitecture-proposal-plan/step-07-feature-reset-and-rollback.md`
+  - `docs/architecture/rearchitecture-proposal.md`
 
 ### Phase 2 - Character Core
 

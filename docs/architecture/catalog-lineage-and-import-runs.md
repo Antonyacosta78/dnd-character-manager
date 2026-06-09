@@ -9,7 +9,7 @@
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Marked the catalog lineage/import-runs architecture as rolled back for active implementation status after Step 7 removed the related runtime code from the repo baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Marked the catalog lineage/import-runs architecture as rolled back for active implementation status after the related runtime code was removed from the repo baseline as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked lineage/import-run architecture as accepted for foundation v1 after merged publish, activation, and run-metrics persistence wiring. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Resolved v1 source metadata, metrics modeling, and activation governance decisions for lineage operations. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Recorded guarded two-phase publish/activation protocol for foundation catalog decisions. (Made with OpenCode)

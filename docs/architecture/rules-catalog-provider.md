@@ -9,7 +9,7 @@
 
 ## Changelog
 
-- `2026-06-08` - `Antony Acosta` - Marked the active rules-catalog provider architecture as rolled back after Step 7 removed runtime Rules Catalog implementation code from the repo. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Marked the active rules-catalog provider architecture as rolled back after runtime Rules Catalog implementation code was removed from the repo as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Recorded v1 fingerprint-scoped reader cache policy. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-02` - `Antony Acosta` - Initial document created.
