@@ -4,11 +4,12 @@
 
 - Status: `accepted`
 - Created At: `2026-03-18`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Updated runtime-access guidance to reflect the current shell/reset backend baseline and remove composition-layer terminology from future rules-catalog wiring guidance. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked data-source architecture as accepted for foundation v1 rules readiness after merged parser/publish/read-model evidence coverage. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Tuned status to reflect active implementation progress. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
@@ -57,7 +58,11 @@ Scope coverage (incremental):
 
 ### Runtime Rule Access Source
 
-Runtime code never reads raw files directly. Runtime rule reads go through the `RulesCatalog` contract, which is bound to a provider implementation at composition time.
+Runtime code never reads raw files directly.
+
+In the current repo baseline, rules-catalog runtime code is rolled back and no live runtime provider is part of the active backend surface.
+
+When runtime rule access is reintroduced, it must go through a dedicated backend-owned `RulesCatalog` boundary wired through the active backend architecture. UI routes, framework route files, and request handlers must not read source files or bind provider implementations directly.
 
 Default v1 provider:
 
@@ -162,7 +167,7 @@ The following are explicitly prohibited:
 - reading files under `EXTERNAL_DATA_PATH` directly from UI or request handlers
 - writing to `external/` from runtime code
 - activating new catalog data without recorded fingerprint lineage
-- mixing source-format fields directly into domain/application types
+- mixing source-format fields directly into orchestration/core-facing types
 
 ## Related Docs
 

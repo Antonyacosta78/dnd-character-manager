@@ -9,17 +9,18 @@ This decision prevents:
 - runtime dependence on external source files
 - divergence between published catalog lineage and runtime readers
 - repeated per-request normalization or JSON-shape re-interpretation
-- accidental coupling between app use-cases and import internals
+- accidental coupling between backend operations and import internals
 
 ## Metadata
 
 - Status: `rolled back`
 - Created At: `2026-04-04`
-- Last Updated: `2026-06-08`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Updated this rolled-back storage/read-model note to replace legacy app-layer, port, and adapter references with the active backend boundary vocabulary. Made with OpenCode.
 - `2026-06-08` - `Antony Acosta` - Marked the catalog storage/read-model architecture as rolled back for active implementation status after catalog runtime code was removed from the repo baseline as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked storage/read-model architecture as accepted after merged publish/runtime-reader implementation and verification. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created architecture note for catalog storage/read-model boundaries.
@@ -97,7 +98,7 @@ Namespaces covered in v1 publish/read-model slice:
 
 - no active catalog version: operational unavailable error category
 - data integrity mismatch: behavior follows `DATA_INTEGRITY_MODE`
-- read-model contract violation (malformed runtime row): adapter-level contract violation error
+- read-model contract violation (malformed runtime row): service-level contract violation error
 
 ## Boundaries
 
@@ -122,9 +123,9 @@ Current state:
 
 Migration approach:
 
-1. add runtime catalog tables and repository ports
+1. add runtime catalog tables and DB-service capabilities
 2. implement publish transaction writing canonical + relation rows
-3. implement `DerivedRulesCatalog` readers from runtime rows
+3. implement `DerivedRulesCatalog` readers from runtime rows behind a service-owned rules boundary
 4. switch runtime reads to published storage path
 
 Backout:
@@ -183,7 +184,7 @@ interface CatalogSpellSourceEdgeRow {
 
 ## Error Taxonomy
 
-Expected adapter/repository errors (mapped to existing envelopes):
+Expected service/storage errors (mapped to existing envelopes):
 
 - `RulesCatalogUnavailableError`
 - `RulesCatalogDatasetMismatchError`
@@ -209,7 +210,7 @@ Minimum required before adoption:
 
 - SQLite remains the primary runtime store in v1 foundation.
 - Optional JSON artifact snapshots are allowed as secondary diagnostics, disabled by default in v1, and never the primary runtime source.
-- Keep runtime query logic in adapters/repositories; app layer consumes only ports.
+- Keep runtime query logic inside backend-owned services; orchestration consumes only the service-facing boundary.
 
 ## Resolved Decisions (2026-04-04)
 

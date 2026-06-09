@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `completed`
+- Status: `accepted`
 - Created At: `2026-03-18`
 - Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Refactored this document into a high-level architecture index. Kept current-baseline overview guidance, removed duplicated front-end and back-end detail, and added canonical references for subsystem-specific rules. Made with OpenCode.
 - `2026-06-09` - `Antony Acosta` - Removed migration-step references so this canonical app-structure document describes only the current active baseline. Made with OpenCode.
 - `2026-06-08` - `Antony Acosta` - Rewrote backend-facing sections to align app structure with the active backend baseline and keep migration-history/process details out of the architecture body. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Renamed planned domain terminology from game/games to adventure/adventures for instance-level play context consistency. Made with OpenCode.
@@ -19,7 +20,25 @@
 
 This document defines the current application structure at a high level.
 
-It describes how the app shell, frontend routes, and active backend baseline fit together in the current repo state. It does not claim final project completion.
+It is the top-level architecture index for the repository.
+
+Use this document to understand how the major runtime areas fit together, then follow the referenced subsystem documents for detailed boundaries and rules.
+
+This document describes the current active baseline only. It does not claim final product completion.
+
+## Document Role
+
+This document:
+
+- summarizes the active application shape
+- explains how front-end, back-end, and browser-only state fit together
+- points to the canonical architecture note for each detailed concern
+
+This document does not:
+
+- restate detailed front-end rendering, i18n, or design-system rules
+- restate detailed backend layer rules or transport contracts
+- replace subsystem-specific architecture notes
 
 ## Architecture Stance
 
@@ -31,101 +50,125 @@ The active structure is intentionally split between:
 - backend runtime boundaries for server-side operations
 - client-side state and UI behavior where required
 
-## Primary Runtime Boundaries
+This split is a delivery boundary, not a repo-silo boundary. The application ships as one codebase, but each runtime area has distinct ownership rules.
 
-### UI and App Shell
+## Current Application Map
 
-Paths:
+### Front-End Runtime
+
+Primary paths:
 
 - `src/app/**/*`
 - `src/components/**/*`
+- `src/client/**/*` for browser-only state and rehydration support
 
-Responsibilities:
+Current role:
 
-- render the shell and presentation layers
+- render the App Router shell and route composition
 - gather user intent
-- call backend entrypoints only through approved backend boundaries
-- avoid direct dependency on legacy backend internals
+- handle browser-only interaction state where required
+- call backend behavior only through approved entrypoints or explicit shell-safe stubs
 
-Rules:
+Canonical reference:
 
-- client code must not import Prisma, Better Auth provider internals, or backend service internals directly
-- server-rendered app shell code may exist without active backend feature behavior when a route is intentionally stubbed/reset
+- `docs/architecture/front-end-architecture.md`
 
-### Backend Runtime
+### Back-End Runtime
 
-Canonical backend reference:
+Primary paths:
+
+- `src/app/api/**`
+- `src/server/entrypoint/**`
+- `src/server/middleware/**`
+- `src/server/orchestration/**`
+- `src/server/core/**`
+- `src/server/services/**`
+
+Current role:
+
+- own transport entrypoints and backend execution flow
+- enforce middleware concerns such as authn/authz and validation when active
+- keep business logic and infrastructure concerns separated by layer
+
+Canonical reference:
 
 - `docs/architecture/back-end-architecture.md`
 
-Active backend layers:
+### Browser-Only State
 
-- framework route wiring in `src/app/api/**`
-- entrypoints in `src/server/entrypoint/**`
-- orchestration in `src/server/orchestration/**`
-- core logic in `src/server/core/**`
-- middleware in `src/server/middleware/**`
-- services in `src/server/services/**`
+Primary paths:
 
-The previous `application` / `ports` / `adapters` / `composition` layering is not part of the active baseline for migrated runtime paths.
+- `src/client/state/**`
 
-### Client State
+Current role:
 
-Paths:
+- own browser-only interaction state, global settings, and local draft/workflow state
+- remain separate from canonical server-owned entity state
 
-- `src/client/**/*`
+Canonical reference:
 
-Responsibilities:
+- `docs/architecture/global-state-management.md`
 
-- own browser-only interaction state and local workflow state
-- remain separate from backend transport or persistence ownership
+### Cross-Cutting Front-End Foundations
 
-## Dependency Direction
+These concerns shape multiple runtime areas and should be treated as shared architectural foundations rather than route-local implementation details:
+
+- internationalization and locale resolution
+- Arcane Codex design-system tokens, primitives, and surface rules
+- API error envelopes and caller-safe error mapping
+- data-source trust boundaries, including `external/`
+
+Canonical references:
+
+- `docs/architecture/internationalization.md`
+- `docs/architecture/design-system-decision-record.md`
+- `docs/architecture/api-error-contract.md`
+- `docs/architecture/data-sources.md`
+
+## Active Baseline Summary
+
+At the application level, the current baseline can be summarized as follows:
+
+- Next.js App Router is the framework foundation.
+- Front-end rendering is server-first, with client islands added only where browser APIs, client hooks, or local interaction state require them.
+- The in-app shell is route-grouped and can intentionally render shell/reset states while backend-dependent behavior remains rolled back or stubbed.
+- Backend HTTP entrypoints are exposed through `src/app/api/**` and delegated into `src/server/entrypoint/**`.
+- Some backend surfaces intentionally return `501 Not Implemented` as explicit reset behavior; this is part of the active baseline, not an accidental partial state.
+- Server-function scaffolding exists, but no active server-function operation is part of the current baseline.
+- No active CLI command is part of the current application runtime baseline.
+
+## High-Level Dependency Direction
 
 Allowed high-level direction:
 
-- UI -> backend entrypoint transport or shell-safe stubs
-- entrypoint -> middleware -> orchestration -> core
+- UI and browser-only state -> backend entrypoint transport or explicit shell-safe stubs
+- framework route wiring -> entrypoint -> middleware -> orchestration -> core
 - orchestration -> services
 
-Disallowed high-level direction:
+High-level prohibitions:
 
-- UI -> Prisma or Better Auth internals
-- Core -> services, transport, framework, or provider logic
-- route wiring files -> direct business logic or persistence access
+- UI must not import Prisma, Better Auth internals, or backend service/orchestration/core internals directly.
+- route wiring files must not own business logic or persistence access.
+- core logic must not depend on transport, framework, or provider details.
 
-## Current Transport Posture
+Use the front-end and back-end architecture notes for detailed layer-specific rules.
 
-Active HTTP routes:
+## How To Use This Index
 
-- `GET /api/characters`
-- `POST /api/auth/register`
-- `GET /api/auth/[...all]` returning intentional `501`
-- `POST /api/auth/[...all]` returning intentional `501`
-
-Current server-function posture:
-
-- scaffolding exists
-- no active server-function operation in repo state
-
-Current CLI posture:
-
-- no active CLI command is part of the current baseline
-- deferred catalog/import CLI scope is not considered active application runtime
-
-## Shell and Reset Notes
-
-The app shell may intentionally preserve non-functional or stubbed routes/components where later reimplementation is planned.
-
-That is currently acceptable for:
-
-- auth transport removed from active use and surfaced as intentional `501`
-- backend-dependent app shell behaviors replaced with shell-safe stubs where required
-
-This document therefore describes the current active baseline, not the final long-term product state.
+- Start here when you need the big-picture map of the app.
+- Use `docs/architecture/front-end-architecture.md` for App Router rendering, shell, client-island, and UI-boundary decisions.
+- Use `docs/architecture/back-end-architecture.md` for backend layer responsibilities, entrypoints, middleware, orchestration, and services.
+- Use `docs/architecture/global-state-management.md` for client-state ownership and persistence rules.
+- Use `docs/architecture/internationalization.md` and `docs/architecture/design-system-decision-record.md` for shared front-end foundations.
+- Use `docs/architecture/api-error-contract.md` and `docs/architecture/data-sources.md` for cross-runtime safety contracts.
 
 ## Related Docs
 
+- `docs/architecture/front-end-architecture.md`
 - `docs/architecture/back-end-architecture.md`
+- `docs/architecture/global-state-management.md`
+- `docs/architecture/internationalization.md`
+- `docs/architecture/design-system-decision-record.md`
 - `docs/architecture/api-error-contract.md`
+- `docs/architecture/data-sources.md`
 - `docs/architecture/rearchitecture-proposal.md`

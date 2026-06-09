@@ -4,11 +4,12 @@
 
 - Status: `rolled back`
 - Created At: `2026-04-02`
-- Last Updated: `2026-06-08`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Updated this rolled-back architecture note to use the active backend boundary vocabulary for any future reimplementation work. Made with OpenCode.
 - `2026-06-08` - `Antony Acosta` - Marked the active rules-catalog provider architecture as rolled back after runtime Rules Catalog implementation code was removed from the repo as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Recorded v1 fingerprint-scoped reader cache policy. (Made with OpenCode)
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
@@ -16,7 +17,7 @@
 
 ## Purpose
 
-This document defines the runtime contract for reading rules content and the implementation strategy for swapping data-access engines without changing application/domain logic.
+This document defines the runtime contract for reading rules content and the implementation strategy for swapping data-access engines without changing orchestration/core behavior.
 
 It is intentionally explicit because this contract is the boundary between:
 
@@ -28,8 +29,8 @@ It is intentionally explicit because this contract is the boundary between:
 Use a single abstraction named `RulesCatalog`.
 
 - No additional facade layer for the same concern.
-- Dependency injection is used only to bind implementation at composition time.
-- Domain/application code depends on `RulesCatalog` only.
+- Explicit wiring is used only to bind implementation at service-construction time.
+- Orchestration and related backend runtime code depend on `RulesCatalog` only.
 
 This avoids abstraction duplication (`RulesFacade` + `RulesCatalogProvider`) while preserving swapability.
 
@@ -183,9 +184,9 @@ Use when:
 - parity with derived provider is proven
 - operational profile is acceptable under production-like load
 
-## Dependency Injection and Composition
+## Service Wiring and Construction
 
-DI is intentionally lightweight and localized to composition root.
+Implementation wiring should stay lightweight and localized to the rules-catalog service boundary.
 
 Recommended wiring shape:
 
@@ -220,10 +221,10 @@ export function createDerivedRulesCatalog(deps: DerivedDeps): RulesCatalog {
 
 Rules:
 
-- application services receive `RulesCatalog` via constructor/function injection
-- route handlers/server actions consume pre-wired services
+- orchestrators or service-owned helpers receive `RulesCatalog` through explicit function parameters or local service wiring
+- route handlers and entrypoints consume pre-wired backend behavior, not provider construction logic
 - no dynamic import branching in random call sites
-- per-namespace reader construction belongs in provider factory code, not in application services
+- per-namespace reader construction belongs in provider factory code, not in entrypoints or orchestration modules
 
 ## Caching and Performance Expectations
 
@@ -301,7 +302,12 @@ This document does not define:
 - `docs/architecture/parsing-pipeline.md`
 - `docs/architecture/catalog-lineage-and-import-runs.md`
 
-## Reference Implementation Drafts
+## Future Implementation Targets
 
-- `src/server/ports/rules-catalog.ts`
-- `src/server/composition/rules-catalog-factory.ts`
+No active implementation files exist in the current rolled-back baseline.
+
+When this slice returns, keep the contract and provider wiring behind active backend-owned boundaries such as:
+
+- `src/server/services/**` for provider construction and infrastructure access
+- `src/server/orchestration/**` for operation-level consumption
+- `src/server/entrypoint/**` for caller-facing transport use
