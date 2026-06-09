@@ -2,14 +2,15 @@
 
 ## Metadata
 
-- Status: `completed`
+- Status: `rolled back`
 - Created At: `2026-04-04`
-- Last Updated: `2026-05-19`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 - Template Version: `v1 (legacy)`
 
 ## Changelog
 
+- `2026-06-08` - `Antony Acosta` - Marked the rules-catalog implementation plan as rolled back after the active catalog runtime and publish/read implementation were removed from the repo as per the rearchitecture proposal. Made with OpenCode.
 - `2026-05-19` - `Antony Acosta` - Added explicit template-version metadata (`v1 (legacy)`) so template lineage remains machine-readable after v2 promotion. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked implementation plan completed after merge, closed Definition of Done items, and recorded implementation evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created implementation plan for foundation publish/read-model delivery.

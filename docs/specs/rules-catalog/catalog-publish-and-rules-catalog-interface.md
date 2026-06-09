@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `approved`
+- Status: `rolled back`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-08` - `Antony Acosta` - Marked the rules-catalog publish/read spec as rolled back after active rules-catalog runtime code was removed from the repo as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Marked the foundation rules-catalog publish/read spec as approved after merged implementation and verification evidence. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Created the foundation spec for catalog publish and `RulesCatalog` reader wiring.
 - `2026-04-04` - `Antony Acosta` - Resolved blocking and non-blocking publish/read-model decisions for v1 implementation scope. Made with OpenCode.

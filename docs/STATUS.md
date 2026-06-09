@@ -6,6 +6,7 @@ Status values:
 
 - `completed`: MVP scope for the phase is implemented and wired
 - `in-progress`: active implementation exists, but MVP is not complete yet
+- `rolled-back`: previously implemented scope was intentionally removed from the active repo and is planned for later reimplementation
 - `planned`: documented intent exists, implementation not started yet
 - `blocked`: phase cannot proceed due to an external or sequencing blocker
 - `unknown`: not enough evidence to classify confidently
@@ -18,23 +19,23 @@ Checklist markers:
 
 ## Snapshot
 
-- Last verified: 2026-04-05
-- Evidence method: docs + code audit + API/browser smoke test (high-confidence only)
+- Last verified: 2026-06-08
+- Evidence method: docs + code audit + rollback verification pass as per the rearchitecture proposal
 
 ## Phase Checklist
 
 ### Phase 0 - Foundation
 
-- Status: `completed`
-- Confidence: `high`
+- Status: `in-progress`
+- Confidence: `medium`
 - Checklist
   - [x] Product and architecture direction documented
   - [x] Feature/spec workflow and templates in place
-  - [x] Rules import and catalog publish foundation wired
+  - [ ] Rules import and catalog publish foundation wired (rolled back from active repo as per the rearchitecture proposal)
   - [x] i18n foundation wired for `en` and `es`
   - [x] Arcane Codex design-system foundation reference slice implemented (tokens, primitives, domain/pattern components, split workbench/codex routes)
   - [x] Global state management foundation (architecture/spec + store, persistence, provider wiring, and tests)
-  - [x] Operations health command wired (`ops-catalog-health`)
+  - [ ] Operations health command wired (`ops-catalog-health`) (rolled back from active repo as per the rearchitecture proposal)
 - Evidence
   - `docs/architecture/feature-workflow.md`
   - `docs/specs/foundation/implementation-plan.md`
@@ -57,46 +58,31 @@ Checklist markers:
   - `src/client/state/__tests__/draft-store.test.ts`
   - `src/client/state/__tests__/draft-store.storage.test.ts`
   - `src/app/draft-store-demo.tsx`
-  - `src/server/import/run-import-pipeline.ts`
-  - `src/server/cli/data-import.ts`
-  - `src/server/adapters/rules-catalog/derived-rules-catalog.ts`
   - `src/i18n/index.ts`
   - `package.json`
-  - `src/server/cli/ops-catalog-health.ts`
+  - `docs/architecture/rearchitecture-proposal.md`
 
 ### Phase 1 - Authentication And Identity
 
-- Status: `completed`
+- Status: `rolled-back`
 - Confidence: `high`
 - Checklist
-  - [x] Authentication entry and session lifecycle flow (sign-in implemented; registration now auto-signs users into an authenticated session)
-- [x] Self-service registration entry flow (`username`, `password`, required `email`) with client-side password confirmation
-  - [x] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
-  - [x] Ownership scoping for user-linked records (Phase 1 owner-list/read path implemented)
-  - [x] Application-layer authz checks at operation boundaries (Phase 1 character list path implemented)
+  - [ ] Authentication entry and session lifecycle flow
+  - [ ] Self-service registration entry flow (`username`, `password`, required `email`) with client-side password confirmation
+  - [ ] App/API access behavior for unauthenticated users (Phase 1 `/characters` scope)
+  - [ ] Ownership scoping for user-linked records
+  - [ ] Application-layer authz checks at operation boundaries
 - Evidence
   - `docs/features/authentication-and-identity-foundation.md`
   - `docs/ROADMAP.md`
   - `docs/specs/authentication/foundation.md`
   - `docs/specs/authentication/implementation-plan.md`
-  - `src/auth.ts`
-  - `src/app/api/auth/[...all]/route.ts`
-  - `src/app/api/auth/register/route.ts`
-  - `src/app/api/auth/register/__tests__/route.test.ts`
   - `src/app/sign-in/page.tsx`
   - `src/app/sign-in/sign-in-form.tsx`
   - `src/app/sign-up/page.tsx`
   - `src/app/sign-up/sign-up-form.tsx`
-  - `src/app/characters/page.tsx`
-  - `src/app/api/characters/route.ts`
-  - `src/app/api/characters/__tests__/route.test.ts`
-  - `src/server/application/use-cases/list-owner-characters.ts`
-  - `src/server/application/use-cases/__tests__/list-owner-characters.authz.test.ts`
-  - `src/server/ports/character-repository.ts`
-  - `src/server/adapters/prisma/character-repository.ts`
-  - `src/server/adapters/auth/auth-session-context.ts`
-  - `GET /api/characters` smoke checks: `401` while signed out, `200` after sign-up session
-  - Playwright smoke: sign-up (`/sign-up`) redirects to `/characters` with authenticated empty state
+  - `src/app/(core)/characters/page.tsx`
+  - `docs/architecture/rearchitecture-proposal.md`
 
 ### Phase 2 - Character Core
 
@@ -109,10 +95,7 @@ Checklist markers:
   - [ ] Mechanical template duplication flow
 - Evidence
   - `docs/ROADMAP.md`
-  - `src/app/api/characters/route.ts` (GET handler only; no creation endpoint)
-  - `src/server/ports/character-repository.ts` (owner-list contract only)
-  - `src/server/adapters/prisma/character-repository.ts` (owner-list adapter only)
-  - `prisma/schema.prisma` (Character model has only `id`, `name`, owner linkage, timestamps)
+  - `src/app/(core)/characters/page.tsx` (shell-only stub; backend-dependent character flows rolled back)
 
 ### Phase 3 - Global Settings
 

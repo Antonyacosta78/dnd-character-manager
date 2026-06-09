@@ -4,242 +4,181 @@
 
 - Status: `accepted`
 - Created At: `2026-04-21`
-- Last Updated: `2026-04-21`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
-- `2026-04-21` - `Antony Acosta` - Created a standalone backend architecture note by extracting backend-relevant boundaries and decisions from app architecture and aligning references to existing backend foundation docs. (Made with OpenCode)
+- `2026-06-09` - `Antony Acosta` - Removed migration-step references so this canonical backend document describes only the current active backend baseline. Made with OpenCode.
+- `2026-06-08` - `Antony Acosta` - Rewrote the canonical backend architecture doc to match the active backend baseline and keep migration-history/process details out of the architecture body. Made with OpenCode.
+- `2026-04-21` - `Antony Acosta` - Created a standalone backend architecture note by extracting backend-relevant boundaries and decisions from app architecture and aligning references to existing backend foundation docs. Made with OpenCode.
 
 ## Purpose
 
-This document defines the backend architecture for the current modular monolith. It extracts and focuses the backend-relevant runtime boundaries from `docs/architecture/app-architecture.md` so backend decisions are discoverable without frontend detail.
+This document defines the current active backend architecture in the repository.
 
-It exists to prevent backend drift in layering, transport choices, persistence boundaries, and operational behavior as catalog and gameplay features expand.
+It is the canonical backend boundary reference for implementation work. It intentionally describes the current active backend baseline only.
 
-## Current Plan
+## Active Backend Baseline
 
-### Backend stance in the modular monolith
+The active backend uses a layered execution path:
 
-The backend runs inside the Next.js App Router modular monolith and is intentionally optimized for delivery speed and domain consistency.
+- framework route wiring in `src/app/api/**`
+- entrypoints in `src/server/entrypoint/**`
+- orchestration in `src/server/orchestration/**`
+- core business logic in `src/server/core/**`
+- middleware in `src/server/middleware/**`
+- infrastructure-facing services in `src/server/services/**`
 
-- Near-term risk is feature delivery drag, not service-scaling limits.
-- Core gameplay invariants benefit from in-process consistency.
-- Migration optionality is preserved through strict ports and composition seams.
+Legacy modular-monolith layers such as `application`, `ports`, `adapters`, and `composition` are not part of the active runtime baseline for the migrated backend surfaces described below.
 
-The architecture is event-ready, not fully event-sourced. Seams for event-based evolution are preserved without adopting full event-sourcing operational overhead in v1.
+## Active Entrypoints
 
-### Layered backend model
+Current active backend entrypoints are:
 
-#### 1) Application layer
+- `GET /api/characters`
+- `POST /api/auth/register`
+- `GET /api/auth/[...all]` returning intentional `501 Not Implemented`
+- `POST /api/auth/[...all]` returning intentional `501 Not Implemented`
 
-Path:
+No active CLI command is part of the current backend baseline.
 
-- `src/server/application/**/*`
+Server-function scaffolding exists, but there is no active server-function operation in the current repo state.
 
-Responsibilities:
+## Boundary Rules
 
-- implement use-cases and cross-module workflows
-- orchestrate repositories, rules catalog reads, and transaction boundaries
-- enforce authn/authz at operation boundaries
-- return deterministic typed results to transport consumers
-
-Rules:
-
-- may coordinate multiple domain modules
-- must not encode raw external format logic
-
-#### 2) Domain layer
+### Framework Wiring
 
 Path:
 
-- `src/server/domain/**/*`
-
-Responsibilities:
-
-- own entities, value objects, and invariant-preserving behavior
-- keep core logic pure where practical for high test density
+- `src/app/api/**/route.ts`
 
 Rules:
 
-- no framework dependencies
-- no ORM model dependencies
-- no network/filesystem concerns
+- route files are framework wiring only
+- route files re-export handlers from `src/server/entrypoint/api/**`
+- route files must not contain business logic, persistence access, or provider logic
 
-#### 3) Ports layer
+### Entrypoint Layer
 
 Path:
 
-- `src/server/ports/**/*`
+- `src/server/entrypoint/**`
 
 Responsibilities:
 
-- define stable capability contracts for repositories, rules catalog access, and auth/session context
+- own transport-boundary request/response handling
+- apply middleware for authentication, authorization, and schema validation
+- invoke one orchestrator per externally invocable operation
+- map typed internal errors into caller-safe transport failures
 
 Rules:
 
-- ports describe semantics, not implementation details
-- application/domain use ports as the only infrastructure dependency boundary
-- rules catalog contract stays namespaced and grows additively (`rulesCatalog.classes.get`, `rulesCatalog.feats.list`)
+- one externally invocable operation maps to one entrypoint path
+- entrypoints do not implement business rules
+- entrypoints do not access Prisma or Better Auth internals directly
 
-#### 4) Adapters layer
+### Orchestration Layer
 
 Path:
 
-- `src/server/adapters/**/*`
+- `src/server/orchestration/**`
 
 Responsibilities:
 
-- implement ports with concrete infrastructure (`Prisma` repositories, Better Auth adapter, `DerivedRulesCatalog`, future `RawRulesCatalog`)
+- coordinate one backend operation at a time
+- call services for data/session/provider access
+- invoke related core functions
+- return `OperationResult<T>` on success
+- throw typed orchestration errors on operation failure
 
 Rules:
 
-- adapters may optimize internals
-- adapters must not leak infrastructure-specific types beyond port contracts
+- orchestration owns operation-level failure meaning such as conflict or not-found
+- orchestration must not perform transport shaping
 
-#### 5) Composition layer
+### Core Layer
 
 Path:
 
-- `src/server/composition/**/*`
+- `src/server/core/**`
 
 Responsibilities:
 
-- wire concrete adapters to ports
-- select implementations through configuration
-- construct application services with resolved dependencies
+- hold pure, deterministic business logic
+- normalize explicit input into explicit output
+- preserve domain/business meaning independent of transport or infrastructure
 
 Rules:
 
-- use lightweight DI (factory/composition functions)
-- avoid hidden service-locator patterns
+- no Prisma access
+- no Better Auth access
+- no Next.js or transport dependencies
 
-### Persistence strategy and storage boundary
+### Middleware
 
-Persistence is Prisma plus repository adapters.
+Paths:
 
-Design intent:
+- `src/server/middleware/api/**`
+- `src/server/middleware/server-function/**`
+- `src/server/middleware/shared/**`
 
-- SQLite-first for v1 convenience
-- preserve uncomplicated migration path to Postgres
-- keep domain/application logic storage-agnostic
+Responsibilities:
 
-Boundary rules:
+- enforce one focused transport-level concern before orchestration
+- stop execution early through typed middleware errors when needed
 
-- domain/application do not import Prisma client/model types directly
-- SQL/storage optimizations stay adapter-side
-- runtime use-cases consume repositories and catalog ports only
+Rules:
 
-Rules-catalog storage/read-model constraints that affect backend behavior:
+- middleware is entrypoint-only
+- middleware may use services but must not invoke orchestration or core
+- no CLI middleware in the current baseline
 
-- runtime reads do not parse external source files in request paths
-- publish and activation follow guarded two-phase behavior
-- runtime readers are active-version scoped and deterministic for a fixed fingerprint
-- integrity mismatch behavior follows `DATA_INTEGRITY_MODE` (`strict`, `warn`, `off`)
+### Services
 
-### Authn/authz policy location and shape
+Paths:
 
-Authentication and authorization are backend-first concerns from v1.
+- `src/server/services/db/**`
+- `src/server/services/session/**`
 
-- provider: Better Auth with Prisma adapter
-- ownership model: user-owned records via `ownerUserId` semantics
-- enforcement location: application-layer use-cases
-- v1 policy shape: owner-based access by default, optional admin capability for diagnostics/operations
+Responsibilities:
 
-Client-side checks are never the access-control boundary.
+- expose typed infrastructure-facing capabilities
+- keep Prisma access centralized inside DB service
+- keep Better Auth/provider-specific logic isolated inside Session service
 
-### Transport model and backend interface posture
+Rules:
 
-Default backend transport posture:
+- services are used by orchestration and, when required, middleware
+- services are not business-rule owners
+- transaction clients stay internal to DB service
 
-- Server Actions for app-internal server operations where appropriate
-- Route Handlers for explicit HTTP boundaries and forward compatibility
+## Transport Notes
 
-Posture decisions:
+### REST
 
-- GraphQL is intentionally excluded in v1 due to overhead without current multi-client payoff
-- tRPC remains optional, not default, and only if ergonomics become materially better
+- `src/server/entrypoint/api/rest-contract.ts` defines the shared HTTP envelope helpers and transport-safe error mapping inputs
+- active REST failures are sanitized before leaving the entrypoint boundary
 
-Transport/error consistency follows `docs/architecture/api-error-contract.md` for envelope and taxonomy behavior.
+### Auth Catch-All
 
-### Dependency direction and prohibited dependencies
+The Better Auth catch-all route is intentionally unavailable in the current baseline.
 
-Allowed direction:
+- `GET /api/auth/[...all]` -> `501`
+- `POST /api/auth/[...all]` -> `501`
 
-- UI -> Application
-- Application -> Domain + Ports
-- Adapters -> Ports
-- Composition -> Application + Adapters + Ports
+This is a deliberate cutover/reset decision, not an accidental partial migration state.
 
-Backend-specific prohibited examples:
+## Deferred Scope
 
-- Domain -> Prisma, Better Auth, Next.js, filesystem/network adapters
-- Application -> direct `external/` file access
-- Route handlers/server actions -> direct adapter internals bypassing application services
-- UI -> Prisma adapter
+Catalog/import runtime code and removed backend-dependent feature implementations are outside this document's active backend baseline.
 
-### Operational concerns
-
-#### Observability
-
-At minimum, backend instrumentation should include:
-
-- use-case latency and failure rate
-- integrity mismatch events
-- active provider identity and dataset fingerprint at startup
-
-#### Reliability
-
-- prefer deterministic behavior over silent permissive fallback
-- fail closed on integrity violations in strict environments
-- keep transaction boundaries explicit in application services
-- never partially activate a catalog version
-
-#### Test strategy
-
-- domain tests for invariant logic
-- application tests for orchestration and policy enforcement
-- adapter contract tests for persistence/provider behavior
-- parity tests for catalog providers where both exist
-- end-to-end tests for critical flows (branching, snapshot freeze, generation prerequisites)
-
-### Backend evolution path
-
-Expected sequence:
-
-1. keep modular-monolith boundaries strict
-2. expand provider parity tests (`DerivedRulesCatalog` and `RawRulesCatalog`)
-3. run shadow-read comparisons for raw provider
-4. consider provider-default changes only after parity and stability criteria are met
-
-This keeps future extraction or provider migration feasible without introducing distributed complexity now.
-
-## Boundaries
-
-This note governs:
-
-- backend runtime layering and dependency direction
-- backend transport posture and auth enforcement location
-- persistence/repository boundary rules and storage-agnostic intent
-- backend operational expectations shared across features
-
-This note does not govern:
-
-- frontend UI architecture or presentation-level concerns
-- parser implementation details already defined in parsing-specific architecture/spec docs
-- feature-specific endpoint payload design
-
-## Notes
-
-- Treat this document as the backend-focused companion to `docs/architecture/app-architecture.md`, not a replacement.
-- Keep cross-document decisions aligned with catalog lineage, storage/read-model, provider contract, and API error contract docs.
+- catalog/import runtime code is not part of the active backend baseline described here
+- removed backend-dependent feature implementations are not part of the active backend baseline described here
+- this document does not mark the overall rearchitecture as complete
 
 ## Related Docs
 
 - `docs/architecture/app-architecture.md`
 - `docs/architecture/api-error-contract.md`
-- `docs/architecture/data-sources.md`
-- `docs/architecture/parsing-pipeline.md`
-- `docs/architecture/rules-catalog-provider.md`
-- `docs/architecture/catalog-lineage-and-import-runs.md`
-- `docs/architecture/catalog-storage-and-read-model.md`
+- `docs/architecture/rearchitecture-proposal.md`

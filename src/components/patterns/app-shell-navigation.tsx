@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 import { AppIcon } from "@/components/domain/rune-icon";
@@ -10,7 +10,6 @@ import {
   type GlobalSettingsModalLabels,
 } from "@/components/settings/global-settings-modal";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 
 type DesktopSubmenuKey = "characters" | "adventures";
@@ -530,9 +529,7 @@ function MobileSubNavItem({ subItem, active }: { subItem: NavSubItem; active: bo
 }
 
 function AccountMenu({ labels }: { labels: AppShellNavigationLabels }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -582,17 +579,9 @@ function AccountMenu({ labels }: { labels: AppShellNavigationLabels }) {
             intent="ghost"
             role="menuitem"
             className="w-full justify-start"
-            disabled={pending}
-            onClick={async () => {
-              setPending(true);
-
-              await authClient.signOut();
-
-              router.push("/sign-in");
-              router.refresh();
-            }}
+            disabled
           >
-            {pending ? labels.signOutPending : labels.signOut}
+            {labels.signOut}
           </Button>
         </div>
       ) : null}

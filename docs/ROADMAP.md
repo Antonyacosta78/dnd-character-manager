@@ -28,9 +28,11 @@ The product should feel strongest at three things:
 
 ## Implementation Snapshot
 
-Last verified: 2026-04-05 (full-project evidence pass + auth/characters smoke test)
+Last verified: 2026-06-08 (rollback reset evidence pass)
 
 Detailed evidence and checklist: `docs/STATUS.md`
+
+Current implementation note: backend-dependent auth, character-list, rules-catalog/import, and related operational command features were intentionally rolled back from the active repo as per the rearchitecture proposal. The phase descriptions below remain planning targets for future reimplementation and should not be read as currently delivered functionality.
 
 - Phase 0 - Foundation
 - Phase 1 - Authentication And Identity
@@ -110,7 +112,7 @@ Goal: make user identity and ownership first-class before character records beco
 - provide a minimal authentication entry flow that can be expanded later without data model churn
 - keep auth focused on single-user ownership and safety, not social or collaboration features
 
-This phase should end with app behavior that treats identity as real from day one, while keeping the first UI slice intentionally lean.
+This phase is currently rolled back in the active repo baseline as per the rearchitecture proposal and remains a future reimplementation target.
 
 ## Phase 2 - Character Core
 

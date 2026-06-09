@@ -2,13 +2,14 @@
 
 ## Metadata
 
-- Status: `in-progress`
+- Status: `rolled back`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-06`
+- Last Updated: `2026-06-08`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-08` - `Antony Acosta` - Marked the authentication and identity feature as rolled back after backend auth transport, provider wiring, and protected backend flows were removed from the active repo as per the rearchitecture proposal. Made with OpenCode.
 - `2026-04-06` - `Antony Acosta` - Updated MVP registration contract to require email at sign-up so Better Auth account creation remains deterministic and avoids undefined-email provider failures.
 - `2026-04-05` - `Antony Acosta` - Added Phase 1 UX and flow requirements for client-side password confirmation on registration and immediate post-registration session establishment (auto sign-in) so onboarding reaches protected routes without a second auth step.
 - `2026-04-05` - `Antony Acosta` - Expanded Phase 1 scope to include MVP self-service registration (`username`, `password`, optional `email`) so sign-in is paired with account creation in the same auth foundation slice.
@@ -18,6 +19,8 @@
 - `2026-04-04` - `Antony Acosta` - Created the authentication and identity foundation rundown so roadmap execution can start with clear MVP boundaries and user ownership guardrails. (Made with OpenCode)
 
 ## Summary
+
+Rollback note: this feature is intentionally removed from the active repo baseline and is planned for later reimplementation under the new architecture.
 
 Make identity real before character data grows: every character and future progression artifact should have a clear owner, and the app should behave predictably when no user session exists.
 
