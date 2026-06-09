@@ -61,3 +61,6 @@ temp/
 # local sqlite db
 /prisma/prisma/local.db
 /prisma/prisma/local.db-*
+
+# local rearchitecture working plans
+/docs/architecture/rearchitecture-proposal-plan/
