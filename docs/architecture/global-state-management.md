@@ -4,11 +4,12 @@
 
 - Status: `accepted`
 - Created At: `2026-04-04`
-- Last Updated: `2026-04-05`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Updated planned server-persistence guidance to match the active backend entrypoint/orchestration/services architecture instead of the retired application/ports/adapters model. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Updated v1 conflict policy baseline: user-authored canonical draft conflicts now require explicit resolution choice with machine-readable conflict details, while timestamp LWW is limited to low-stakes non-canonical state.
 - `2026-04-05` - `Antony Acosta` - Updated state ownership vocabulary from game to adventure for planned play-instance terminology consistency. (Made with OpenCode)
 - `2026-04-04` - `OpenCode` - Created initial architecture skeleton for global state ownership, persistence, and rollout.
@@ -99,8 +100,9 @@ Phase 1 (required): local persistence
 
 Phase 2 (planned): server draft persistence
 
-- Add draft save/load use-cases in application layer.
-- Add draft repository port + adapter for persistence.
+- Add draft save/load backend entrypoints under `src/server/entrypoint/**`.
+- Add one orchestrator per draft operation under `src/server/orchestration/**`.
+- Add service-owned persistence capabilities under `src/server/services/**`.
 - Sync policy: optimistic local-first updates with action-based save triggers.
 - Initial action triggers: input blur and explicit submit/save interactions.
 
@@ -128,7 +130,7 @@ Conflict policy (v1 baseline)
 - No domain rule evaluation inside client store actions.
 - No persistence of secrets or auth/session tokens in draft storage.
 - No global singleton initialized in server component module scope.
-- No direct adapter calls from UI components; all persistence goes through application boundary.
+- No direct server service or orchestrator imports from UI components; all persistence goes through backend entrypoint transport.
 
 ### Documentation and Governance Sequence
 
