@@ -27,6 +27,7 @@ opencode:
 - Do not persist auth secrets, tokens, or session credentials in local persistence.
 - Do not call server adapters directly from UI/store code; use route handlers or server actions through application boundaries.
 - Do not initialize global mutable stores in server component module scope.
+- Do not couple styling-heavy leaf UI components directly to global-store orchestration when wrapper, pattern, or page-composition components can pass data, status, and callbacks via props instead.
 
 ## Mutation and Read Discipline
 

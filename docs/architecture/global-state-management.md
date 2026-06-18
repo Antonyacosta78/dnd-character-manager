@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Added a UI-boundary guardrail: global-store coordination belongs in wrapper, pattern, or page-composition components, while styling-heavy leaf UI should stay prop-driven and presentational. Made with OpenCode.
 - `2026-06-09` - `Antony Acosta` - Updated planned server-persistence guidance to match the active backend entrypoint/orchestration/services architecture instead of the retired application/ports/adapters model. Made with OpenCode.
 - `2026-04-05` - `Antony Acosta` - Updated v1 conflict policy baseline: user-authored canonical draft conflicts now require explicit resolution choice with machine-readable conflict details, while timestamp LWW is limited to low-stakes non-canonical state.
 - `2026-04-05` - `Antony Acosta` - Updated state ownership vocabulary from game to adventure for planned play-instance terminology consistency. (Made with OpenCode)
@@ -131,6 +132,7 @@ Conflict policy (v1 baseline)
 - No persistence of secrets or auth/session tokens in draft storage.
 - No global singleton initialized in server component module scope.
 - No direct server service or orchestrator imports from UI components; all persistence goes through backend entrypoint transport.
+- Global-store coordination should live in wrapper, pattern, or page-composition components; styling-heavy leaf UI should receive data, status, and callbacks via props instead of owning store orchestration directly.
 
 ### Documentation and Governance Sequence
 

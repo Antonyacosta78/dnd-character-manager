@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Added an application-level front-end ownership note: backend/global-state coordination belongs in composition-oriented wrapper layers, while styling-heavy leaf UI stays presentational. Made with OpenCode.
 - `2026-06-09` - `Antony Acosta` - Refactored this document into a high-level architecture index. Kept current-baseline overview guidance, removed duplicated front-end and back-end detail, and added canonical references for subsystem-specific rules. Made with OpenCode.
 - `2026-06-09` - `Antony Acosta` - Removed migration-step references so this canonical app-structure document describes only the current active baseline. Made with OpenCode.
 - `2026-06-08` - `Antony Acosta` - Rewrote backend-facing sections to align app structure with the active backend baseline and keep migration-history/process details out of the architecture body. Made with OpenCode.
@@ -68,6 +69,7 @@ Current role:
 - gather user intent
 - handle browser-only interaction state where required
 - call backend behavior only through approved entrypoints or explicit shell-safe stubs
+- keep backend/global-state orchestration in wrapper, pattern, or route-composition layers instead of mixing it into styling-heavy leaf UI components
 
 Canonical reference:
 

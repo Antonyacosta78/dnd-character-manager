@@ -9,6 +9,7 @@
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Added a component-responsibility boundary for front-end work: components that coordinate backend operations or global client state should compose other UI components for styling and display instead of mixing those concerns in one leaf component. Made with OpenCode.
 - `2026-06-09` - `Antony Acosta` - Documented the current App Router shell shape, server/client rendering split, state ownership surfaces, and i18n/design-system integration based on the active repo implementation. Added references to deeper architecture notes to avoid duplication. Made with OpenCode.
 - `2026-06-09` - `Antony Acosta` - Rewrote the front-end architecture note to align with the active backend baseline and remove references to the retired application/ports/adapters/composition model. Made with OpenCode.
 - `2026-04-21` - `Antony Acosta` - Extracted and refactored front-end-relevant architecture boundaries from `app-architecture.md` into a standalone front-end reference.
@@ -53,6 +54,13 @@ Explicitly out of scope for UI code:
 - Direct Prisma access.
 - Direct imports from `src/server/services/**`, `src/server/orchestration/**`, or `src/server/core/**`.
 - Direct reads from `external/` data.
+
+### Component responsibility split
+
+- Visual and presentational components should own styling, semantic markup, and UI-local interaction state only.
+- When a front-end component coordinates backend operations or global client state, it should do so as a wrapper/composition component that renders other UI components for the actual visual surface.
+- Reusable styling-heavy layers such as `src/components/ui/**` and presentational `src/components/domain/**` should remain backend-agnostic and should not directly own global-store coordination.
+- Prefer passing resolved copy, data, status, and callbacks into visual components over embedding backend calls and global-state orchestration inside styled leaf components.
 
 ## Current Front-End Runtime Shape
 
