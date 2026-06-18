@@ -13,6 +13,8 @@ cursor:
 
 - Use server components by default and add client components only when interactivity requires them.
 - Keep route structure in `src/app/` clear and colocate route-specific UI nearby.
+- Keep styling-heavy UI components presentational and prop-driven where practical.
+- If a feature needs backend operations or global client-state coordination, place that work in a wrapper, pattern, or route-composition component and render other UI components for the visual surface.
 - Prefer design choices that feel intentional instead of shipping generic starter layouts.
 - Use CSS variables or Tailwind tokens when introducing new visual themes.
 - Check mobile and desktop behavior for page-level UI changes.

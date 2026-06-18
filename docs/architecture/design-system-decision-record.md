@@ -4,11 +4,12 @@
 
 - Status: `accepted`
 - Created At: `2026-04-03`
-- Last Updated: `2026-04-04`
+- Last Updated: `2026-06-09`
 - Owner: `Antony Acosta`
 
 ## Changelog
 
+- `2026-06-09` - `Antony Acosta` - Added a component-governance rule that separates visual recipe ownership from backend/global-state orchestration so styling-heavy UI components stay presentational and prop-driven. Made with OpenCode.
 - `2026-04-04` - `Antony Acosta` - Backfilled metadata and changelog sections for lifecycle tracking. (Made with OpenCode)
 - `2026-04-03` - `Antony Acosta` - Initial document created.
 
@@ -310,6 +311,12 @@ Required domain components in v1:
 - `ValidationCallout`
 
 Rule: do not represent domain states using generic `Card` + random utility classes when a domain component exists.
+
+### Presentation and orchestration split
+
+- Primitive and domain components are presentation-first. They may own UI-local interaction state required for accessibility and direct interaction, but they should not directly own backend transport or global client-state orchestration.
+- If a feature needs backend operations or global client-state coordination, place that work in a wrapper, pattern, or page-composition component and render presentational child components for the UI surface.
+- Keep styling-heavy leaf components prop-driven where practical. Prefer passing data, status, and callbacks into them instead of mixing visual recipe ownership with transport or store coordination.
 
 ### State completeness policy
 
